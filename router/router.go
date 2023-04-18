@@ -9,6 +9,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Config struct {
@@ -25,7 +27,7 @@ func New(controllers []controllers.Controller, authn []authn.Provider) (http.Han
 	{
 		mapControllers(controllers, g)
 	}
-
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	return engine, nil
 }
 

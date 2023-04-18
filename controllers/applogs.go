@@ -34,6 +34,20 @@ func (c *appLogs) Endpoints() []Endpoint {
 	}
 }
 
+// GetComponentLog godoc
+// @Summary Get log for a component
+// @Tags GetComponentLog
+// @Produce plain
+// @Success 200 {string} ALogRecord
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Failure 404
+// @Failure 500
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param componentName path string true "Component Name"
+// @Router /applications/{appName}/environments/{envName}/components/{componentName} [get]
 func (c *appLogs) GetComponentLog(ctx *gin.Context) {
 	var params appURIParams
 	if err := ctx.BindUri(&params); err != nil {
