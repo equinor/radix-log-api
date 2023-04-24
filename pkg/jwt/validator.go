@@ -10,7 +10,7 @@ import (
 )
 
 type Validator interface {
-	Validate(token string) error
+	Validate(token string) (bool, error)
 }
 
 type jwtValidator struct {
@@ -28,7 +28,7 @@ func NewValidator(issuerUrl string, audience string) (Validator, error) {
 	return &jwtValidator{cacheProvider: provider, issuerURL: issuerUrl, audience: audience}, nil
 }
 
-func (v *jwtValidator) Validate(token string) error {
+func (v *jwtValidator) Validate(token string) (bool, error) {
 	validator, err := validator.New(
 		v.cacheProvider.KeyFunc,
 		validator.RS256,
@@ -36,8 +36,8 @@ func (v *jwtValidator) Validate(token string) error {
 		[]string{v.audience},
 	)
 	if err != nil {
-		return err
+		return false, err
 	}
 	_, err = validator.ValidateToken(context.TODO(), token)
-	return err
+	return err == nil, nil
 }

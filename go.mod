@@ -7,6 +7,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery v1.0.0
 	github.com/auth0/go-jwt-middleware/v2 v2.1.0
+	github.com/equinor/radix-common v1.2.10
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.0

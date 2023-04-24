@@ -9,24 +9,37 @@ import (
 
 	"github.com/Azure/azure-kusto-go/kusto"
 	"github.com/Azure/azure-kusto-go/kusto/data/types"
+	"github.com/Azure/azure-kusto-go/kusto/unsafe"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/equinor/radix-common/utils/pointers"
 )
 
 const (
-	logQuery = `KubePodInventory
-	| where Namespace == ParamNamespace
+	paramNamespace     = "ParamNamespace"
+	paramAppName       = "ParamAppName"
+	paramComponentName = "ParamComponentName"
+)
+
+var (
+	logQuery string = fmt.Sprintf(`KubePodInventory
+	| where Namespace == %s
 	| where ContainerID != ""
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == ParamAppName and d["radix-component"] == ParamComponentName
+	| where d["radix-app"] == %s and d["radix-component"] == %s
 	| summarize ContainerCreationTimeStamp=min(ContainerCreationTimeStamp) by ContainerID, Name
 	| join kind=inner ContainerLog on $left.ContainerID==$right.ContainerID
 	| project TimeGenerated, Name, ContainerID, LogEntry
-	| sort by TimeGenerated asc`
+	| sort by TimeGenerated asc`, paramNamespace, paramAppName, paramComponentName)
+)
+
+var (
+	defaultGetLogsQueryOptions *GetLogsQueryOptions = &GetLogsQueryOptions{
+		LimitRows: pointers.Ptr(1000),
+	}
 )
 
 type GetLogsQueryOptions struct {
-	TakeRows *int32
-	Age      *time.Duration
+	LimitRows *int
 }
 
 type AppLogs interface {
@@ -39,15 +52,25 @@ type appLogs struct {
 }
 
 func (s *appLogs) GetLogs(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error) {
-	kql := kusto.NewStmt(logQuery).MustDefinitions(
-		kusto.NewDefinitions().Must(
-			kusto.ParamTypes{
-				"ParamNamespace":     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
-				"ParamAppName":       kusto.ParamType{Type: types.String, Default: appName},
-				"ParamComponentName": kusto.ParamType{Type: types.String, Default: componentName},
-			},
-		),
-	)
+	if options == nil {
+		options = defaultGetLogsQueryOptions
+	}
+
+	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{})).
+		UnsafeAdd(logQuery).
+		MustDefinitions(
+			kusto.NewDefinitions().Must(
+				kusto.ParamTypes{
+					paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+					paramAppName:       kusto.ParamType{Type: types.String, Default: appName},
+					paramComponentName: kusto.ParamType{Type: types.String, Default: componentName},
+				},
+			),
+		)
+
+	if options.LimitRows != nil {
+		kql.UnsafeAdd(fmt.Sprintf("| take %d", *options.LimitRows))
+	}
 
 	query := kql.String()
 	timspan := azquery.NewTimeInterval(time.Now().Add(-48*time.Hour), time.Now())

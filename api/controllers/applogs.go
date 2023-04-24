@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/equinor/radix-log-api/internal/uriparams"
-	"github.com/equinor/radix-log-api/services"
+	"github.com/equinor/radix-log-api/pkg/constants"
+	"github.com/equinor/radix-log-api/pkg/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,9 +28,10 @@ type appLogs struct {
 func (c *appLogs) Endpoints() []Endpoint {
 	return []Endpoint{
 		{
-			Method:  http.MethodGet,
-			Path:    "/applications/:appName/environments/:envName/components/:componentName",
-			Handler: c.GetComponentLog,
+			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName",
+			Handler:               c.GetComponentLog,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 	}
 }

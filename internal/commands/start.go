@@ -2,16 +2,21 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
-	"github.com/equinor/radix-log-api/controllers"
-	"github.com/equinor/radix-log-api/pkg/authn"
+	"github.com/equinor/radix-log-api/api/controllers"
+	apierrors "github.com/equinor/radix-log-api/api/errors"
+	"github.com/equinor/radix-log-api/api/middleware/authn"
+	"github.com/equinor/radix-log-api/api/middleware/authz"
+	"github.com/equinor/radix-log-api/api/router"
+
+	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/jwt"
-	"github.com/equinor/radix-log-api/router"
+	"github.com/equinor/radix-log-api/pkg/services"
 	"github.com/equinor/radix-log-api/server"
-	"github.com/equinor/radix-log-api/services"
 	"github.com/urfave/cli/v2"
 )
 
@@ -84,10 +89,27 @@ func initRouter(ctx *cli.Context) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	authn := []authn.Provider{
+	authn := []authn.AuthenticationProvider{
 		authn.NewJwt(jwtValidator),
 	}
-	return router.New(controllers, authn)
+	authz := buildAuthorization()
+	return router.New(controllers, authn, authz)
+}
+
+func buildAuthorization() authz.Authorizer {
+	auth := authz.NewAuthorizer(func(ab authz.AuthorizationBuilder) {
+		ab.AddPolicy(constants.AuthorizationPolicyAuthenticated, func(pb authz.PolicyBuilder) {
+			pb.RequireAuthenticatedUser()
+		})
+		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authz.PolicyBuilder) {
+			pb.RequireAuthenticatedUser()
+			pb.AddRequirement(authz.RequirementFunc(func(ctx *authz.AuthorizationContext) error {
+				fmt.Println(ctx.User().Token())
+				return apierrors.NewForbiddenError()
+			}))
+		})
+	})
+	return auth
 }
 
 func initLogsAnalyticsClient() (*azquery.LogsClient, error) {
