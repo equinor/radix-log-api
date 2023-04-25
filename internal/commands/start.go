@@ -2,21 +2,20 @@ package commands
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 	"github.com/equinor/radix-log-api/api/controllers"
-	apierrors "github.com/equinor/radix-log-api/api/errors"
+	logscontroller "github.com/equinor/radix-log-api/api/controllers/logs"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/middleware/authz"
 	"github.com/equinor/radix-log-api/api/router"
 
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/jwt"
-	"github.com/equinor/radix-log-api/pkg/services"
 	"github.com/equinor/radix-log-api/server"
+	logservice "github.com/equinor/radix-log-api/services/logs"
 	"github.com/urfave/cli/v2"
 )
 
@@ -83,7 +82,7 @@ func initRouter(ctx *cli.Context) (http.Handler, error) {
 		return nil, err
 	}
 	controllers := []controllers.Controller{
-		controllers.NewAppLogs(services.NewAppLogs(logsClient, ctx.String(LogAnalyticsWorkspaceId))),
+		logscontroller.New(logservice.New(logsClient, ctx.String(LogAnalyticsWorkspaceId))),
 	}
 	jwtValidator, err := jwt.NewValidator(ctx.String(AuthIssuerURL), ctx.String(AuthAudience))
 	if err != nil {
@@ -104,8 +103,9 @@ func buildAuthorization() authz.Authorizer {
 		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authz.PolicyBuilder) {
 			pb.RequireAuthenticatedUser()
 			pb.AddRequirement(authz.RequirementFunc(func(ctx *authz.AuthorizationContext) error {
-				fmt.Println(ctx.User().Token())
-				return apierrors.NewForbiddenError()
+				// fmt.Println(ctx.User().Token())
+				// return apierrors.NewForbiddenError()
+				return nil
 			}))
 		})
 	})

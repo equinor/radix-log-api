@@ -1,11 +1,12 @@
-package controllers
+package logs
 
 import (
 	"net/http"
 
+	"github.com/equinor/radix-log-api/api/controllers"
 	"github.com/equinor/radix-log-api/internal/uriparams"
 	"github.com/equinor/radix-log-api/pkg/constants"
-	"github.com/equinor/radix-log-api/pkg/services"
+	logservice "github.com/equinor/radix-log-api/services/logs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,18 +16,18 @@ type appURIParams struct {
 	uriparams.Component
 }
 
-func NewAppLogs(appLogsService services.AppLogs) Controller {
-	return &appLogs{
+func New(appLogsService logservice.Interface) controllers.Controller {
+	return &controller{
 		appLogsService: appLogsService,
 	}
 }
 
-type appLogs struct {
-	appLogsService services.AppLogs
+type controller struct {
+	appLogsService logservice.Interface
 }
 
-func (c *appLogs) Endpoints() []Endpoint {
-	return []Endpoint{
+func (c *controller) Endpoints() []controllers.Endpoint {
+	return []controllers.Endpoint{
 		{
 			Method:                http.MethodGet,
 			Path:                  "/applications/:appName/environments/:envName/components/:componentName",
@@ -50,7 +51,7 @@ func (c *appLogs) Endpoints() []Endpoint {
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
 // @Router /applications/{appName}/environments/{envName}/components/{componentName} [get]
-func (c *appLogs) GetComponentLog(ctx *gin.Context) {
+func (c *controller) GetComponentLog(ctx *gin.Context) {
 	var params appURIParams
 	if err := ctx.BindUri(&params); err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)

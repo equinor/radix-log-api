@@ -3,11 +3,13 @@ package authn
 import (
 	"net/http"
 	"strings"
-
-	"github.com/equinor/radix-log-api/pkg/jwt"
 )
 
-func NewJwt(validator jwt.Validator) AuthenticationProvider {
+type JwtValidator interface {
+	Validate(token string) error
+}
+
+func NewJwt(validator JwtValidator) AuthenticationProvider {
 	return &jwtProvider{validator: validator}
 }
 
@@ -19,7 +21,7 @@ func (p *jwtPrincipal) Token() string         { return p.token }
 func (p *jwtPrincipal) IsAuthenticated() bool { return true }
 
 type jwtProvider struct {
-	validator jwt.Validator
+	validator JwtValidator
 }
 
 func (a *jwtProvider) Authenticate(req *http.Request) (ClaimsPrincipal, error) {
@@ -35,12 +37,9 @@ func (a *jwtProvider) Authenticate(req *http.Request) (ClaimsPrincipal, error) {
 	if len(token) == 0 {
 		return nil, nil
 	}
-	valid, err := a.validator.Validate(token)
+	err := a.validator.Validate(token)
 	if err != nil {
 		return nil, err
-	}
-	if !valid {
-		return nil, nil
 	}
 	return &jwtPrincipal{token: token}, nil
 }

@@ -1,4 +1,4 @@
-package services
+package logs
 
 import (
 	"context"
@@ -42,16 +42,12 @@ type GetLogsQueryOptions struct {
 	LimitRows *int
 }
 
-type AppLogs interface {
-	GetLogs(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error)
-}
-
-type appLogs struct {
+type logService struct {
 	logsClient  *azquery.LogsClient
 	workspaceId string
 }
 
-func (s *appLogs) GetLogs(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error) {
+func (s *logService) GetLogs(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error) {
 	if options == nil {
 		options = defaultGetLogsQueryOptions
 	}
@@ -82,8 +78,8 @@ func (s *appLogs) GetLogs(appName, envName, componentName string, options *GetLo
 	return &logReader{source: resp.Results.Tables[0], logCol: 3}, nil
 }
 
-func NewAppLogs(logsClient *azquery.LogsClient, workspaceId string) AppLogs {
-	return &appLogs{
+func New(logsClient *azquery.LogsClient, workspaceId string) Interface {
+	return &logService{
 		logsClient:  logsClient,
 		workspaceId: workspaceId,
 	}
