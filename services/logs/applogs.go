@@ -52,7 +52,7 @@ func (s *logService) GetLogs(appName, envName, componentName string, options *Ge
 		options = defaultGetLogsQueryOptions
 	}
 
-	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{})).
+	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
 		UnsafeAdd(logQuery).
 		MustDefinitions(
 			kusto.NewDefinitions().Must(

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/equinor/radix-log-api/cmd"
 	_ "github.com/equinor/radix-log-api/docs"
-	"github.com/equinor/radix-log-api/internal/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -18,7 +18,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.DefaultCommand = "start"
-	app.Commands = commands.CliCommands
+	app.Commands = cmd.CliCommands
 
 	if err := app.Run(os.Args); err != nil {
 		logrus.Fatal(err)

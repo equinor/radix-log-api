@@ -4,16 +4,16 @@ import (
 	"net/http"
 
 	"github.com/equinor/radix-log-api/api/controllers"
-	"github.com/equinor/radix-log-api/internal/uriparams"
+	"github.com/equinor/radix-log-api/api/params"
 	"github.com/equinor/radix-log-api/pkg/constants"
 	logservice "github.com/equinor/radix-log-api/services/logs"
 	"github.com/gin-gonic/gin"
 )
 
 type appURIParams struct {
-	uriparams.App
-	uriparams.Env
-	uriparams.Component
+	params.App
+	params.Env
+	params.Component
 }
 
 func New(appLogsService logservice.Interface) controllers.Controller {

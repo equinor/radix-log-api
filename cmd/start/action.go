@@ -1,4 +1,4 @@
-package commands
+package start
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/middleware/authz"
 	"github.com/equinor/radix-log-api/api/router"
-
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/jwt"
 	"github.com/equinor/radix-log-api/server"
@@ -19,55 +18,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	HostName                = "host"
-	PortNumber              = "port"
-	AuthIssuerURL           = "auth-issuer-url"
-	AuthAudience            = "auth-audience"
-	LogAnalyticsWorkspaceId = "workspace-id"
-)
-
-var startFlags = []cli.Flag{
-	&cli.StringFlag{
-		Name:    HostName,
-		Usage:   "Host name",
-		Value:   "",
-		EnvVars: []string{"RADIX_LOG_API_HOST"},
-	},
-	&cli.IntFlag{
-		Name:    PortNumber,
-		Usage:   "Port number",
-		Value:   8080,
-		EnvVars: []string{"RADIX_LOG_API_PORT"},
-	},
-	&cli.StringFlag{
-		Name:     AuthIssuerURL,
-		Usage:    "OIDC issuer URL",
-		Required: true,
-		EnvVars:  []string{"RADIX_LOG_API_ISSUER"},
-	},
-	&cli.StringFlag{
-		Name:     AuthAudience,
-		Usage:    "Audience",
-		Required: true,
-		EnvVars:  []string{"RADIX_LOG_API_AUDIENCE"},
-	},
-	&cli.StringFlag{
-		Name:     LogAnalyticsWorkspaceId,
-		Usage:    "Log Analytics workspace ID",
-		Required: true,
-		EnvVars:  []string{"RADIX_LOG_API_WORKSPACE_ID"},
-	},
-}
-
-var Start = cli.Command{
-	Name:   "start",
-	Usage:  "Starts the web server",
-	Action: startAction,
-	Flags:  startFlags,
-}
-
-func startAction(ctx *cli.Context) error {
+func action(ctx *cli.Context) error {
 	cfg := initConfig(ctx)
 	router, err := initRouter(ctx)
 	if err != nil {
