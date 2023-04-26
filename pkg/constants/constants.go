@@ -1,6 +1,5 @@
 package constants
 
 const (
-	AuthorizationPolicyAuthenticated = "authenticated"
-	AuthorizationPolicyAppAdmin      = "app-admin"
+	AuthorizationPolicyAppAdmin = "app-admin"
 )

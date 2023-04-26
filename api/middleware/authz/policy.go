@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var defaultPolicy = &policy{requirements: []Requirement{&denyAnonymousUserRequirement{}}}
+var defaultPolicy = &policy{requirements: []Requirement{denyAnonymousUserRequirement}}
 
 type AuthorizationContext struct {
 	user   authn.ClaimsPrincipal
@@ -21,7 +21,7 @@ func (ctx *AuthorizationContext) GinCtx() *gin.Context {
 }
 
 type Policy interface {
-	Handle(ctx *AuthorizationContext) error
+	HandlePolicy(ctx *AuthorizationContext) error
 }
 
 type PolicyBuilder interface {
@@ -33,9 +33,9 @@ type policy struct {
 	requirements []Requirement
 }
 
-func (p *policy) Handle(ctx *AuthorizationContext) error {
+func (p *policy) HandlePolicy(ctx *AuthorizationContext) error {
 	for _, r := range p.requirements {
-		if err := r.Handle(ctx); err != nil {
+		if err := r.HandleRequirement(ctx); err != nil {
 			return err
 		}
 	}
@@ -43,7 +43,7 @@ func (p *policy) Handle(ctx *AuthorizationContext) error {
 }
 
 func (p *policy) RequireAuthenticatedUser() PolicyBuilder {
-	p.requirements = append(p.requirements, &denyAnonymousUserRequirement{})
+	p.requirements = append(p.requirements, denyAnonymousUserRequirement)
 	return p
 }
 

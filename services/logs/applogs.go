@@ -42,12 +42,12 @@ type GetLogsQueryOptions struct {
 	LimitRows *int
 }
 
-type logService struct {
+type service struct {
 	logsClient  *azquery.LogsClient
 	workspaceId string
 }
 
-func (s *logService) GetLogs(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error) {
+func (s *service) Component(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error) {
 	if options == nil {
 		options = defaultGetLogsQueryOptions
 	}
@@ -78,8 +78,8 @@ func (s *logService) GetLogs(appName, envName, componentName string, options *Ge
 	return &logReader{source: resp.Results.Tables[0], logCol: 3}, nil
 }
 
-func New(logsClient *azquery.LogsClient, workspaceId string) Interface {
-	return &logService{
+func New(logsClient *azquery.LogsClient, workspaceId string) Service {
+	return &service{
 		logsClient:  logsClient,
 		workspaceId: workspaceId,
 	}

@@ -70,6 +70,18 @@ func NewForbiddenError(options ...ErrorOptions) *StatusError {
 	return err
 }
 
+func NewNotFoundError(resourceType, resourceName string, options ...ErrorOptions) *StatusError {
+	err := &StatusError{
+		APIStatus: Status{
+			Code:    http.StatusNotFound,
+			Reason:  "NotFound",
+			Message: fmt.Sprintf("%s '%s' not found", resourceType, resourceName),
+		},
+	}
+	applyOptions(err, options...)
+	return err
+}
+
 func NewInternalServerError(options ...ErrorOptions) *StatusError {
 	err := &StatusError{
 		APIStatus: Status{

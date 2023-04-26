@@ -11,10 +11,14 @@ import (
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/middleware/authz"
 	"github.com/equinor/radix-log-api/api/router"
+	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/jwt"
+	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/equinor/radix-log-api/server"
 	logservice "github.com/equinor/radix-log-api/services/logs"
+	runtimeclient "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/urfave/cli/v2"
 )
 
@@ -42,25 +46,23 @@ func initRouter(ctx *cli.Context) (http.Handler, error) {
 	authn := []authn.AuthenticationProvider{
 		authn.NewJwt(jwtValidator),
 	}
-	authz := buildAuthorization()
+	authz := buildAuthorization(ctx)
 	return router.New(controllers, authn, authz)
 }
 
-func buildAuthorization() authz.Authorizer {
+func buildAuthorization(ctx *cli.Context) authz.Authorizer {
+	client := buildRadixAPIApplicationClient(ctx.String(RadixAPIHost), ctx.String(RadixAPIPath), ctx.String(RadixAPIScheme))
+	appOwnerRequirement := requirement.NewAppOwnerRequirement(client)
 	auth := authz.NewAuthorizer(func(ab authz.AuthorizationBuilder) {
-		ab.AddPolicy(constants.AuthorizationPolicyAuthenticated, func(pb authz.PolicyBuilder) {
-			pb.RequireAuthenticatedUser()
-		})
 		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authz.PolicyBuilder) {
-			pb.RequireAuthenticatedUser()
-			pb.AddRequirement(authz.RequirementFunc(func(ctx *authz.AuthorizationContext) error {
-				// fmt.Println(ctx.User().Token())
-				// return apierrors.NewForbiddenError()
-				return nil
-			}))
+			pb.RequireAuthenticatedUser().AddRequirement(appOwnerRequirement)
 		})
 	})
 	return auth
+}
+
+func buildRadixAPIApplicationClient(host, path, scheme string) application.ClientService {
+	return application.New(runtimeclient.New(host, path, []string{scheme}), strfmt.Default)
 }
 
 func initLogsAnalyticsClient() (*azquery.LogsClient, error) {

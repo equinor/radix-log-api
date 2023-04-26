@@ -16,14 +16,14 @@ type appURIParams struct {
 	params.Component
 }
 
-func New(appLogsService logservice.Interface) controllers.Controller {
+func New(appLogsService logservice.Service) controllers.Controller {
 	return &controller{
 		appLogsService: appLogsService,
 	}
 }
 
 type controller struct {
-	appLogsService logservice.Interface
+	appLogsService logservice.Service
 }
 
 func (c *controller) Endpoints() []controllers.Endpoint {
@@ -57,7 +57,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	logReader, err := c.appLogsService.GetLogs(params.AppName, params.EnvName, params.ComponentName, nil)
+	logReader, err := c.appLogsService.Component(params.AppName, params.EnvName, params.ComponentName, nil)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
