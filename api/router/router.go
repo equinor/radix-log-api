@@ -22,7 +22,7 @@ func New(controllers []controllers.Controller, authn []authnmiddleware.Authentic
 	engine := gin.New()
 	engine.RemoveExtraSlash = true
 
-	engine.Use(gin.Logger(), gin.Recovery(), gzip.Gzip(gzip.DefaultCompression))
+	engine.Use(gin.Logger(), gzip.Gzip(gzip.DefaultCompression), gin.Recovery())
 
 	g := engine.Group("/api/v1", cors.Default(), errmiddleware.ErrorHandler, authnmiddleware.New(authn...))
 	{

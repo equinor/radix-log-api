@@ -3,5 +3,6 @@ package logs
 import "io"
 
 type Service interface {
-	Component(appName, envName, componentName string, options *GetLogsQueryOptions) (io.Reader, error)
+	ComponentLog(appName, envName, componentName string, options *ComponentLogOptions) (io.Reader, error)
+	ComponentPodInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error)
 }
