@@ -12,12 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type appURIParams struct {
-	params.App
-	params.Env
-	params.Component
-}
-
 func New(appLogsService logservice.Service) controllers.Controller {
 	return &controller{
 		appLogsService: appLogsService,
@@ -32,49 +26,29 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 	return []controllers.Endpoint{
 		{
 			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName",
+			Handler:               c.GetComponentInventory,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
+		{
+			Method:                http.MethodGet,
 			Path:                  "/applications/:appName/environments/:envName/components/:componentName/logs",
 			Handler:               c.GetComponentLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 		{
 			Method:                http.MethodGet,
-			Path:                  "/applications/:appName/environments/:envName/components/:componentName",
-			Handler:               c.GetComponentInventory,
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/logs",
+			Handler:               c.GetComponentReplicaLog,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
+		{
+			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/containers/:containerId/logs",
+			Handler:               c.GetComponentContainerLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 	}
-}
-
-// GetComponentLog godoc
-// @Summary Get log for a component
-// @Tags Logs
-// @Produce plain
-// @Security ApiKeyAuth
-// @Success 200 {string} ALogRecord
-// @Failure 400
-// @Failure 401
-// @Failure 403
-// @Failure 404
-// @Failure 500
-// @Param appName path string true "Application Name"
-// @Param envName path string true "Environment Name"
-// @Param componentName path string true "Component Name"
-// @Router /applications/{appName}/environments/{envName}/components/{componentName}/logs [get]
-func (c *controller) GetComponentLog(ctx *gin.Context) {
-	var params appURIParams
-	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
-	if err != nil {
-		ctx.Error(err)
-		ctx.Abort()
-		return
-	}
-
-	ctx.DataFromReader(200, -1, "text/plain; charset=utf-8", logReader, nil)
 }
 
 // GetComponentInventory godoc
@@ -93,13 +67,17 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Param componentName path string true "Component Name"
 // @Router /applications/{appName}/environments/{envName}/components/{componentName} [get]
 func (c *controller) GetComponentInventory(ctx *gin.Context) {
-	var params appURIParams
+	var params struct {
+		params.App
+		params.Env
+		params.Component
+	}
 	if err := ctx.BindUri(&params); err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	pods, err := c.appLogsService.ComponentPodInventory(params.AppName, params.EnvName, params.ComponentName, nil)
+	pods, err := c.appLogsService.ComponentInventory(params.AppName, params.EnvName, params.ComponentName, nil)
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -107,8 +85,8 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 	}
 
 	response := models.ComponentInventoryResponse{
-		Pods: slice.Map(pods, func(s logservice.Pod) models.Pod {
-			return models.Pod{
+		Replicas: slice.Map(pods, func(s logservice.Pod) models.Replica {
+			return models.Replica{
 				Name:              s.Name,
 				CreationTimestamp: s.CreationTimestamp,
 				Containers:        slice.Map(s.Containers, func(c logservice.Container) models.Container { return models.Container(c) })}
@@ -116,4 +94,118 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+// GetComponentLog godoc
+// @Summary Get log for a component
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} ALogRecord
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Failure 404
+// @Failure 500
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param componentName path string true "Component Name"
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/logs [get]
+func (c *controller) GetComponentLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.Env
+		params.Component
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	if err != nil {
+		ctx.Error(err)
+		ctx.Abort()
+		return
+	}
+
+	ctx.DataFromReader(200, -1, "text/plain; charset=utf-8", logReader, nil)
+}
+
+// GetComponentReplicaLog godoc
+// @Summary Get log for a replica
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} ALogRecord
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Failure 404
+// @Failure 500
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param componentName path string true "Component Name"
+// @Param replicaName path string true "Replica Name"
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs [get]
+func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.Env
+		params.Component
+		params.Replica
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	if err != nil {
+		ctx.Error(err)
+		ctx.Abort()
+		return
+	}
+
+	ctx.DataFromReader(200, -1, "text/plain; charset=utf-8", logReader, nil)
+}
+
+// GetComponentContainerLog godoc
+// @Summary Get log for a container
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} ALogRecord
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Failure 404
+// @Failure 500
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param componentName path string true "Component Name"
+// @Param replicaName path string true "Replica Name"
+// @Param containerId path string true "Container ID"
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs [get]
+func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.Env
+		params.Component
+		params.Replica
+		params.Container
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	if err != nil {
+		ctx.Error(err)
+		ctx.Abort()
+		return
+	}
+
+	ctx.DataFromReader(200, -1, "text/plain; charset=utf-8", logReader, nil)
 }

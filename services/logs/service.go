@@ -2,10 +2,8 @@ package logs
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/Azure/azure-kusto-go/kusto"
 	"github.com/Azure/azure-kusto-go/kusto/data/types"
@@ -26,9 +24,9 @@ func New(logsClient *azquery.LogsClient, workspaceId string) Service {
 	}
 }
 
-func (s *service) ComponentLog(appName, envName, componentName string, options *ComponentLogOptions) (io.Reader, error) {
+func (s *service) ComponentLog(appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
 	if options == nil {
-		options = &ComponentLogOptions{}
+		options = &LogOptions{}
 	}
 
 	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
@@ -61,13 +59,20 @@ func (s *service) ComponentLog(appName, envName, componentName string, options *
 	return &logReader{source: resp.Results.Tables[0], logCol: 3}, nil
 }
 
-func (s *service) ComponentPodInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
+func (s *service) ComponentPodLog(appName, envName, componentName, podName string, options *LogOptions) (io.Reader, error) {
+	return nil, nil
+}
+func (s *service) ComponentContainerLog(appName, envName, componentName, podName, containerId string, options *LogOptions) (io.Reader, error) {
+	return nil, nil
+}
+
+func (s *service) ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
 	if options == nil {
 		options = &ComponentPodInventoryOptions{}
 	}
 
 	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
-		UnsafeAdd(componentPodInventory).
+		UnsafeAdd(componentInventory).
 		MustDefinitions(
 			kusto.NewDefinitions().Must(
 				kusto.ParamTypes{
@@ -105,62 +110,4 @@ func (s *service) ComponentPodInventory(appName, envName, componentName string, 
 		pods = append(pods, *pod)
 	}
 	return pods, nil
-}
-
-type logReader struct {
-	source *azquery.Table
-	row    int
-	offset int
-	logCol int
-}
-
-func mustParseTime(t string) time.Time {
-	if t == "" {
-		fmt.Println("")
-	}
-	parsed, err := time.Parse(time.RFC3339, t)
-	if err != nil {
-		panic(err)
-	}
-	return parsed
-}
-
-func (r *logReader) Read(p []byte) (n int, err error) {
-	if r.source == nil {
-		return 0, io.EOF
-	}
-
-	bufLen := len(p)
-	var bpos int
-
-	for bpos < bufLen {
-		cp, err := r.copyRow(p[bpos:])
-		if err != nil {
-			return bpos, err
-		}
-		bpos += cp
-
-	}
-
-	return bpos, nil
-}
-
-func (r *logReader) copyRow(p []byte) (int, error) {
-	rowCount := len(r.source.Rows)
-	if r.row >= rowCount {
-		return 0, io.EOF
-	}
-	currRow, ok := r.source.Rows[r.row][r.logCol].(string)
-	if !ok {
-		return 0, errors.New("unexpected data in log")
-	}
-	currRow += "\n"
-	cp := copy(p, currRow[r.offset:])
-	r.offset += cp
-
-	if r.offset >= len(currRow) {
-		r.row++
-		r.offset = 0
-	}
-	return cp, nil
 }

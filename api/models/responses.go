@@ -1,5 +1,5 @@
 package models
 
 type ComponentInventoryResponse struct {
-	Pods []Pod
+	Replicas []Replica `json:"replicas"`
 }

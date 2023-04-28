@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type Pod struct {
+type Replica struct {
 	Name              string      `json:"name"`
 	CreationTimestamp time.Time   `json:"creationTimestamp,omitempty"`
 	Containers        []Container `json:"containers"`
