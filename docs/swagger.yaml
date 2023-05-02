@@ -82,6 +82,101 @@ paths:
       summary: Get log for a component
       tags:
       - Logs
+  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs:
+    get:
+      parameters:
+      - description: Application Name
+        in: path
+        name: appName
+        required: true
+        type: string
+      - description: Environment Name
+        in: path
+        name: envName
+        required: true
+        type: string
+      - description: Component Name
+        in: path
+        name: componentName
+        required: true
+        type: string
+      - description: Replica Name
+        in: path
+        name: replicaName
+        required: true
+        type: string
+      - description: Container ID
+        in: path
+        name: containerId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get log for a container
+      tags:
+      - Logs
+  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs:
+    get:
+      parameters:
+      - description: Application Name
+        in: path
+        name: appName
+        required: true
+        type: string
+      - description: Environment Name
+        in: path
+        name: envName
+        required: true
+        type: string
+      - description: Component Name
+        in: path
+        name: componentName
+        required: true
+        type: string
+      - description: Replica Name
+        in: path
+        name: replicaName
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get log for a replica
+      tags:
+      - Logs
 schemes:
 - http
 - https

@@ -160,7 +160,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 		return
 	}
 
-	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	logReader, err := c.appLogsService.ComponentPodLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, nil)
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -200,7 +200,7 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 		return
 	}
 
-	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	logReader, err := c.appLogsService.ComponentContainerLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, nil)
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()

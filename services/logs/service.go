@@ -25,10 +25,6 @@ func New(logsClient *azquery.LogsClient, workspaceId string) Service {
 }
 
 func (s *service) ComponentLog(appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
-	if options == nil {
-		options = &LogOptions{}
-	}
-
 	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
 		UnsafeAdd(componentLogQuery).
 		MustDefinitions(
@@ -40,6 +36,48 @@ func (s *service) ComponentLog(appName, envName, componentName string, options *
 				},
 			),
 		)
+
+	return s.executeLogQuery(kql, options)
+}
+
+func (s *service) ComponentPodLog(appName, envName, componentName, podName string, options *LogOptions) (io.Reader, error) {
+	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
+		UnsafeAdd(componentPodLogQuery).
+		MustDefinitions(
+			kusto.NewDefinitions().Must(
+				kusto.ParamTypes{
+					paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+					paramAppName:       kusto.ParamType{Type: types.String, Default: appName},
+					paramComponentName: kusto.ParamType{Type: types.String, Default: componentName},
+					paramPodName:       kusto.ParamType{Type: types.String, Default: podName},
+				},
+			),
+		)
+
+	return s.executeLogQuery(kql, options)
+}
+func (s *service) ComponentContainerLog(appName, envName, componentName, podName, containerId string, options *LogOptions) (io.Reader, error) {
+	kql := kusto.NewStmt("", kusto.UnsafeStmt(unsafe.Stmt{SuppressWarning: true})).
+		UnsafeAdd(componentContainerLogQuery).
+		MustDefinitions(
+			kusto.NewDefinitions().Must(
+				kusto.ParamTypes{
+					paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+					paramAppName:       kusto.ParamType{Type: types.String, Default: appName},
+					paramComponentName: kusto.ParamType{Type: types.String, Default: componentName},
+					paramPodName:       kusto.ParamType{Type: types.String, Default: podName},
+					paramContainerId:   kusto.ParamType{Type: types.String, Default: containerId},
+				},
+			),
+		)
+
+	return s.executeLogQuery(kql, options)
+}
+
+func (s *service) executeLogQuery(kql kusto.Stmt, options *LogOptions) (io.Reader, error) {
+	if options == nil {
+		options = &LogOptions{}
+	}
 
 	if options.LimitRows != nil {
 		kql.UnsafeAdd(fmt.Sprintf("| take %d", *options.LimitRows))
@@ -57,13 +95,6 @@ func (s *service) ComponentLog(appName, envName, componentName string, options *
 	}
 
 	return &logReader{source: resp.Results.Tables[0], logCol: 3}, nil
-}
-
-func (s *service) ComponentPodLog(appName, envName, componentName, podName string, options *LogOptions) (io.Reader, error) {
-	return nil, nil
-}
-func (s *service) ComponentContainerLog(appName, envName, componentName, podName, containerId string, options *LogOptions) (io.Reader, error) {
-	return nil, nil
 }
 
 func (s *service) ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
