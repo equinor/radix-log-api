@@ -1,6 +1,11 @@
 package start
 
-import "github.com/urfave/cli/v2"
+import (
+	"fmt"
+	"os"
+
+	"github.com/urfave/cli/v2"
+)
 
 const (
 	HostName                = "host"
@@ -47,8 +52,8 @@ var flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:     RadixAPIHost,
 		Usage:    "Radix API host name",
-		Value:    "",
-		Required: true,
+		Value:    getRadixAPIHostFromEnv(),
+		Required: false,
 		EnvVars:  []string{"RADIX_LOG_API_RADIX_API_HOST"},
 	},
 	&cli.StringFlag{
@@ -63,4 +68,12 @@ var flags = []cli.Flag{
 		Value:   "https",
 		EnvVars: []string{"RADIX_LOG_API_RADIX_API_SCHEME"},
 	},
+}
+
+func getRadixAPIHostFromEnv() string {
+	envName, clusterName, dnsZone := os.Getenv("RADIX_ENVIRONMENT"), os.Getenv("RADIX_CLUSTERNAME"), os.Getenv("RADIX_DNS_ZONE")
+	if len(envName) == 0 || len(clusterName) == 0 || len(dnsZone) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("server-radix-api-%s.%s.%s", envName, clusterName, dnsZone)
 }

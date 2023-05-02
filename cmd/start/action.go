@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -46,19 +47,26 @@ func initRouter(ctx *cli.Context) (http.Handler, error) {
 	authn := []authn.AuthenticationProvider{
 		authn.NewJwt(jwtValidator),
 	}
-	authz := buildAuthorization(ctx)
+	authz, err := buildAuthorization(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return router.New(controllers, authn, authz)
 }
 
-func buildAuthorization(ctx *cli.Context) authz.Authorizer {
-	client := buildRadixAPIApplicationClient(ctx.String(RadixAPIHost), ctx.String(RadixAPIPath), ctx.String(RadixAPIScheme))
+func buildAuthorization(ctx *cli.Context) (authz.Authorizer, error) {
+	radixApiHost := ctx.String(RadixAPIHost)
+	if len(radixApiHost) == 0 {
+		return nil, fmt.Errorf("required argument %s is not set", RadixAPIHost)
+	}
+	client := buildRadixAPIApplicationClient(radixApiHost, ctx.String(RadixAPIPath), ctx.String(RadixAPIScheme))
 	appOwnerRequirement := requirement.NewAppOwnerRequirement(client)
 	auth := authz.NewAuthorizer(func(ab authz.AuthorizationBuilder) {
 		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authz.PolicyBuilder) {
 			pb.RequireAuthenticatedUser().AddRequirement(appOwnerRequirement)
 		})
 	})
-	return auth
+	return auth, nil
 }
 
 func buildRadixAPIApplicationClient(host, path, scheme string) application.ClientService {
