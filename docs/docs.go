@@ -152,6 +152,12 @@ const docTemplate = `{
                         "description": "End time",
                         "name": "end",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -251,6 +257,12 @@ const docTemplate = `{
                         "description": "End time",
                         "name": "end",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -342,6 +354,12 @@ const docTemplate = `{
                         "example": "2023-05-02T12:00:00Z",
                         "description": "End time",
                         "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
                         "in": "query"
                     }
                 ],

@@ -15,6 +15,7 @@ type timeIntervalParams struct {
 type logParams struct {
 	timeIntervalParams
 	Rows *int `form:"rows"`
+	File bool `form:"file"`
 }
 
 func (p *logParams) AsLogOptions() *logservice.LogOptions {

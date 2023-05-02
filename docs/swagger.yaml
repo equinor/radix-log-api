@@ -89,6 +89,10 @@ paths:
         in: query
         name: end
         type: string
+      - description: Response as attachment
+        in: query
+        name: file
+        type: boolean
       produces:
       - text/plain
       responses:
@@ -156,6 +160,10 @@ paths:
         in: query
         name: end
         type: string
+      - description: Response as attachment
+        in: query
+        name: file
+        type: boolean
       produces:
       - text/plain
       responses:
@@ -218,6 +226,10 @@ paths:
         in: query
         name: end
         type: string
+      - description: Response as attachment
+        in: query
+        name: file
+        type: boolean
       produces:
       - text/plain
       responses:
