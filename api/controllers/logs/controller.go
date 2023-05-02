@@ -5,6 +5,7 @@ import (
 
 	"github.com/equinor/radix-common/utils/slice"
 	"github.com/equinor/radix-log-api/api/controllers"
+	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/models"
 	"github.com/equinor/radix-log-api/api/params"
 	"github.com/equinor/radix-log-api/pkg/constants"
@@ -65,6 +66,8 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Router /applications/{appName}/environments/{envName}/components/{componentName} [get]
 func (c *controller) GetComponentInventory(ctx *gin.Context) {
 	var params struct {
@@ -77,7 +80,14 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 		return
 	}
 
-	pods, err := c.appLogsService.ComponentInventory(params.AppName, params.EnvName, params.ComponentName, nil)
+	queryParams, err := paramsFromContext[inventoryParams](ctx)
+	if err != nil {
+		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		ctx.Abort()
+		return
+	}
+
+	pods, err := c.appLogsService.ComponentInventory(params.AppName, params.EnvName, params.ComponentName, queryParams.AsComponentPodInventoryOptions())
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -110,19 +120,29 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
+// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Router /applications/{appName}/environments/{envName}/components/{componentName}/logs [get]
 func (c *controller) GetComponentLog(ctx *gin.Context) {
-	var params struct {
+	var uriParams struct {
 		params.App
 		params.Env
 		params.Component
 	}
-	if err := ctx.BindUri(&params); err != nil {
+	if err := ctx.BindUri(&uriParams); err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	logReader, err := c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, nil)
+	queryParams, err := paramsFromContext[logParams](ctx)
+	if err != nil {
+		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		ctx.Abort()
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentLog(uriParams.AppName, uriParams.EnvName, uriParams.ComponentName, queryParams.AsLogOptions())
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -147,6 +167,9 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
 // @Param replicaName path string true "Replica Name"
+// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs [get]
 func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 	var params struct {
@@ -160,7 +183,14 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 		return
 	}
 
-	logReader, err := c.appLogsService.ComponentPodLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, nil)
+	queryParams, err := paramsFromContext[logParams](ctx)
+	if err != nil {
+		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		ctx.Abort()
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentPodLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, queryParams.AsLogOptions())
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -186,6 +216,9 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 // @Param componentName path string true "Component Name"
 // @Param replicaName path string true "Replica Name"
 // @Param containerId path string true "Container ID"
+// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs [get]
 func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 	var params struct {
@@ -200,7 +233,14 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 		return
 	}
 
-	logReader, err := c.appLogsService.ComponentContainerLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, nil)
+	queryParams, err := paramsFromContext[logParams](ctx)
+	if err != nil {
+		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		ctx.Abort()
+		return
+	}
+
+	logReader, err := c.appLogsService.ComponentContainerLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, queryParams.AsLogOptions())
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()

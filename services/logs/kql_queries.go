@@ -15,7 +15,7 @@ const (
 var (
 	joinContainerLog = `| join kind=inner ContainerLog on $left.ContainerID==$right.ContainerID
 	| project TimeGenerated, Name, ContainerID, LogEntry
-	| sort by TimeGenerated asc`
+	| sort by TimeGenerated desc`
 )
 
 var (

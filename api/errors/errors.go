@@ -46,6 +46,18 @@ func applyOptions(err *StatusError, options ...ErrorOptions) {
 	}
 }
 
+func NewBadRequestError(options ...ErrorOptions) *StatusError {
+	err := &StatusError{
+		APIStatus: Status{
+			Code:    http.StatusBadRequest,
+			Reason:  "BadRequest",
+			Message: "Bad request",
+		},
+	}
+	applyOptions(err, options...)
+	return err
+}
+
 func NewUnauthorizedError(options ...ErrorOptions) *StatusError {
 	err := &StatusError{
 		APIStatus: Status{

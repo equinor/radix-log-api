@@ -80,7 +80,7 @@ func (s *service) executeLogQuery(kql kusto.Stmt, options *LogOptions) (io.Reade
 	}
 
 	if options.LimitRows != nil {
-		kql.UnsafeAdd(fmt.Sprintf("| take %d", *options.LimitRows))
+		kql = kql.UnsafeAdd(fmt.Sprintf("| take %d", *options.LimitRows))
 	}
 
 	timspan := azquery.TimeInterval("")

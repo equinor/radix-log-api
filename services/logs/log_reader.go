@@ -52,7 +52,8 @@ func (r *logReader) copyRow(p []byte) (int, error) {
 	if r.row >= rowCount {
 		return 0, io.EOF
 	}
-	currRow, ok := r.source.Rows[r.row][r.logCol].(string)
+	// Read rows in reverse order
+	currRow, ok := r.source.Rows[rowCount-1-r.row][r.logCol].(string)
 	if !ok {
 		return 0, errors.New("unexpected data in log")
 	}

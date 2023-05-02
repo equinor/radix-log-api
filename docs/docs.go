@@ -51,6 +51,22 @@ const docTemplate = `{
                         "name": "componentName",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -113,6 +129,29 @@ const docTemplate = `{
                         "name": "componentName",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return in descending order by log time",
+                        "name": "rows",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -189,6 +228,29 @@ const docTemplate = `{
                         "name": "containerId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return in descending order by log time",
+                        "name": "rows",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -258,6 +320,29 @@ const docTemplate = `{
                         "name": "replicaName",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return in descending order by log time",
+                        "name": "rows",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
                     }
                 ],
                 "responses": {

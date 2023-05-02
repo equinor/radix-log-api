@@ -20,6 +20,18 @@ paths:
         name: componentName
         required: true
         type: string
+      - description: Start time
+        example: "2023-05-01T08:15:00+02:00"
+        format: date-time
+        in: query
+        name: start
+        type: string
+      - description: End time
+        example: "2023-05-02T12:00:00Z"
+        format: date-time
+        in: query
+        name: end
+        type: string
       produces:
       - application/json
       responses:
@@ -59,6 +71,23 @@ paths:
         in: path
         name: componentName
         required: true
+        type: string
+      - description: Number of rows to return in descending order by log time
+        example: 100
+        in: query
+        name: rows
+        type: integer
+      - description: Start time
+        example: "2023-05-01T08:15:00+02:00"
+        format: date-time
+        in: query
+        name: start
+        type: string
+      - description: End time
+        example: "2023-05-02T12:00:00Z"
+        format: date-time
+        in: query
+        name: end
         type: string
       produces:
       - text/plain
@@ -110,6 +139,23 @@ paths:
         name: containerId
         required: true
         type: string
+      - description: Number of rows to return in descending order by log time
+        example: 100
+        in: query
+        name: rows
+        type: integer
+      - description: Start time
+        example: "2023-05-01T08:15:00+02:00"
+        format: date-time
+        in: query
+        name: start
+        type: string
+      - description: End time
+        example: "2023-05-02T12:00:00Z"
+        format: date-time
+        in: query
+        name: end
+        type: string
       produces:
       - text/plain
       responses:
@@ -154,6 +200,23 @@ paths:
         in: path
         name: replicaName
         required: true
+        type: string
+      - description: Number of rows to return in descending order by log time
+        example: 100
+        in: query
+        name: rows
+        type: integer
+      - description: Start time
+        example: "2023-05-01T08:15:00+02:00"
+        format: date-time
+        in: query
+        name: start
+        type: string
+      - description: End time
+        example: "2023-05-02T12:00:00Z"
+        format: date-time
+        in: query
+        name: end
         type: string
       produces:
       - text/plain
