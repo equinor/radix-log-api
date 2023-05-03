@@ -72,10 +72,10 @@ paths:
         name: componentName
         required: true
         type: string
-      - description: Number of rows to return in descending order by log time
+      - description: Number of rows to return from the tail of the log
         example: 100
         in: query
-        name: rows
+        name: tail
         type: integer
       - description: Start time
         example: "2023-05-01T08:15:00+02:00"
@@ -143,10 +143,10 @@ paths:
         name: containerId
         required: true
         type: string
-      - description: Number of rows to return in descending order by log time
+      - description: Number of rows to return from the tail of the log
         example: 100
         in: query
-        name: rows
+        name: tail
         type: integer
       - description: Start time
         example: "2023-05-01T08:15:00+02:00"
@@ -209,10 +209,10 @@ paths:
         name: replicaName
         required: true
         type: string
-      - description: Number of rows to return in descending order by log time
+      - description: Number of rows to return from the tail of the log
         example: 100
         in: query
-        name: rows
+        name: tail
         type: integer
       - description: Start time
         example: "2023-05-01T08:15:00+02:00"

@@ -133,8 +133,8 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "example": 100,
-                        "description": "Number of rows to return in descending order by log time",
-                        "name": "rows",
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
                         "in": "query"
                     },
                     {
@@ -238,8 +238,8 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "example": 100,
-                        "description": "Number of rows to return in descending order by log time",
-                        "name": "rows",
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
                         "in": "query"
                     },
                     {
@@ -336,8 +336,8 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "example": 100,
-                        "description": "Number of rows to return in descending order by log time",
-                        "name": "rows",
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
                         "in": "query"
                     },
                     {

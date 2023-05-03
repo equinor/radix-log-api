@@ -14,12 +14,12 @@ type timeIntervalParams struct {
 
 type logParams struct {
 	timeIntervalParams
-	Rows *int `form:"rows"`
+	Tail *int `form:"tail"`
 	File bool `form:"file"`
 }
 
 func (p *logParams) AsLogOptions() *logservice.LogOptions {
-	options := logservice.LogOptions{LimitRows: p.Rows}
+	options := logservice.LogOptions{LimitRows: p.Tail}
 	if p.Start != nil || p.End != nil {
 		timeInverval := logservice.TimeInterval{End: time.Now()}
 		if p.Start != nil {

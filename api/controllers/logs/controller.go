@@ -121,7 +121,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
-// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
@@ -157,7 +157,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
 // @Param replicaName path string true "Replica Name"
-// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
@@ -195,7 +195,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 // @Param componentName path string true "Component Name"
 // @Param replicaName path string true "Replica Name"
 // @Param containerId path string true "Container ID"
-// @Param rows query integer false "Number of rows to return in descending order by log time" example(100)
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
