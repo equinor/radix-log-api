@@ -8,11 +8,11 @@ import (
 var defaultPolicy = &policy{requirements: []Requirement{denyAnonymousUserRequirement}}
 
 type AuthorizationContext struct {
-	user   authn.ClaimsPrincipal
+	user   authn.TokenPrincipal
 	ginCtx *gin.Context
 }
 
-func (ctx *AuthorizationContext) User() authn.ClaimsPrincipal {
+func (ctx *AuthorizationContext) User() authn.TokenPrincipal {
 	return ctx.user
 }
 

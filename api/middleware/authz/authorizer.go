@@ -41,7 +41,7 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 		authCtx := AuthorizationContext{ginCtx: ctx}
 		user, exists := ctx.Get(authn.UserKey)
 		if exists {
-			if userTyped, ok := user.(authn.ClaimsPrincipal); ok {
+			if userTyped, ok := user.(authn.TokenPrincipal); ok {
 				authCtx.user = userTyped
 			} else {
 				ctx.AbortWithError(http.StatusInternalServerError, errors.New("invalid user type"))

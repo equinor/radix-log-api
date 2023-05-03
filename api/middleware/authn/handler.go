@@ -8,7 +8,7 @@ const (
 	UserKey = "user"
 )
 
-var _ ClaimsPrincipal = &anonymousPrincipal{}
+var _ TokenPrincipal = &anonymousPrincipal{}
 
 type anonymousPrincipal struct{}
 
@@ -36,6 +36,6 @@ func New(auths ...AuthenticationProvider) gin.HandlerFunc {
 	}
 }
 
-func setUserForContext(ctx *gin.Context, user ClaimsPrincipal) {
+func setUserForContext(ctx *gin.Context, user TokenPrincipal) {
 	ctx.Set(UserKey, user)
 }

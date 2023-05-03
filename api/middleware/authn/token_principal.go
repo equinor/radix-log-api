@@ -1,6 +1,6 @@
 package authn
 
-type ClaimsPrincipal interface {
+type TokenPrincipal interface {
 	IsAuthenticated() bool
 	Token() string
 }

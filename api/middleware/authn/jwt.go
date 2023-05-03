@@ -24,7 +24,7 @@ type jwtProvider struct {
 	validator JwtValidator
 }
 
-func (a *jwtProvider) Authenticate(req *http.Request) (ClaimsPrincipal, error) {
+func (a *jwtProvider) Authenticate(req *http.Request) (TokenPrincipal, error) {
 	authorization := req.Header.Get("Authorization")
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		return nil, nil
