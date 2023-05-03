@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/Azure/azure-kusto-go/kusto"
 	"github.com/Azure/azure-kusto-go/kusto/data/types"
 	"github.com/Azure/azure-kusto-go/kusto/unsafe"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 	"github.com/equinor/radix-common/utils/slice"
+	"github.com/equinor/radix-log-api/pkg/aztable"
 )
 
 type service struct {
@@ -94,7 +96,7 @@ func (s *service) executeLogQuery(kql kusto.Stmt, options *LogOptions) (io.Reade
 		return nil, err
 	}
 
-	return &logReader{source: resp.Results.Tables[0], logCol: 3}, nil
+	return aztable.NewReader(resp.Results.Tables[0], 3), nil
 }
 
 func (s *service) ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
@@ -141,4 +143,15 @@ func (s *service) ComponentInventory(appName, envName, componentName string, opt
 		pods = append(pods, *pod)
 	}
 	return pods, nil
+}
+
+func mustParseTime(t string) time.Time {
+	if t == "" {
+		fmt.Println("")
+	}
+	parsed, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		panic(err)
+	}
+	return parsed
 }

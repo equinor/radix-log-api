@@ -1,33 +1,27 @@
-package logs
+package aztable
 
 import (
 	"errors"
-	"fmt"
 	"io"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 )
 
-type logReader struct {
+type reader struct {
 	source *azquery.Table
 	row    int
 	offset int
 	logCol int
 }
 
-func mustParseTime(t string) time.Time {
-	if t == "" {
-		fmt.Println("")
+func NewReader(aztable *azquery.Table, logCol int) io.Reader {
+	return &reader{
+		source: aztable,
+		logCol: logCol,
 	}
-	parsed, err := time.Parse(time.RFC3339, t)
-	if err != nil {
-		panic(err)
-	}
-	return parsed
 }
 
-func (r *logReader) Read(p []byte) (n int, err error) {
+func (r *reader) Read(p []byte) (n int, err error) {
 	if r.source == nil {
 		return 0, io.EOF
 	}
@@ -47,7 +41,7 @@ func (r *logReader) Read(p []byte) (n int, err error) {
 	return bpos, nil
 }
 
-func (r *logReader) copyRow(p []byte) (int, error) {
+func (r *reader) copyRow(p []byte) (int, error) {
 	rowCount := len(r.source.Rows)
 	if r.row >= rowCount {
 		return 0, io.EOF
