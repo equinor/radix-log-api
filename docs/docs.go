@@ -29,7 +29,7 @@ const docTemplate = `{
                 "tags": [
                     "Inventory"
                 ],
-                "summary": "Get inventory (pods and their containers) for a component",
+                "summary": "Get inventory (pods and containers) for a component",
                 "parameters": [
                     {
                         "type": "string",
@@ -94,7 +94,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/applications/{appName}/environments/{envName}/components/{componentName}/logs": {
+        "/applications/{appName}/environments/{envName}/components/{componentName}/log": {
             "get": {
                 "security": [
                     {
@@ -185,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs": {
+        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log": {
             "get": {
                 "security": [
                     {
@@ -290,7 +290,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs": {
+        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log": {
             "get": {
                 "security": [
                     {

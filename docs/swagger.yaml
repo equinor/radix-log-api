@@ -51,10 +51,10 @@ paths:
           description: Internal Server Error
       security:
       - ApiKeyAuth: []
-      summary: Get inventory (pods and their containers) for a component
+      summary: Get inventory (pods and containers) for a component
       tags:
       - Inventory
-  /applications/{appName}/environments/{envName}/components/{componentName}/logs:
+  /applications/{appName}/environments/{envName}/components/{componentName}/log:
     get:
       parameters:
       - description: Application Name
@@ -115,7 +115,7 @@ paths:
       summary: Get log for a component
       tags:
       - Logs
-  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs:
+  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log:
     get:
       parameters:
       - description: Application Name
@@ -186,7 +186,7 @@ paths:
       summary: Get log for a container
       tags:
       - Logs
-  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs:
+  /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log:
     get:
       parameters:
       - description: Application Name
