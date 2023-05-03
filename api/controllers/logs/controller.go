@@ -34,19 +34,19 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 		},
 		{
 			Method:                http.MethodGet,
-			Path:                  "/applications/:appName/environments/:envName/components/:componentName/logs",
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName/log",
 			Handler:               c.GetComponentLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 		{
 			Method:                http.MethodGet,
-			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/logs",
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/log",
 			Handler:               c.GetComponentReplicaLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 		{
 			Method:                http.MethodGet,
-			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/containers/:containerId/logs",
+			Path:                  "/applications/:appName/environments/:envName/components/:componentName/replicas/:replicaName/containers/:containerId/log",
 			Handler:               c.GetComponentContainerLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
@@ -54,7 +54,7 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 }
 
 // GetComponentInventory godoc
-// @Summary Get inventory (pods and their containers) for a component
+// @Summary Get inventory (pods and containers) for a component
 // @Tags Inventory
 // @Produce json
 // @Security ApiKeyAuth
@@ -125,7 +125,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
-// @Router /applications/{appName}/environments/{envName}/components/{componentName}/logs [get]
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/log [get]
 func (c *controller) GetComponentLog(ctx *gin.Context) {
 	var params struct {
 		params.App
@@ -161,7 +161,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
-// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/logs [get]
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log [get]
 func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 	var params struct {
 		params.App
@@ -199,7 +199,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 // @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
 // @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
 // @Param file query boolean false "Response as attachment"
-// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/logs [get]
+// @Router /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log [get]
 func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 	var params struct {
 		params.App
