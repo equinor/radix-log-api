@@ -10,9 +10,9 @@ import (
 const (
 	HostName                = "host"
 	PortNumber              = "port"
-	AuthIssuerURL           = "auth-issuer-url"
+	AuthIssuer              = "auth-issuer"
 	AuthAudience            = "auth-audience"
-	LogAnalyticsWorkspaceId = "workspace-id"
+	LogAnalyticsWorkspaceId = "log-analytics-workspace-id"
 	RadixAPIHost            = "radix-api-host"
 	RadixAPIPath            = "radix-api-path"
 	RadixAPIScheme          = "radix-api-scheme"
@@ -21,33 +21,33 @@ const (
 var flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:    HostName,
-		Usage:   "Host name",
+		Usage:   "Host name/ip",
 		Value:   "",
 		EnvVars: []string{"LOG_API_HOST"},
 	},
 	&cli.IntFlag{
 		Name:    PortNumber,
 		Usage:   "Port number",
-		Value:   8080,
+		Value:   8000,
 		EnvVars: []string{"LOG_API_PORT"},
 	},
 	&cli.StringFlag{
-		Name:     AuthIssuerURL,
-		Usage:    "OIDC issuer URL",
+		Name:     AuthIssuer,
+		Usage:    "OIDC issuer",
 		Required: true,
-		EnvVars:  []string{"LOG_API_ISSUER"},
+		EnvVars:  []string{"LOG_API_AUTH_ISSUER"},
 	},
 	&cli.StringFlag{
 		Name:     AuthAudience,
 		Usage:    "Audience",
 		Required: true,
-		EnvVars:  []string{"LOG_API_AUDIENCE"},
+		EnvVars:  []string{"LOG_API_AUTH_AUDIENCE"},
 	},
 	&cli.StringFlag{
 		Name:     LogAnalyticsWorkspaceId,
 		Usage:    "Log Analytics workspace ID",
 		Required: true,
-		EnvVars:  []string{"LOG_API_WORKSPACE_ID"},
+		EnvVars:  []string{"LOG_API_LOG_ANALYTICS_WORKSPACE_ID"},
 	},
 	&cli.StringFlag{
 		Name:     RadixAPIHost,

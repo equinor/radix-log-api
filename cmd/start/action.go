@@ -52,7 +52,7 @@ func buildLogService(ctx *cli.Context) (logservice.Service, error) {
 }
 
 func buildJwtValidator(ctx *cli.Context) (authn.JwtValidator, error) {
-	return jwt.NewValidator(ctx.String(AuthIssuerURL), ctx.String(AuthAudience))
+	return jwt.NewValidator(ctx.String(AuthIssuer), ctx.String(AuthAudience))
 }
 
 func buildApplicationClient(ctx *cli.Context) (application.ClientService, error) {
