@@ -7,14 +7,9 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
-	"github.com/equinor/radix-log-api/api/controllers"
-	logscontroller "github.com/equinor/radix-log-api/api/controllers/logs"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
-	"github.com/equinor/radix-log-api/api/middleware/authz"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/api/server"
-	"github.com/equinor/radix-log-api/pkg/authz/requirement"
-	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/jwt"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	logservice "github.com/equinor/radix-log-api/services/logs"
@@ -24,56 +19,52 @@ import (
 )
 
 func action(ctx *cli.Context) error {
-	cfg := initConfig(ctx)
-	router, err := initRouter(ctx)
+	router, err := buildRouter(ctx)
 	if err != nil {
 		return err
 	}
-	return server.Run(context.TODO(), router, cfg)
+	return server.Run(context.TODO(), router, buildServerConfig(ctx))
 }
 
-func initRouter(ctx *cli.Context) (http.Handler, error) {
-	logsClient, err := initLogsAnalyticsClient()
+func buildRouter(ctx *cli.Context) (http.Handler, error) {
+	logService, err := buildLogService(ctx)
 	if err != nil {
 		return nil, err
 	}
-	controllers := []controllers.Controller{
-		logscontroller.New(logservice.New(logsClient, ctx.String(LogAnalyticsWorkspaceId))),
-	}
-	jwtValidator, err := jwt.NewValidator(ctx.String(AuthIssuerURL), ctx.String(AuthAudience))
+	jwtValidator, err := buildJwtValidator(ctx)
 	if err != nil {
 		return nil, err
 	}
-	authn := []authn.AuthenticationProvider{
-		authn.NewJwt(jwtValidator),
-	}
-	authz, err := buildAuthorization(ctx)
+	applicationClient, err := buildApplicationClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return router.New(controllers, authn, authz)
+	return router.New(logService, jwtValidator, applicationClient)
 }
 
-func buildAuthorization(ctx *cli.Context) (authz.Authorizer, error) {
+func buildLogService(ctx *cli.Context) (logservice.Service, error) {
+	logsClient, err := buildLogsAnalyticsClient()
+	if err != nil {
+		return nil, err
+	}
+	logService := logservice.New(logsClient, ctx.String(LogAnalyticsWorkspaceId))
+	return logService, nil
+}
+
+func buildJwtValidator(ctx *cli.Context) (authn.JwtValidator, error) {
+	return jwt.NewValidator(ctx.String(AuthIssuerURL), ctx.String(AuthAudience))
+}
+
+func buildApplicationClient(ctx *cli.Context) (application.ClientService, error) {
 	radixApiHost := ctx.String(RadixAPIHost)
 	if len(radixApiHost) == 0 {
 		return nil, fmt.Errorf("required argument %s is not set", RadixAPIHost)
 	}
-	client := buildRadixAPIApplicationClient(radixApiHost, ctx.String(RadixAPIPath), ctx.String(RadixAPIScheme))
-	appOwnerRequirement := requirement.NewAppOwnerRequirement(client)
-	auth := authz.NewAuthorizer(func(ab authz.AuthorizationBuilder) {
-		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authz.PolicyBuilder) {
-			pb.RequireAuthenticatedUser().AddRequirement(appOwnerRequirement)
-		})
-	})
-	return auth, nil
+	client := application.New(runtimeclient.New(radixApiHost, ctx.String(RadixAPIPath), []string{ctx.String(RadixAPIScheme)}), strfmt.Default)
+	return client, nil
 }
 
-func buildRadixAPIApplicationClient(host, path, scheme string) application.ClientService {
-	return application.New(runtimeclient.New(host, path, []string{scheme}), strfmt.Default)
-}
-
-func initLogsAnalyticsClient() (*azquery.LogsClient, error) {
+func buildLogsAnalyticsClient() (*azquery.LogsClient, error) {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		return nil, err
@@ -82,7 +73,7 @@ func initLogsAnalyticsClient() (*azquery.LogsClient, error) {
 	return azquery.NewLogsClient(cred, nil)
 }
 
-func initConfig(ctx *cli.Context) *server.Config {
+func buildServerConfig(ctx *cli.Context) *server.Config {
 	cfg := &server.Config{
 		Host: ctx.String(HostName),
 		Port: ctx.Int(PortNumber),
