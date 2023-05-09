@@ -84,3 +84,40 @@ func (s *authnzTestSuite) Test_JwtValidatorTokenGenericError() {
 	r.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
 }
+
+func (s *authnzTestSuite) Test_SuccessfulAuthentication() {
+	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	token := "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(&getApplicationMatcher{}, &getApplicationAuthMatcher{}).Return(nil, nil).Times(1)
+	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	s.Equal(http.StatusInternalServerError, w.Code)
+}
+
+type getApplicationMatcher struct{}
+
+// Matches returns whether x is a match.
+func (m *getApplicationMatcher) Matches(x interface{}) bool {
+	return true
+}
+
+// String describes what the matcher matches.
+func (m *getApplicationMatcher) String() string {
+	return ""
+}
+
+type getApplicationAuthMatcher struct{}
+
+// Matches returns whether x is a match.
+func (m *getApplicationAuthMatcher) Matches(x interface{}) bool {
+	return true
+}
+
+// String describes what the matcher matches.
+func (m *getApplicationAuthMatcher) String() string {
+	return ""
+}
