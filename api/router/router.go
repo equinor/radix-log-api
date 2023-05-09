@@ -24,7 +24,7 @@ func New(logService logservice.Service, jwtValidator authnmiddleware.JwtValidato
 	if err != nil {
 		return nil, err
 	}
-	authn := authnmiddleware.New(authnmiddleware.NewJwt(jwtValidator))
+	authn := authnmiddleware.New(authnmiddleware.NewJwtProvider(jwtValidator))
 	controllers := buildControllers(logService)
 
 	engine := gin.New()

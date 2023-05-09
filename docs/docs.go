@@ -73,23 +73,38 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ComponentInventoryResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     }
                 }
             }
@@ -168,19 +183,34 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     }
                 }
             }
@@ -273,19 +303,34 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     }
                 }
             }
@@ -371,20 +416,91 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "errors.Status": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ComponentInventoryResponse": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Replica"
+                    }
+                }
+            }
+        },
+        "models.Container": {
+            "type": "object",
+            "properties": {
+                "creationTimestamp": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "d40ba550f05b252da60e5b873c32204368ecb5b9e17ea123738d318be4e5295b"
+                }
+            }
+        },
+        "models.Replica": {
+            "type": "object",
+            "properties": {
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Container"
+                    }
+                },
+                "creationTimestamp": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "web-7db5f9c99b-nwn2w"
                 }
             }
         }

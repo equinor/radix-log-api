@@ -16,7 +16,9 @@ require (
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/go-openapi/swag v0.22.3
 	github.com/go-openapi/validate v0.22.1
+	github.com/golang/mock v1.6.0
 	github.com/sirupsen/logrus v1.9.0
+	github.com/stretchr/testify v1.8.2
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
@@ -32,6 +34,7 @@ require (
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -61,6 +64,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/samber/lo v1.37.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect

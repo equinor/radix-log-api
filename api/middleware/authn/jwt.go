@@ -5,20 +5,20 @@ import (
 	"strings"
 )
 
-type JwtValidator interface {
-	Validate(token string) error
-}
-
-func NewJwt(validator JwtValidator) AuthenticationProvider {
-	return &jwtProvider{validator: validator}
-}
-
 type jwtPrincipal struct {
 	token string
 }
 
 func (p *jwtPrincipal) Token() string         { return p.token }
 func (p *jwtPrincipal) IsAuthenticated() bool { return true }
+
+type JwtValidator interface {
+	Validate(token string) error
+}
+
+func NewJwtProvider(validator JwtValidator) AuthenticationProvider {
+	return &jwtProvider{validator: validator}
+}
 
 type jwtProvider struct {
 	validator JwtValidator

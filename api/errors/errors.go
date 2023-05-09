@@ -5,8 +5,9 @@ import (
 	"net/http"
 )
 
+// Status describes an error response
 type Status struct {
-	Code    int32  `json:"code,omitempty"`
+	Code    int32  `json:"-"`
 	Reason  string `json:"reason,omitempty"`
 	Message string `json:"message,omitempty"`
 }

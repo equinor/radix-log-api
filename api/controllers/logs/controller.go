@@ -58,12 +58,12 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 // @Tags Inventory
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {string} ALogRecord
-// @Failure 400
-// @Failure 401
-// @Failure 403
-// @Failure 404
-// @Failure 500
+// @Success 200 {object} models.ComponentInventoryResponse
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 404 {object} errors.Status
+// @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
@@ -112,12 +112,12 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 // @Tags Logs
 // @Produce plain
 // @Security ApiKeyAuth
-// @Success 200 {string} ALogRecord
-// @Failure 400
-// @Failure 401
-// @Failure 403
-// @Failure 404
-// @Failure 500
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 404 {object} errors.Status
+// @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
@@ -147,12 +147,12 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Tags Logs
 // @Produce plain
 // @Security ApiKeyAuth
-// @Success 200 {string} ALogRecord
-// @Failure 400
-// @Failure 401
-// @Failure 403
-// @Failure 404
-// @Failure 500
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 404 {object} errors.Status
+// @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
@@ -184,12 +184,12 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 // @Tags Logs
 // @Produce plain
 // @Security ApiKeyAuth
-// @Success 200 {string} ALogRecord
-// @Failure 400
-// @Failure 401
-// @Failure 403
-// @Failure 404
-// @Failure 500
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 404 {object} errors.Status
+// @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
 // @Param componentName path string true "Component Name"
