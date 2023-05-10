@@ -28,10 +28,9 @@ func (r *appOwnerRequirement) HandleRequirement(ctx *authz.AuthorizationContext)
 		application.NewGetApplicationParams().WithAppName(params.AppName),
 		httptransport.BearerToken(ctx.User().Token()))
 
-	// Return Forbidden for both NotFound or Forbidden responses to disallow enumeration of existing app names
 	switch err.(type) {
 	case *application.GetApplicationUnauthorized:
-		return apierrors.NewUnauthorizedError(apierrors.WithCause(err))
+		return apierrors.NewForbiddenError(apierrors.WithCause(err))
 	case *application.GetApplicationForbidden:
 		return apierrors.NewForbiddenError(apierrors.WithCause(err))
 	case *application.GetApplicationNotFound:

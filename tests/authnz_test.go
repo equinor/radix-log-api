@@ -8,116 +8,155 @@ import (
 
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/router"
-	"github.com/equinor/radix-log-api/tests/mock"
-	"github.com/golang/mock/gomock"
+	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
+	"github.com/equinor/radix-log-api/tests/internal/match"
 	"github.com/stretchr/testify/suite"
 )
 
-func Test_AuthnzTestSuite(t *testing.T) {
+func Test_AuthnzTest(t *testing.T) {
 	suite.Run(t, new(authnzTestSuite))
 }
 
 type authnzTestSuite struct {
-	suite.Suite
-	logService        *mock.MockLogService
-	jwtValidator      *mock.MockJwtValidator
-	applicationClient *mock.MockRadixApiApplicationClient
-}
-
-func (s *authnzTestSuite) SetupTest() {
-	ctrl := gomock.NewController(s.T())
-	s.logService = mock.NewMockLogService(ctrl)
-	s.jwtValidator = mock.NewMockJwtValidator(ctrl)
-	s.applicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
+	testSuite
 }
 
 func (s *authnzTestSuite) Test_MissingAuthorizationHeader() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp")
+	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
 }
 
 func (s *authnzTestSuite) Test_MissingBearerInAuthorizationHeader() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withAuthorization(""))
+	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withAuthorization(""))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
 }
 
 func (s *authnzTestSuite) Test_MissingTokenInBearerAuthorizationHeader() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withBearerAuthorization(""))
+	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(""))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
 }
 
 func (s *authnzTestSuite) Test_JwtValidatorTokenUnauthorized() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
 	token := "anytoken"
 	s.jwtValidator.EXPECT().Validate(token).Return(apierrors.NewUnauthorizedError()).Times(1)
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withBearerAuthorization(token))
+
+	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(token))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
 }
 
 func (s *authnzTestSuite) Test_JwtValidatorTokenGenericError() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
 	token := "anytoken"
 	s.jwtValidator.EXPECT().Validate(token).Return(errors.New("generic error")).Times(1)
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withBearerAuthorization(token))
+
+	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(token))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
 }
 
-func (s *authnzTestSuite) Test_SuccessfulAuthentication() {
-	r, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+func (s *authnzTestSuite) Test_Authorization_GetApplication_AppNotFound() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	token := "anytoken"
+	appName, token := "anyapp", "anytoken"
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
-	s.applicationClient.EXPECT().GetApplication(&getApplicationMatcher{}, &getApplicationAuthMatcher{}).Return(nil, nil).Times(1)
-	req, _ := newInventoryRequest("anyapp", "anyenv", "anycomp", withBearerAuthorization(token))
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationNotFound{}).Times(1)
+
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusForbidden, w.Code)
+}
+
+func (s *authnzTestSuite) Test_Authorization_GetApplication_Unauthorized() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, token := "anyapp", "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationUnauthorized{}).Times(1)
+
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusForbidden, w.Code)
+}
+
+func (s *authnzTestSuite) Test_Authorization_GetApplication_Forbidden() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, token := "anyapp", "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationForbidden{}).Times(1)
+
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusForbidden, w.Code)
+}
+
+func (s *authnzTestSuite) Test_Authorization_GetApplication_InternalServerError() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, token := "anyapp", "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationInternalServerError{}).Times(1)
+
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
 }
 
-type getApplicationMatcher struct{}
+func (s *authnzTestSuite) Test_Authorization_GetApplication_Conflict() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
 
-// Matches returns whether x is a match.
-func (m *getApplicationMatcher) Matches(x interface{}) bool {
-	return true
+	appName, token := "anyapp", "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationConflict{}).Times(1)
+
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusInternalServerError, w.Code)
 }
 
-// String describes what the matcher matches.
-func (m *getApplicationMatcher) String() string {
-	return ""
-}
+func (s *authnzTestSuite) Test_Authorization_GetApplication_GenericError() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
 
-type getApplicationAuthMatcher struct{}
+	appName, token := "anyapp", "anytoken"
+	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, errors.New("any error")).Times(1)
 
-// Matches returns whether x is a match.
-func (m *getApplicationAuthMatcher) Matches(x interface{}) bool {
-	return true
-}
-
-// String describes what the matcher matches.
-func (m *getApplicationAuthMatcher) String() string {
-	return ""
+	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusInternalServerError, w.Code)
 }
