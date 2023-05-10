@@ -10,6 +10,7 @@ import (
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/equinor/radix-log-api/tests/internal/match"
+	"github.com/equinor/radix-log-api/tests/internal/request"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,7 +26,7 @@ func (s *authnzTestSuite) Test_MissingAuthorizationHeader() {
 	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"))
+	req, _ := request.New(request.ComponentInventoryUrl("anyapp", "anyenv", "anycomp"))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
@@ -35,7 +36,7 @@ func (s *authnzTestSuite) Test_MissingBearerInAuthorizationHeader() {
 	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withAuthorization(""))
+	req, _ := request.New(request.ComponentInventoryUrl("anyapp", "anyenv", "anycomp"), request.WithAuthorization(""))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
@@ -45,7 +46,7 @@ func (s *authnzTestSuite) Test_MissingTokenInBearerAuthorizationHeader() {
 	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
-	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(""))
+	req, _ := request.New(request.ComponentInventoryUrl("anyapp", "anyenv", "anycomp"), request.WithBearerAuthorization(""))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
@@ -58,7 +59,7 @@ func (s *authnzTestSuite) Test_JwtValidatorTokenUnauthorized() {
 	token := "anytoken"
 	s.jwtValidator.EXPECT().Validate(token).Return(apierrors.NewUnauthorizedError()).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl("anyapp", "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusUnauthorized, w.Code)
@@ -71,7 +72,7 @@ func (s *authnzTestSuite) Test_JwtValidatorTokenGenericError() {
 	token := "anytoken"
 	s.jwtValidator.EXPECT().Validate(token).Return(errors.New("generic error")).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl("anyapp", "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl("anyapp", "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
@@ -85,7 +86,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_AppNotFound() {
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationNotFound{}).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusForbidden, w.Code)
@@ -99,7 +100,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_Unauthorized() {
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationUnauthorized{}).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusForbidden, w.Code)
@@ -113,7 +114,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_Forbidden() {
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationForbidden{}).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusForbidden, w.Code)
@@ -127,7 +128,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_InternalServerError(
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationInternalServerError{}).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
@@ -141,7 +142,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_Conflict() {
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationConflict{}).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
@@ -155,7 +156,7 @@ func (s *authnzTestSuite) Test_Authorization_GetApplication_GenericError() {
 	s.jwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
 	s.applicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, errors.New("any error")).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, "anyenv", "anycomp"), withBearerAuthorization(token))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, "anyenv", "anycomp"), request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)

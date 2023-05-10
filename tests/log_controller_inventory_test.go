@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"github.com/equinor/radix-log-api/api/models"
 	"github.com/equinor/radix-log-api/api/router"
 	logservice "github.com/equinor/radix-log-api/services/logs"
+	"github.com/equinor/radix-log-api/tests/internal/request"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 )
@@ -52,7 +54,7 @@ func (s *logControllerTestSuite) Test_ComponentInventory_Success() {
 	}
 	s.logService.EXPECT().ComponentInventory(appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(inventory, nil).Times(1)
 
-	req, _ := newRequest(newComponentInventoryUrl(appName, envName, compName), withBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentInventoryUrl(appName, envName, compName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	expected := models.ComponentInventoryResponse{Replicas: []models.Replica{
@@ -86,11 +88,55 @@ func (s *logControllerTestSuite) Test_ComponentInventory_WithParams() {
 	start, end := timeFormatRFC3339(time.Now()), timeFormatRFC3339(time.Now().Add(time.Hour))
 	s.logService.EXPECT().ComponentInventory(appName, envName, compName, &logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
-	req, _ := newRequest(
-		newComponentInventoryUrl(appName, envName, compName, withQueryParam("start", start.Format(time.RFC3339)), withQueryParam("end", end.Format(time.RFC3339))),
-		withBearerAuthorization("anytoken"),
+	req, _ := request.New(
+		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
+		request.WithBearerAuthorization("anytoken"),
 	)
 	w := httptest.NewRecorder()
 	sut.ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
+}
+
+func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_Start() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+	req, _ := request.New(
+		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", "notadate")),
+		request.WithBearerAuthorization("anytoken"),
+	)
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusBadRequest, w.Code)
+}
+
+func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_End() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+	req, _ := request.New(
+		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("end", "notadate")),
+		request.WithBearerAuthorization("anytoken"),
+	)
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusBadRequest, w.Code)
+}
+
+func (s *logControllerTestSuite) Test_ComponentInventory_LogServiceError() {
+	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
+	s.Require().NoError(err)
+
+	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+	s.logService.EXPECT().ComponentInventory(appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+
+	req, _ := request.New(
+		request.ComponentInventoryUrl(appName, envName, compName),
+		request.WithBearerAuthorization("anytoken"),
+	)
+	w := httptest.NewRecorder()
+	sut.ServeHTTP(w, req)
+	s.Equal(http.StatusInternalServerError, w.Code)
 }

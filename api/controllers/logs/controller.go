@@ -62,7 +62,6 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 // @Failure 400 {object} errors.Status
 // @Failure 401 {object} errors.Status
 // @Failure 403 {object} errors.Status
-// @Failure 404 {object} errors.Status
 // @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
@@ -116,7 +115,6 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 // @Failure 400 {object} errors.Status
 // @Failure 401 {object} errors.Status
 // @Failure 403 {object} errors.Status
-// @Failure 404 {object} errors.Status
 // @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
@@ -151,7 +149,6 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 // @Failure 400 {object} errors.Status
 // @Failure 401 {object} errors.Status
 // @Failure 403 {object} errors.Status
-// @Failure 404 {object} errors.Status
 // @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
@@ -188,7 +185,6 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 // @Failure 400 {object} errors.Status
 // @Failure 401 {object} errors.Status
 // @Failure 403 {object} errors.Status
-// @Failure 404 {object} errors.Status
 // @Failure 500 {object} errors.Status
 // @Param appName path string true "Application Name"
 // @Param envName path string true "Environment Name"
