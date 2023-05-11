@@ -1,4 +1,4 @@
-package tests
+package logs
 
 import (
 	"bytes"
@@ -10,38 +10,35 @@ import (
 	"testing"
 	"time"
 
-	"github.com/equinor/radix-log-api/api/router"
+	"github.com/equinor/radix-log-api/internal/tests/request"
+	"github.com/equinor/radix-log-api/internal/tests/utils"
 	logservice "github.com/equinor/radix-log-api/services/logs"
-	"github.com/equinor/radix-log-api/tests/internal/request"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 )
 
-func Test_LogControllerContainerLogTest(t *testing.T) {
-	suite.Run(t, new(logControllerContainerLogTestSuite))
+func Test_ControllerContainerLogSuite(t *testing.T) {
+	suite.Run(t, new(controllerContainerLogTestSuite))
 }
 
-type logControllerContainerLogTestSuite struct {
-	testSuite
+type controllerContainerLogTestSuite struct {
+	controllerTestSuite
 }
 
-func (s *logControllerContainerLogTestSuite) SetupTest() {
-	s.testSuite.SetupTest()
-	s.jwtValidator.EXPECT().Validate(gomock.Any()).AnyTimes()
-	s.applicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
+func (s *controllerContainerLogTestSuite) SetupTest() {
+	s.controllerTestSuite.SetupTest()
+	s.JwtValidator.EXPECT().Validate(gomock.Any()).AnyTimes()
+	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_Success() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_Success() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	log := "line1\nline2"
-	s.logService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
 	s.Equal("text/plain; charset=utf-8", w.Header().Get("Content-Type"))
 	s.Empty(w.Header().Get("Content-Disposition"))
@@ -50,17 +47,14 @@ func (s *logControllerContainerLogTestSuite) Test_ContainerLog_Success() {
 	s.Equal(log, string(actual))
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_ResponseAsAttachment() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_ResponseAsAttachment() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	log := "line1\nline2"
-	s.logService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("file", "true")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
 	s.Equal("text/plain; charset=utf-8", w.Header().Get("Content-Type"))
 	s.Equal(`attachment; filename="log.txt"`, w.Header().Get("Content-Disposition"))
@@ -69,73 +63,55 @@ func (s *logControllerContainerLogTestSuite) Test_ContainerLog_ResponseAsAttachm
 	s.Equal(log, string(actual))
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_WithParams() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_WithParams() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
-	start, end, limit := timeFormatRFC3339(time.Now()), timeFormatRFC3339(time.Now().Add(time.Hour)), 500
-	s.logService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
+	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
+	s.LogService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_TailNegative() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_TailNegative() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("tail", strconv.Itoa(-1))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_StartNonDate() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_StartNonDate() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("start", "notadate")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_EndNonDate() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_EndNonDate() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("end", "notadate")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_FileNonBoolean() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_InvalidParam_FileNonBoolean() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId, request.WithQueryParam("file", "notabool")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerContainerLogTestSuite) Test_ContainerLog_LogServiceError() {
-	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
-	s.Require().NoError(err)
-
+func (s *controllerContainerLogTestSuite) Test_ContainerLog_LogServiceError() {
 	appName, envName, compName, replicaName, containerId := "anyapp", "anyenv", "anycomp", "anyreplica", "anycontainer"
-	s.logService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
+	s.LogService.EXPECT().ComponentContainerLog(appName, envName, compName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
 	req, _ := request.New(request.ContainerLogUrl(appName, envName, compName, replicaName, containerId), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
-	sut.ServeHTTP(w, req)
+	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)
 }

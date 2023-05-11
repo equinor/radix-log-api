@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var defaultPolicy = &policy{requirements: []Requirement{denyAnonymousUserRequirement}}
+
 type Authorizer interface {
 	Authorize(policies ...string) gin.HandlerFunc
 }

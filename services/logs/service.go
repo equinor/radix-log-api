@@ -129,6 +129,7 @@ func (s *service) ComponentInventory(appName, envName, componentName string, opt
 
 	podmap := slice.Reduce(resp.Tables[0].Rows, map[string]*Pod{}, func(acc map[string]*Pod, row azquery.Row) map[string]*Pod {
 		podName := row[0].(string)
+		fmt.Println(podName)
 		pod, ok := acc[podName]
 		if !ok {
 			pod = &Pod{Name: podName, CreationTimestamp: mustParseTime(row[2].(string)), Containers: []Container{}}

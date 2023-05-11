@@ -7,6 +7,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/equinor/radix-log-api/api/controllers"
+	logscontroller "github.com/equinor/radix-log-api/api/controllers/logs"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/api/server"
@@ -27,10 +29,7 @@ func action(ctx *cli.Context) error {
 }
 
 func buildRouter(ctx *cli.Context) (http.Handler, error) {
-	logService, err := buildLogService(ctx)
-	if err != nil {
-		return nil, err
-	}
+
 	jwtValidator, err := buildJwtValidator(ctx)
 	if err != nil {
 		return nil, err
@@ -39,7 +38,22 @@ func buildRouter(ctx *cli.Context) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return router.New(logService, jwtValidator, applicationClient)
+	controllers, err := buildControllers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return router.New(jwtValidator, applicationClient, controllers...)
+}
+
+func buildControllers(ctx *cli.Context) ([]controllers.Controller, error) {
+	logService, err := buildLogService(ctx)
+	if err != nil {
+		return nil, err
+	}
+	contollers := []controllers.Controller{
+		logscontroller.New(logService),
+	}
+	return contollers, nil
 }
 
 func buildLogService(ctx *cli.Context) (logservice.Service, error) {

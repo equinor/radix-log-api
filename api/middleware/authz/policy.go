@@ -5,8 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var defaultPolicy = &policy{requirements: []Requirement{denyAnonymousUserRequirement}}
-
 type AuthorizationContext struct {
 	user   authn.TokenPrincipal
 	ginCtx *gin.Context
