@@ -44,7 +44,7 @@ var (
 		paramNamespace, paramPodName, paramContainerId, paramAppName, paramComponentName)
 
 	componentInventory string = fmt.Sprintf(`KubePodInventory
-	| where Namespace == %s and ContainerID != ""
+	| where Namespace == %s and ContainerID != "" and isnotnull(ContainerCreationTimeStamp) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
 	| project Name, ContainerID, PodCreationTimeStamp, ContainerCreationTimeStamp=coalesce(ContainerCreationTimeStamp,todatetime(parse_json(ContainerLastStatus)["startedAt"]))
