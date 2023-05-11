@@ -97,7 +97,7 @@ func (s *logControllerTestSuite) Test_ComponentInventory_WithParams() {
 	s.Equal(http.StatusOK, w.Code)
 }
 
-func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_Start() {
+func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_StartNonData() {
 	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 
@@ -111,7 +111,7 @@ func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_Start() {
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_End() {
+func (s *logControllerTestSuite) Test_ComponentInventory_InvalidParam_EndNonDate() {
 	sut, err := router.New(s.logService, s.jwtValidator, s.applicationClient)
 	s.Require().NoError(err)
 

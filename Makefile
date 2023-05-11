@@ -1,4 +1,8 @@
 
+.PHONY: test
+test:
+	go test -cover `go list ./...`
+
 .PHONY: swagger
 swagger:
 	swag init

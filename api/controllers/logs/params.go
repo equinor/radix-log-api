@@ -14,7 +14,7 @@ type timeIntervalParams struct {
 
 type logParams struct {
 	timeIntervalParams
-	Tail *int `form:"tail"`
+	Tail *int `form:"tail" binding:"omitempty,min=0"`
 	File bool `form:"file"`
 }
 
