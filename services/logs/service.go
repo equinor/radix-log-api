@@ -127,14 +127,32 @@ func (s *service) ComponentInventory(appName, envName, componentName string, opt
 		return nil, err
 	}
 
+	colMap := map[string]int{}
+	for i, col := range resp.Tables[0].Columns {
+		colMap[*col.Name] = i
+	}
+
 	podmap := slice.Reduce(resp.Tables[0].Rows, map[string]*Pod{}, func(acc map[string]*Pod, row azquery.Row) map[string]*Pod {
-		podName := row[0].(string)
-		fmt.Println(podName)
+		podName := row[colMap["Name"]].(string)
+		lastTimeGenerated := mustParseTime(row[colMap["LastTimeGenerated"]].(string))
 		pod, ok := acc[podName]
 		if !ok {
-			pod = &Pod{Name: podName, CreationTimestamp: mustParseTime(row[2].(string)), Containers: []Container{}}
+			pod = &Pod{
+				Name:              podName,
+				CreationTimestamp: mustParseTime(row[colMap["PodCreationTimeStamp"]].(string)),
+				LastKnown:         lastTimeGenerated,
+				Containers:        []Container{},
+			}
 		}
-		pod.Containers = append(pod.Containers, Container{Id: row[1].(string), CreationTimestamp: mustParseTime(row[3].(string))})
+		if lastTimeGenerated.After(pod.LastKnown) {
+			pod.LastKnown = lastTimeGenerated
+		}
+		pod.Containers = append(pod.Containers,
+			Container{
+				Id:                row[colMap["ContainerID"]].(string),
+				LastKnown:         lastTimeGenerated,
+				CreationTimestamp: mustParseTime(row[colMap["ContainerCreationTimeStamp"]].(string)),
+			})
 		acc[podName] = pod
 		return acc
 	})

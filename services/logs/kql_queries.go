@@ -47,7 +47,7 @@ var (
 	| where Namespace == %s and ContainerID != "" and isnotnull(ContainerCreationTimeStamp) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
-	| project Name, ContainerID, PodCreationTimeStamp, ContainerCreationTimeStamp=coalesce(ContainerCreationTimeStamp,todatetime(parse_json(ContainerLastStatus)["startedAt"]))
-	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(ContainerCreationTimeStamp) by Name, ContainerID`,
+	| project TimeGenerated, Name, ContainerID, PodCreationTimeStamp, ContainerCreationTimeStamp=coalesce(ContainerCreationTimeStamp,todatetime(parse_json(ContainerLastStatus)["startedAt"]))
+	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(ContainerCreationTimeStamp), LastTimeGenerated=max(TimeGenerated) by Name, ContainerID`,
 		paramNamespace, paramAppName, paramComponentName)
 )

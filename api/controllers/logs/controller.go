@@ -99,6 +99,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 			return models.Replica{
 				Name:              s.Name,
 				CreationTimestamp: s.CreationTimestamp,
+				LastKnown:         s.LastKnown,
 				Containers:        slice.Map(s.Containers, func(c logservice.Container) models.Container { return models.Container(c) })}
 		}),
 	}

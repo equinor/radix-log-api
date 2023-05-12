@@ -32,20 +32,23 @@ func (s *logControllerComponentInventoryTestSuite) SetupTest() {
 
 func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Success() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+	pod1BaseTime, pod2BaseTime := time.Now(), time.Now().Add(1*time.Hour)
 	inventory := []logservice.Pod{
 		{
 			Name:              "pod1",
-			CreationTimestamp: utils.TimeFormatRFC3339(time.Now()),
+			CreationTimestamp: utils.TimeFormatRFC3339(pod1BaseTime),
+			LastKnown:         utils.TimeFormatRFC3339(pod1BaseTime.Add(1 * time.Minute)),
 			Containers: []logservice.Container{
-				{Id: "c1", CreationTimestamp: utils.TimeFormatRFC3339(time.Now().Add(1 * time.Minute))},
-				{Id: "c2", CreationTimestamp: utils.TimeFormatRFC3339(time.Now().Add(2 * time.Minute))},
+				{Id: "c1", LastKnown: utils.TimeFormatRFC3339(pod1BaseTime.Add(2 * time.Minute)), CreationTimestamp: utils.TimeFormatRFC3339(utils.TimeFormatRFC3339(pod1BaseTime.Add(3 * time.Minute)).Add(3 * time.Minute))},
+				{Id: "c2", LastKnown: utils.TimeFormatRFC3339(time.Now().Add(4 * time.Minute)), CreationTimestamp: utils.TimeFormatRFC3339(time.Now().Add(5 * time.Minute))},
 			},
 		},
 		{
 			Name:              "pod2",
-			CreationTimestamp: utils.TimeFormatRFC3339(time.Now().Add(3 * time.Minute)),
+			CreationTimestamp: utils.TimeFormatRFC3339(pod2BaseTime),
+			LastKnown:         utils.TimeFormatRFC3339(pod2BaseTime.Add(1 * time.Minute)),
 			Containers: []logservice.Container{
-				{Id: "c3", CreationTimestamp: utils.TimeFormatRFC3339(time.Now().Add(4 * time.Minute))},
+				{Id: "c3", LastKnown: utils.TimeFormatRFC3339(pod2BaseTime.Add(2 * time.Minute)), CreationTimestamp: utils.TimeFormatRFC3339(utils.TimeFormatRFC3339(pod2BaseTime.Add(3 * time.Minute)).Add(3 * time.Minute))},
 			},
 		},
 	}
@@ -58,16 +61,18 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 		{
 			Name:              inventory[0].Name,
 			CreationTimestamp: inventory[0].CreationTimestamp,
+			LastKnown:         inventory[0].LastKnown,
 			Containers: []models.Container{
-				{Id: inventory[0].Containers[0].Id, CreationTimestamp: inventory[0].Containers[0].CreationTimestamp},
-				{Id: inventory[0].Containers[1].Id, CreationTimestamp: inventory[0].Containers[1].CreationTimestamp},
+				{Id: inventory[0].Containers[0].Id, LastKnown: inventory[0].Containers[0].LastKnown, CreationTimestamp: inventory[0].Containers[0].CreationTimestamp},
+				{Id: inventory[0].Containers[1].Id, LastKnown: inventory[0].Containers[1].LastKnown, CreationTimestamp: inventory[0].Containers[1].CreationTimestamp},
 			},
 		},
 		{
 			Name:              inventory[1].Name,
 			CreationTimestamp: inventory[1].CreationTimestamp,
+			LastKnown:         inventory[1].LastKnown,
 			Containers: []models.Container{
-				{Id: inventory[1].Containers[0].Id, CreationTimestamp: inventory[1].Containers[0].CreationTimestamp},
+				{Id: inventory[1].Containers[0].Id, LastKnown: inventory[1].Containers[0].LastKnown, CreationTimestamp: inventory[1].Containers[0].CreationTimestamp},
 			},
 		},
 	}}
