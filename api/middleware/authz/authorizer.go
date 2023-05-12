@@ -3,24 +3,37 @@ package authz
 import (
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	errInvalidUserTypeInContext = errors.New("invalid user type")
+	errPolicyNotFound           = func(policyName string) error { return fmt.Errorf("policy with name '%s' not found", policyName) }
+)
+
 var defaultPolicy = &policy{requirements: []Requirement{denyAnonymousUserRequirement}}
 
+// Authorizer is used to create authorization middlewares using the Authorize() method.
 type Authorizer interface {
+	// Authorize returns a Gin middleware that validates the incoming request with the specified policies.
+	// The middlesware aborts the Gin context if any of the policies fails validation.
 	Authorize(policies ...string) gin.HandlerFunc
 }
 
-type AuthorizationBuilder interface {
-	AddPolicy(name string, configure func(PolicyBuilder)) AuthorizationBuilder
-	WithDefaultPolicy(configure func(PolicyBuilder)) AuthorizationBuilder
+// AuthorizationConfiguration configures the authorizer.
+type AuthorizationConfiguration interface {
+	// AddPolicy registers a named policy.
+	AddPolicy(name string, configure func(PolicyConfiguration)) AuthorizationConfiguration
+
+	// WithDefaultPolicy sets the default policy.
+	// This policy is used when no policy names are specified for the Authorize() method.
+	WithDefaultPolicy(configure func(PolicyConfiguration)) AuthorizationConfiguration
 }
 
-func NewAuthorizer(configure func(AuthorizationBuilder)) Authorizer {
+// NewAuthorizer creates a new Authorizer
+func NewAuthorizer(configure func(AuthorizationConfiguration)) Authorizer {
 	authz := &authorizer{
 		policies:      map[string]Policy{},
 		defaultPolicy: defaultPolicy,
@@ -46,7 +59,8 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 			if userTyped, ok := user.(authn.TokenPrincipal); ok {
 				authCtx.user = userTyped
 			} else {
-				ctx.AbortWithError(http.StatusInternalServerError, errors.New("invalid user type"))
+				ctx.Error(errInvalidUserTypeInContext)
+				ctx.Abort()
 				return
 			}
 		}
@@ -78,14 +92,14 @@ func (a *authorizer) getPoliciesByName(policyNames []string) ([]Policy, error) {
 	for _, policyName := range policyNames {
 		policy, found := a.policies[policyName]
 		if !found {
-			return nil, fmt.Errorf("policy with name '%s' not found", policyName)
+			return nil, errPolicyNotFound(policyName)
 		}
 		policies = append(policies, policy)
 	}
 	return policies, nil
 }
 
-func (a *authorizer) AddPolicy(name string, configure func(PolicyBuilder)) AuthorizationBuilder {
+func (a *authorizer) AddPolicy(name string, configure func(PolicyConfiguration)) AuthorizationConfiguration {
 	p := &policy{}
 	if configure != nil {
 		configure(p)
@@ -94,7 +108,7 @@ func (a *authorizer) AddPolicy(name string, configure func(PolicyBuilder)) Autho
 	return a
 }
 
-func (a *authorizer) WithDefaultPolicy(configure func(PolicyBuilder)) AuthorizationBuilder {
+func (a *authorizer) WithDefaultPolicy(configure func(PolicyConfiguration)) AuthorizationConfiguration {
 	p := &policy{}
 	if configure != nil {
 		configure(p)

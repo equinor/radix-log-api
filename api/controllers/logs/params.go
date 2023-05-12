@@ -18,10 +18,11 @@ type logParams struct {
 	File bool `form:"file"`
 }
 
-func (p *logParams) AsLogOptions() *logservice.LogOptions {
+// AsLogOptions converts the parameters to LogOptions parameters
+func (p *logParams) AsLogOptions() logservice.LogOptions {
 	options := logservice.LogOptions{LimitRows: p.Tail}
 	if p.Start != nil || p.End != nil {
-		timeInverval := logservice.TimeInterval{End: time.Now()}
+		timeInverval := logservice.TimeInterval{}
 		if p.Start != nil {
 			timeInverval.Start = *p.Start
 		}
@@ -31,17 +32,18 @@ func (p *logParams) AsLogOptions() *logservice.LogOptions {
 		options.Timeinterval = &timeInverval
 	}
 
-	return &options
+	return options
 }
 
 type inventoryParams struct {
 	timeIntervalParams
 }
 
-func (p *inventoryParams) AsComponentPodInventoryOptions() *logservice.ComponentPodInventoryOptions {
+// AsComponentPodInventoryOptions converts the parameters to ComponentPodInventoryOptions parameters
+func (p *inventoryParams) AsComponentPodInventoryOptions() logservice.ComponentPodInventoryOptions {
 	var options logservice.ComponentPodInventoryOptions
 	if p.Start != nil || p.End != nil {
-		timeInverval := logservice.TimeInterval{End: time.Now()}
+		timeInverval := logservice.TimeInterval{}
 		if p.Start != nil {
 			timeInverval.Start = *p.Start
 		}
@@ -51,7 +53,7 @@ func (p *inventoryParams) AsComponentPodInventoryOptions() *logservice.Component
 		options.Timeinterval = &timeInverval
 	}
 
-	return &options
+	return options
 }
 
 func paramsFromContext[T any](ctx *gin.Context) (*T, error) {

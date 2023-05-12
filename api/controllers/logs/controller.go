@@ -87,7 +87,8 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 		return
 	}
 
-	pods, err := c.appLogsService.ComponentInventory(params.AppName, params.EnvName, params.ComponentName, queryParams.AsComponentPodInventoryOptions())
+	options := queryParams.AsComponentPodInventoryOptions()
+	pods, err := c.appLogsService.ComponentInventory(params.AppName, params.EnvName, params.ComponentName, &options)
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()
@@ -136,8 +137,8 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 		return
 	}
 
-	c.handleLogRequest(ctx, func(options logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, &options)
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.ComponentLog(params.AppName, params.EnvName, params.ComponentName, options)
 	})
 }
 
@@ -172,8 +173,8 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 		return
 	}
 
-	c.handleLogRequest(ctx, func(options logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentPodLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, &options)
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.ComponentPodLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, options)
 	})
 }
 
@@ -210,12 +211,12 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 		return
 	}
 
-	c.handleLogRequest(ctx, func(options logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentContainerLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, &options)
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.ComponentContainerLog(params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, options)
 	})
 }
 
-func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options logservice.LogOptions) (io.Reader, error)) {
+func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options *logservice.LogOptions) (io.Reader, error)) {
 	queryParams, err := paramsFromContext[logParams](ctx)
 	if err != nil {
 		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
@@ -223,7 +224,8 @@ func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options l
 		return
 	}
 
-	logReader, err := logSource(*queryParams.AsLogOptions())
+	logOptions := queryParams.AsLogOptions()
+	logReader, err := logSource(&logOptions)
 	if err != nil {
 		ctx.Error(err)
 		ctx.Abort()

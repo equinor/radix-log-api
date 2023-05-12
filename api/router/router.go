@@ -46,8 +46,8 @@ func mapControllers(controllers []controllers.Controller, router gin.IRoutes, au
 
 func buildAuthorizer(applicationClient applicationclient.ClientService) (authzmiddleware.Authorizer, error) {
 	appOwnerRequirement := requirement.NewAppOwnerRequirement(applicationClient)
-	auth := authzmiddleware.NewAuthorizer(func(ab authzmiddleware.AuthorizationBuilder) {
-		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authzmiddleware.PolicyBuilder) {
+	auth := authzmiddleware.NewAuthorizer(func(ab authzmiddleware.AuthorizationConfiguration) {
+		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authzmiddleware.PolicyConfiguration) {
 			pb.RequireAuthenticatedUser().AddRequirement(appOwnerRequirement)
 		})
 	})

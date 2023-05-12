@@ -12,7 +12,11 @@ type TimeInterval struct {
 }
 
 func (o TimeInterval) AzQueryTimeinterval() azquery.TimeInterval {
-	return azquery.NewTimeInterval(o.Start, o.End)
+	end := o.End
+	if end.IsZero() {
+		end = time.Now()
+	}
+	return azquery.NewTimeInterval(o.Start, end)
 }
 
 type LogOptions struct {

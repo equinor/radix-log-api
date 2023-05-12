@@ -7,7 +7,7 @@ import (
 
 // Status describes an error response
 type Status struct {
-	Code    int32  `json:"-"`
+	Code    int    `json:"-"`
 	Reason  string `json:"reason,omitempty"`
 	Message string `json:"message,omitempty"`
 }

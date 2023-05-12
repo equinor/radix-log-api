@@ -9,6 +9,8 @@ type Endpoint struct {
 	AuthorizationPolicies []string
 }
 
+// Controller defines the endpoints for a HTTP API controller.
 type Controller interface {
+	// Endpoints returns the endpoints defined for the controller.
 	Endpoints() []Endpoint
 }
