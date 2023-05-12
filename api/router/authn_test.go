@@ -25,14 +25,14 @@ type authnTestSuite struct {
 	suite.Suite
 	JwtValidator      *authn.MockJwtValidator
 	ApplicationClient *mock.MockRadixApiApplicationClient
-	ApiController     *mock.MockController
+	ApiController     *controllers.MockController
 }
 
 func (s *authnTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
 	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
 	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
-	s.ApiController = mock.NewMockController(ctrl)
+	s.ApiController = controllers.NewMockController(ctrl)
 }
 
 func (s *authnTestSuite) sut() http.Handler {

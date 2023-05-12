@@ -7,20 +7,21 @@ import (
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
+	logsservice "github.com/equinor/radix-log-api/services/logs"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 )
 
 type controllerTestSuite struct {
 	suite.Suite
-	LogService        *mock.MockLogService
+	LogService        *logsservice.MockLogService
 	JwtValidator      *authn.MockJwtValidator
 	ApplicationClient *mock.MockRadixApiApplicationClient
 }
 
 func (s *controllerTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
-	s.LogService = mock.NewMockLogService(ctrl)
+	s.LogService = logsservice.NewMockLogService(ctrl)
 	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
 	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
 }
