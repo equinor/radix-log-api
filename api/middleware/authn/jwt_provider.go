@@ -12,10 +12,6 @@ type jwtPrincipal struct {
 func (p *jwtPrincipal) Token() string         { return p.token }
 func (p *jwtPrincipal) IsAuthenticated() bool { return true }
 
-type JwtValidator interface {
-	Validate(token string) error
-}
-
 func NewJwtProvider(validator JwtValidator) AuthenticationProvider {
 	return &jwtProvider{validator: validator}
 }

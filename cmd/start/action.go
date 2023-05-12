@@ -12,7 +12,6 @@ import (
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/api/server"
-	"github.com/equinor/radix-log-api/pkg/jwt"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	logservice "github.com/equinor/radix-log-api/services/logs"
 	runtimeclient "github.com/go-openapi/runtime/client"
@@ -66,7 +65,7 @@ func buildLogService(ctx *cli.Context) (logservice.Service, error) {
 }
 
 func buildJwtValidator(ctx *cli.Context) (authn.JwtValidator, error) {
-	return jwt.NewValidator(ctx.String(AuthIssuer), ctx.String(AuthAudience))
+	return authn.NewValidator(ctx.String(AuthIssuer), ctx.String(AuthAudience))
 }
 
 func buildApplicationClient(ctx *cli.Context) (application.ClientService, error) {

@@ -3,6 +3,7 @@ package logs
 import (
 	"net/http"
 
+	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
@@ -13,14 +14,14 @@ import (
 type controllerTestSuite struct {
 	suite.Suite
 	LogService        *mock.MockLogService
-	JwtValidator      *mock.MockJwtValidator
+	JwtValidator      *authn.MockJwtValidator
 	ApplicationClient *mock.MockRadixApiApplicationClient
 }
 
 func (s *controllerTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
 	s.LogService = mock.NewMockLogService(ctrl)
-	s.JwtValidator = mock.NewMockJwtValidator(ctrl)
+	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
 	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
 }
 

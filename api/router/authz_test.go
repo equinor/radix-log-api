@@ -8,6 +8,7 @@ import (
 
 	"github.com/equinor/radix-log-api/api/controllers"
 	apierrors "github.com/equinor/radix-log-api/api/errors"
+	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/internal/tests/match"
 	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
@@ -50,14 +51,14 @@ func Test_AuthzTestSuite(t *testing.T) {
 
 type authzTestSuite struct {
 	suite.Suite
-	JwtValidator      *mock.MockJwtValidator
+	JwtValidator      *authn.MockJwtValidator
 	ApplicationClient *mock.MockRadixApiApplicationClient
 	ApiController     *mock.MockController
 }
 
 func (s *authzTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
-	s.JwtValidator = mock.NewMockJwtValidator(ctrl)
+	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
 	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
 	s.ApiController = mock.NewMockController(ctrl)
 }

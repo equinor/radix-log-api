@@ -1,4 +1,4 @@
-package jwt
+package authn
 
 import (
 	"context"
@@ -8,8 +8,11 @@ import (
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	apierrors "github.com/equinor/radix-log-api/api/errors"
-	"github.com/equinor/radix-log-api/api/middleware/authn"
 )
+
+type JwtValidator interface {
+	Validate(token string) error
+}
 
 type jwtValidator struct {
 	cacheProvider *jwks.CachingProvider
@@ -17,7 +20,7 @@ type jwtValidator struct {
 	audience      string
 }
 
-func NewValidator(issuerUrl string, audience string) (authn.JwtValidator, error) {
+func NewValidator(issuerUrl string, audience string) (JwtValidator, error) {
 	url, err := url.Parse(issuerUrl)
 	if err != nil {
 		return nil, err
