@@ -19,7 +19,7 @@ func (ctx *AuthorizationContext) GinCtx() *gin.Context {
 }
 
 type Policy interface {
-	HandlePolicy(ctx *AuthorizationContext) error
+	ValidatePolicy(ctx *AuthorizationContext) error
 }
 
 type PolicyBuilder interface {
@@ -31,9 +31,9 @@ type policy struct {
 	requirements []Requirement
 }
 
-func (p *policy) HandlePolicy(ctx *AuthorizationContext) error {
+func (p *policy) ValidatePolicy(ctx *AuthorizationContext) error {
 	for _, r := range p.requirements {
-		if err := r.HandleRequirement(ctx); err != nil {
+		if err := r.ValidateRequirement(ctx); err != nil {
 			return err
 		}
 	}

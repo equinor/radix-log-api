@@ -63,7 +63,7 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 		}
 
 		for _, policy := range policies {
-			if err := policy.HandlePolicy(&authCtx); err != nil {
+			if err := policy.ValidatePolicy(&authCtx); err != nil {
 				ctx.Error(err)
 				ctx.Abort()
 				return

@@ -5,12 +5,12 @@ import (
 )
 
 type Requirement interface {
-	HandleRequirement(ctx *AuthorizationContext) error
+	ValidateRequirement(ctx *AuthorizationContext) error
 }
 
 type RequirementFunc func(ctx *AuthorizationContext) error
 
-func (f RequirementFunc) HandleRequirement(ctx *AuthorizationContext) error {
+func (f RequirementFunc) ValidateRequirement(ctx *AuthorizationContext) error {
 	return f(ctx)
 }
 

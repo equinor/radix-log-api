@@ -18,7 +18,7 @@ func NewAppOwnerRequirement(applicationClient application.ClientService) authz.R
 	}
 }
 
-func (r *appOwnerRequirement) HandleRequirement(ctx *authz.AuthorizationContext) error {
+func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContext) error {
 	var params params.App
 	if err := ctx.GinCtx().ShouldBindUri(&params); err != nil {
 		return apierrors.NewInternalServerError(apierrors.WithCause(err))
