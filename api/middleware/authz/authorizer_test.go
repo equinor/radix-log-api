@@ -1,12 +1,14 @@
 package authz
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
-	"github.com/equinor/radix-log-api/api/errors"
+	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,7 +29,7 @@ func Test_Authorizer_DefaultConfiguration(t *testing.T) {
 		authorizer.Authorize()(&ctx)
 		assert.True(t, ctx.IsAborted())
 		require.Len(t, ctx.Errors, 1)
-		apiErr, ok := ctx.Errors[0].Err.(errors.APIStatus)
+		apiErr, ok := ctx.Errors[0].Err.(apierrors.APIStatus)
 		require.True(t, ok)
 		assert.Equal(t, http.StatusUnauthorized, apiErr.Status().Code)
 	})
@@ -38,7 +40,7 @@ func Test_Authorizer_DefaultConfiguration(t *testing.T) {
 		authorizer.Authorize()(&ctx)
 		assert.True(t, ctx.IsAborted())
 		require.Len(t, ctx.Errors, 1)
-		apiErr, ok := ctx.Errors[0].Err.(errors.APIStatus)
+		apiErr, ok := ctx.Errors[0].Err.(apierrors.APIStatus)
 		require.True(t, ok)
 		assert.Equal(t, http.StatusUnauthorized, apiErr.Status().Code)
 	})
@@ -51,6 +53,14 @@ func Test_Authorizer_DefaultConfiguration(t *testing.T) {
 		require.Len(t, ctx.Errors, 1)
 		assert.ErrorIs(t, ctx.Errors[0].Err, errInvalidUserTypeInContext)
 	})
+	t.Run("user context set to authenticated user", func(t *testing.T) {
+		t.Parallel()
+		var ctx gin.Context
+		ctx.Set(authn.UserKey, &fakeTokenPrincipal{"", true})
+		authorizer.Authorize()(&ctx)
+		assert.False(t, ctx.IsAborted())
+		assert.Empty(t, ctx.Errors)
+	})
 	t.Run("undefined policy name", func(t *testing.T) {
 		t.Parallel()
 		var ctx gin.Context
@@ -60,4 +70,55 @@ func Test_Authorizer_DefaultConfiguration(t *testing.T) {
 		expectedErr := errPolicyNotFound("unknown_policy")
 		assert.ErrorContains(t, ctx.Errors[0].Err, expectedErr.Error())
 	})
+}
+
+func Test_Authorizer_UseDefaultPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	defaultPolicy := NewMockPolicy(ctrl)
+	defaultPolicy.EXPECT().ValidatePolicy(gomock.Any()).Return(nil).Times(1)
+	authz := authorizer{defaultPolicy: defaultPolicy}
+	var ctx gin.Context
+	authz.Authorize()(&ctx)
+}
+
+func Test_Authorizer_UseNamedPolicyOnly(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	defaultPolicy := NewMockPolicy(ctrl)
+	policy1 := NewMockPolicy(ctrl)
+	policy1.EXPECT().ValidatePolicy(gomock.Any()).Return(nil).Times(1)
+	policy2 := NewMockPolicy(ctrl)
+	authz := authorizer{defaultPolicy: defaultPolicy, policies: map[string]Policy{"policy1": policy1, "policy2": policy2}}
+	var ctx gin.Context
+	authz.Authorize("policy1")(&ctx)
+}
+
+func Test_Authorizer_ValidateAllNamedPolicies(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	policy1 := NewMockPolicy(ctrl)
+	policy1.EXPECT().ValidatePolicy(gomock.Any()).Return(nil).Times(1)
+	policy2 := NewMockPolicy(ctrl)
+	policy2.EXPECT().ValidatePolicy(gomock.Any()).Return(nil).Times(1)
+	authz := authorizer{policies: map[string]Policy{"policy1": policy1, "policy2": policy2}}
+	var ctx gin.Context
+	authz.Authorize("policy1", "policy2")(&ctx)
+	assert.False(t, ctx.IsAborted())
+	require.Empty(t, ctx.Errors)
+}
+
+func Test_Authorizer_SkipPolicyValidationAfterFirstError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	expectedErr := errors.New("first error")
+	policy1 := NewMockPolicy(ctrl)
+	policy1.EXPECT().ValidatePolicy(gomock.Any()).Return(expectedErr).Times(1)
+	policy2 := NewMockPolicy(ctrl)
+	authz := authorizer{policies: map[string]Policy{"policy1": policy1, "policy2": policy2}}
+	var ctx gin.Context
+	authz.Authorize("policy1", "policy2")(&ctx)
+	assert.True(t, ctx.IsAborted())
+	require.Len(t, ctx.Errors, 1)
+	assert.ErrorIs(t, ctx.Errors[0].Err, expectedErr)
 }

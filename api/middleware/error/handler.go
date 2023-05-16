@@ -16,13 +16,16 @@ func ErrorHandler(ctx *gin.Context) {
 		return
 	}
 
-	apiStatus := apierrors.NewInternalServerError().APIStatus
+	var apiStatus apierrors.Status
 	for _, e := range ctx.Errors {
 		logrus.Error(e)
 		apierr := apierrors.APIStatus(nil)
 		if ok := errors.As(e, &apierr); ok {
 			apiStatus = apierr.Status()
 		}
+	}
+	if apiStatus.Code == 0 {
+		apiStatus = apierrors.NewInternalServerError().APIStatus
 	}
 
 	ctx.JSON(int(apiStatus.Code), apiStatus)
