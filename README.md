@@ -60,12 +60,3 @@ Copy file `.env.template` to `.env`
 Radix Log API follows the [standard procedure](https://github.com/equinor/radix-private/blob/master/docs/how-we-work/development-practices.md#standard-radix-applications) defined in _how we work_. 
 
 Radix Log API is installed as a Radix application in [script](https://github.com/equinor/radix-platform/blob/master/scripts/install_base_components.sh) when setting up a cluster.
-
-
-
-
-```
-go install github.com/swaggo/swag/cmd/swag@latest
-```
-
-
