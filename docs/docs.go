@@ -94,12 +94,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/errors.Status"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Status"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -196,12 +190,6 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Status"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/errors.Status"
                         }
@@ -320,12 +308,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/errors.Status"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Status"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -433,12 +415,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/errors.Status"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Status"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -482,6 +458,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "d40ba550f05b252da60e5b873c32204368ecb5b9e17ea123738d318be4e5295b"
+                },
+                "lastKnown": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
                 }
             }
         },
@@ -495,6 +475,10 @@ const docTemplate = `{
                     }
                 },
                 "creationTimestamp": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "lastKnown": {
                     "type": "string",
                     "example": "2023-01-31T08:00:00Z"
                 },

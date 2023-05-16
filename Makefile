@@ -1,12 +1,40 @@
+SHELL = bash
+.DEFAULT_GOAL = build
 
-.PHONY: test
-test:
-	go test -cover `go list ./...`
+.PHONY: swag_tool
+swag_tool:
+ifeq (, $(shell which swag))
+	go install github.com/swaggo/swag/cmd/swag@latest
+endif
+SWAG_TOOL=$(shell which swag)
+
+.PHONY: staticcheck_tool
+staticcheck_tool:
+ifeq (, $(shell which staticcheck))
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+endif
+STATICCHECK_TOOL=$(shell which staticcheck)
 
 .PHONY: swagger
-swagger:
-	swag init
+swagger: swag_tool
+	${SWAG_TOOL} init
 
+.PHONY: test
+test:	
+	go test -cover ./...
+
+.PHONY: staticcheck
+staticcheck: staticcheck_tool
+	${STATICCHECK_TOOL} ./...
+
+.PHONY: build
+build: swagger
+	CGO_ENABLED=0 \
+	go build \
+	-installsuffix cgo \
+	-ldflags="-s -w" \
+	-o ./bin/radix-log-api \
+	.
 
 .PHONY: radixapiclient
 radixapiclient:

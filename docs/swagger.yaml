@@ -22,6 +22,9 @@ definitions:
       id:
         example: d40ba550f05b252da60e5b873c32204368ecb5b9e17ea123738d318be4e5295b
         type: string
+      lastKnown:
+        example: "2023-01-31T08:00:00Z"
+        type: string
     type: object
   models.Replica:
     properties:
@@ -30,6 +33,9 @@ definitions:
           $ref: '#/definitions/models.Container'
         type: array
       creationTimestamp:
+        example: "2023-01-31T08:00:00Z"
+        type: string
+      lastKnown:
         example: "2023-01-31T08:00:00Z"
         type: string
       name:
@@ -86,10 +92,6 @@ paths:
             $ref: '#/definitions/errors.Status'
         "403":
           description: Forbidden
-          schema:
-            $ref: '#/definitions/errors.Status'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/errors.Status'
         "500":
@@ -157,10 +159,6 @@ paths:
             $ref: '#/definitions/errors.Status'
         "403":
           description: Forbidden
-          schema:
-            $ref: '#/definitions/errors.Status'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/errors.Status'
         "500":
@@ -240,10 +238,6 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/errors.Status'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Status'
         "500":
           description: Internal Server Error
           schema:
@@ -314,10 +308,6 @@ paths:
             $ref: '#/definitions/errors.Status'
         "403":
           description: Forbidden
-          schema:
-            $ref: '#/definitions/errors.Status'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/errors.Status'
         "500":
