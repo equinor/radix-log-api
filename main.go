@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/equinor/radix-log-api/cmd"
 	_ "github.com/equinor/radix-log-api/docs"
@@ -16,6 +18,7 @@ import (
 // @name						Authorization
 // @description					Bearer is currently not supported by go-swag. Use "Bearer <JWT>" in value.
 func main() {
+	fmt.Printf("num cpu: %d", runtime.NumCPU())
 	app := cli.NewApp()
 	app.DefaultCommand = "start"
 	app.Commands = cmd.CliCommands
