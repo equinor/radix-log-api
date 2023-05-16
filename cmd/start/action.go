@@ -28,7 +28,6 @@ func action(ctx *cli.Context) error {
 }
 
 func buildRouter(ctx *cli.Context) (http.Handler, error) {
-
 	jwtValidator, err := buildJwtValidator(ctx)
 	if err != nil {
 		return nil, err

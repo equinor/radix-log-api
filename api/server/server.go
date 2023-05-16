@@ -13,6 +13,7 @@ func Run(ctx context.Context, handler http.Handler, cfg *Config) error {
 		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Handler: handler,
 	}
+	logrus.Infof("starting server with address %s", srv.Addr)
 	go startHttp(srv)
 	<-ctx.Done()
 	return srv.Close()
