@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/equinor/radix-common/utils/pointers"
-	logservice "github.com/equinor/radix-log-api/services/logs"
+	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/stretchr/testify/assert"
 )
 

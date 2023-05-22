@@ -13,7 +13,7 @@ import (
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/api/server"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
-	logservice "github.com/equinor/radix-log-api/services/logs"
+	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	runtimeclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/urfave/cli/v2"
