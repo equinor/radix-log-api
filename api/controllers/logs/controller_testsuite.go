@@ -7,7 +7,7 @@ import (
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
-	logsservice "github.com/equinor/radix-log-api/services/logs"
+	logsservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 )

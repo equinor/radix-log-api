@@ -3,7 +3,7 @@ package logs
 import (
 	"time"
 
-	logservice "github.com/equinor/radix-log-api/services/logs"
+	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/gin-gonic/gin"
 )
 

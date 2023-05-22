@@ -50,7 +50,7 @@ radixapiclient:
 .PHONY: mocks
 mocks: mockgen_tool
 	${MOCKGEN_TOOL} -source ./api/controllers/interface.go -destination ./api/controllers/mock_controller.go -package controllers
-	${MOCKGEN_TOOL} -source ./services/logs/interface.go -mock_names Service=MockLogService -destination ./services/logs/mock_service.go -package logs
+	${MOCKGEN_TOOL} -source ./pkg/services/logs/interface.go -mock_names Service=MockLogService -destination ./pkg/services/logs/mock_service.go -package logs
 	${MOCKGEN_TOOL} -source ./api/middleware/authn/jwt_validator.go -destination ./api/middleware/authn/mock_jwt_validator.go -package authn
 	${MOCKGEN_TOOL} -source ./api/middleware/authn/provider.go -destination ./api/middleware/authn/mock_provider.go -package authn
 	${MOCKGEN_TOOL} -source ./api/middleware/authz/policy.go -destination ./api/middleware/authz/mock_policy.go -package authz

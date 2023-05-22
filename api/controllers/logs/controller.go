@@ -10,7 +10,7 @@ import (
 	"github.com/equinor/radix-log-api/api/models"
 	"github.com/equinor/radix-log-api/api/params"
 	"github.com/equinor/radix-log-api/pkg/constants"
-	logservice "github.com/equinor/radix-log-api/services/logs"
+	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/gin-gonic/gin"
 )
 
