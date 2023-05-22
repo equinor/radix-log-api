@@ -1,0 +1,16 @@
+
+name: radix-log-api-pr
+on:
+  pull_request:
+    branches:
+    - main
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build docker image
+      env:
+        REF: ${{ github. sha }}
+      run: docker build -t radix-log-api:${REF##*/} .
