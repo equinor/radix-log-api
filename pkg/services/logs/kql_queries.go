@@ -12,6 +12,8 @@ const (
 	paramContainerId   = "ParamContainerId"
 )
 
+// KQL documentation: https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/
+
 var (
 	joinContainerLog = `| join kind=inner ContainerLog on $left.ContainerID==$right.ContainerID
 	| project TimeGenerated, Name, ContainerID, LogEntry
