@@ -8,9 +8,10 @@ import (
 
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/go-openapi/runtime"
+	"github.com/golang/mock/gomock"
 )
 
-func GetApplicationRequest(appName string) *getApplicationMatcher {
+func GetApplicationRequest(appName string) gomock.Matcher {
 	return &getApplicationMatcher{appName: appName}
 }
 
@@ -21,7 +22,7 @@ type getApplicationMatcher struct {
 // Matches returns whether x is a match.
 func (m *getApplicationMatcher) Matches(x interface{}) bool {
 	if params, ok := x.(*application.GetApplicationParams); ok {
-		return params.AppName == m.appName
+		return params.AppName == m.appName && IsContext().Matches(params.Context)
 	}
 	return false
 }
@@ -31,7 +32,7 @@ func (m *getApplicationMatcher) String() string {
 	return fmt.Sprintf("appName '%s' in request", m.appName)
 }
 
-func GetApplicationAuthRequest(token string) *getApplicationAuthMatcher {
+func GetApplicationAuthRequest(token string) gomock.Matcher {
 	return &getApplicationAuthMatcher{token: token}
 }
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/equinor/radix-log-api/internal/tests/match"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 )
@@ -53,7 +54,7 @@ func (s *jwtTestSuite) Test_AuthorizationHeaderBearerWithoutToken() {
 
 func (s *jwtTestSuite) Test_AuthorizationHeaderBearerWithToken() {
 	token := "anytoken"
-	s.validator.EXPECT().Validate(gomock.Any(), token).Return(nil).Times(1)
+	s.validator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
 	sut := NewJwtProvider(s.validator)
 	user, err := sut.Authenticate(&http.Request{Header: http.Header{"Authorization": []string{"Bearer " + token}}})
 	s.NoError(err)
@@ -64,7 +65,7 @@ func (s *jwtTestSuite) Test_AuthorizationHeaderBearerWithToken() {
 
 func (s *jwtTestSuite) Test_AuthorizationHeaderBearerWithToken_ValidationError() {
 	errMsg := "any err"
-	s.validator.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(errors.New(errMsg)).Times(1)
+	s.validator.EXPECT().Validate(match.IsContext(), gomock.Any()).Return(errors.New(errMsg)).Times(1)
 	sut := NewJwtProvider(s.validator)
 	user, err := sut.Authenticate(&http.Request{Header: http.Header{"Authorization": []string{"Bearer anytoken"}}})
 	s.ErrorContains(err, errMsg)

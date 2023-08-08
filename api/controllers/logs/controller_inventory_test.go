@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/equinor/radix-log-api/api/models"
+	"github.com/equinor/radix-log-api/internal/tests/match"
 	"github.com/equinor/radix-log-api/internal/tests/request"
 	"github.com/equinor/radix-log-api/internal/tests/utils"
 	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
@@ -26,7 +27,7 @@ type logControllerComponentInventoryTestSuite struct {
 
 func (s *logControllerComponentInventoryTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
-	s.JwtValidator.EXPECT().Validate(gomock.Any(), gomock.Any()).AnyTimes()
+	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
 	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
 }
 
@@ -52,7 +53,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 			},
 		},
 	}
-	s.LogService.EXPECT().ComponentInventory(gomock.Any(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(inventory, nil).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(inventory, nil).Times(1)
 
 	req, _ := request.New(request.ComponentInventoryUrl(appName, envName, compName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -85,7 +86,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_WithParams() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
 	start, end := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour))
-	s.LogService.EXPECT().ComponentInventory(gomock.Any(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
 	req, _ := request.New(
 		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
@@ -120,7 +121,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Inval
 
 func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_LogServiceError() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
-	s.LogService.EXPECT().ComponentInventory(gomock.Any(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New(
 		request.ComponentInventoryUrl(appName, envName, compName),
