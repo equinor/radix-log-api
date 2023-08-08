@@ -1,9 +1,10 @@
 package start
 
 import (
-	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
@@ -19,32 +20,35 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func action(ctx *cli.Context) error {
-	router, err := buildRouter(ctx)
+func action(cliCtx *cli.Context) error {
+	router, err := buildRouter(cliCtx)
 	if err != nil {
 		return err
 	}
-	return server.Run(context.TODO(), router, buildServerConfig(ctx))
+
+	ctx, cancel := signal.NotifyContext(cliCtx.Context, os.Interrupt, os.Kill)
+	defer cancel()
+	return server.Run(ctx, router, buildServerConfig(cliCtx))
 }
 
-func buildRouter(ctx *cli.Context) (http.Handler, error) {
-	jwtValidator, err := buildJwtValidator(ctx)
+func buildRouter(cliCtx *cli.Context) (http.Handler, error) {
+	jwtValidator, err := buildJwtValidator(cliCtx)
 	if err != nil {
 		return nil, err
 	}
-	applicationClient, err := buildApplicationClient(ctx)
+	applicationClient, err := buildApplicationClient(cliCtx)
 	if err != nil {
 		return nil, err
 	}
-	controllers, err := buildControllers(ctx)
+	controllers, err := buildControllers(cliCtx)
 	if err != nil {
 		return nil, err
 	}
 	return router.New(jwtValidator, applicationClient, controllers...)
 }
 
-func buildControllers(ctx *cli.Context) ([]controllers.Controller, error) {
-	logService, err := buildLogService(ctx)
+func buildControllers(cliCtx *cli.Context) ([]controllers.Controller, error) {
+	logService, err := buildLogService(cliCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -54,25 +58,25 @@ func buildControllers(ctx *cli.Context) ([]controllers.Controller, error) {
 	return contollers, nil
 }
 
-func buildLogService(ctx *cli.Context) (logservice.Service, error) {
+func buildLogService(cliCtx *cli.Context) (logservice.Service, error) {
 	logsClient, err := buildLogsAnalyticsClient()
 	if err != nil {
 		return nil, err
 	}
-	logService := logservice.New(logsClient, ctx.String(LogAnalyticsWorkspaceId))
+	logService := logservice.New(logsClient, cliCtx.String(LogAnalyticsWorkspaceId))
 	return logService, nil
 }
 
-func buildJwtValidator(ctx *cli.Context) (authn.JwtValidator, error) {
-	return authn.NewValidator(ctx.String(AuthIssuer), ctx.String(AuthAudience))
+func buildJwtValidator(cliCtx *cli.Context) (authn.JwtValidator, error) {
+	return authn.NewValidator(cliCtx.String(AuthIssuer), cliCtx.String(AuthAudience))
 }
 
-func buildApplicationClient(ctx *cli.Context) (application.ClientService, error) {
-	radixApiHost := ctx.String(RadixAPIHost)
+func buildApplicationClient(cliCtx *cli.Context) (application.ClientService, error) {
+	radixApiHost := cliCtx.String(RadixAPIHost)
 	if len(radixApiHost) == 0 {
 		return nil, fmt.Errorf("required argument %s is not set", RadixAPIHost)
 	}
-	client := application.New(runtimeclient.New(radixApiHost, ctx.String(RadixAPIPath), []string{ctx.String(RadixAPIScheme)}), strfmt.Default)
+	client := application.New(runtimeclient.New(radixApiHost, cliCtx.String(RadixAPIPath), []string{cliCtx.String(RadixAPIScheme)}), strfmt.Default)
 	return client, nil
 }
 
@@ -85,10 +89,10 @@ func buildLogsAnalyticsClient() (*azquery.LogsClient, error) {
 	return azquery.NewLogsClient(cred, nil)
 }
 
-func buildServerConfig(ctx *cli.Context) *server.Config {
+func buildServerConfig(cliCtx *cli.Context) *server.Config {
 	cfg := &server.Config{
-		Host: ctx.String(HostName),
-		Port: ctx.Int(PortNumber),
+		Host: cliCtx.String(HostName),
+		Port: cliCtx.Int(PortNumber),
 	}
 	return cfg
 }

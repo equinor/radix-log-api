@@ -1,10 +1,13 @@
 package logs
 
-import "io"
+import (
+	"context"
+	"io"
+)
 
 type Service interface {
-	ComponentLog(appName, envName, componentName string, options *LogOptions) (io.Reader, error)
-	ComponentPodLog(appName, envName, componentName, replicaName string, options *LogOptions) (io.Reader, error)
-	ComponentContainerLog(appName, envName, componentName, replicaName, containerId string, options *LogOptions) (io.Reader, error)
-	ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error)
+	ComponentLog(ctx context.Context, appName, envName, componentName string, options *LogOptions) (io.Reader, error)
+	ComponentPodLog(ctx context.Context, appName, envName, componentName, replicaName string, options *LogOptions) (io.Reader, error)
+	ComponentContainerLog(ctx context.Context, appName, envName, componentName, replicaName, containerId string, options *LogOptions) (io.Reader, error)
+	ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error)
 }

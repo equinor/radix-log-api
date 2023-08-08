@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/equinor/radix-log-api/pkg/radixapi/models"
 )
@@ -54,10 +55,12 @@ func NewTriggerPipelineBuildDeployParamsWithHTTPClient(client *http.Client) *Tri
 	}
 }
 
-/* TriggerPipelineBuildDeployParams contains all the parameters to send to the API endpoint
-   for the trigger pipeline build deploy operation.
+/*
+TriggerPipelineBuildDeployParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the trigger pipeline build deploy operation.
+
+	Typically these are written to a http.Request.
 */
 type TriggerPipelineBuildDeployParams struct {
 
@@ -65,7 +68,7 @@ type TriggerPipelineBuildDeployParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -139,13 +142,13 @@ func (o *TriggerPipelineBuildDeployParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the trigger pipeline build deploy params
-func (o *TriggerPipelineBuildDeployParams) WithImpersonateGroup(impersonateGroup *string) *TriggerPipelineBuildDeployParams {
+func (o *TriggerPipelineBuildDeployParams) WithImpersonateGroup(impersonateGroup []string) *TriggerPipelineBuildDeployParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the trigger pipeline build deploy params
-func (o *TriggerPipelineBuildDeployParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *TriggerPipelineBuildDeployParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -192,9 +195,14 @@ func (o *TriggerPipelineBuildDeployParams) WriteToRequest(r runtime.ClientReques
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -220,4 +228,21 @@ func (o *TriggerPipelineBuildDeployParams) WriteToRequest(r runtime.ClientReques
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamTriggerPipelineBuildDeploy binds the parameter Impersonate-Group
+func (o *TriggerPipelineBuildDeployParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

@@ -54,6 +54,18 @@ type Job struct {
 	// Enum: [build-deploy]
 	Pipeline string `json:"pipeline,omitempty"`
 
+	// PromotedDeploymentName the name of the deployment that was promoted
+	// Example: component-6hznh
+	PromotedDeploymentName string `json:"promotedDeploymentName,omitempty"`
+
+	// PromotedFromEnvironment the name of the environment that was promoted from
+	// Example: dev
+	PromotedFromEnvironment string `json:"promotedFromEnvironment,omitempty"`
+
+	// PromotedToEnvironment the name of the environment that was promoted to
+	// Example: qa
+	PromotedToEnvironment string `json:"promotedToEnvironment,omitempty"`
+
 	// Started timestamp
 	// Example: 2006-01-02T15:04:05Z
 	Started string `json:"started,omitempty"`
@@ -302,6 +314,11 @@ func (m *Job) contextValidateComponents(ctx context.Context, formats strfmt.Regi
 	for i := 0; i < len(m.Components); i++ {
 
 		if m.Components[i] != nil {
+
+			if swag.IsZero(m.Components[i]) { // not required
+				return nil
+			}
+
 			if err := m.Components[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("components" + "." + strconv.Itoa(i))
@@ -322,6 +339,11 @@ func (m *Job) contextValidateDeployments(ctx context.Context, formats strfmt.Reg
 	for i := 0; i < len(m.Deployments); i++ {
 
 		if m.Deployments[i] != nil {
+
+			if swag.IsZero(m.Deployments[i]) { // not required
+				return nil
+			}
+
 			if err := m.Deployments[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("deployments" + "." + strconv.Itoa(i))
@@ -342,6 +364,11 @@ func (m *Job) contextValidateSteps(ctx context.Context, formats strfmt.Registry)
 	for i := 0; i < len(m.Steps); i++ {
 
 		if m.Steps[i] != nil {
+
+			if swag.IsZero(m.Steps[i]) { // not required
+				return nil
+			}
+
 			if err := m.Steps[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("steps" + "." + strconv.Itoa(i))

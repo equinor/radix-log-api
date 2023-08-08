@@ -26,7 +26,7 @@ func New(logsClient *azquery.LogsClient, workspaceId string) Service {
 	}
 }
 
-func (s *service) ComponentLog(appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
+func (s *service) ComponentLog(ctx context.Context, appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
 			paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
@@ -39,10 +39,10 @@ func (s *service) ComponentLog(appName, envName, componentName string, options *
 		AddUnsafe(params.String()).
 		AddUnsafe(componentLogQuery)
 
-	return s.executeLogQuery(builder, options)
+	return s.executeLogQuery(ctx, builder, options)
 }
 
-func (s *service) ComponentPodLog(appName, envName, componentName, podName string, options *LogOptions) (io.Reader, error) {
+func (s *service) ComponentPodLog(ctx context.Context, appName, envName, componentName, podName string, options *LogOptions) (io.Reader, error) {
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
 			paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
@@ -55,9 +55,10 @@ func (s *service) ComponentPodLog(appName, envName, componentName, podName strin
 		AddUnsafe(params.String()).
 		AddUnsafe(componentPodLogQuery)
 
-	return s.executeLogQuery(builder, options)
+	return s.executeLogQuery(ctx, builder, options)
 }
-func (s *service) ComponentContainerLog(appName, envName, componentName, podName, containerId string, options *LogOptions) (io.Reader, error) {
+
+func (s *service) ComponentContainerLog(ctx context.Context, appName, envName, componentName, podName, containerId string, options *LogOptions) (io.Reader, error) {
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
 			paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
@@ -72,33 +73,10 @@ func (s *service) ComponentContainerLog(appName, envName, componentName, podName
 		AddUnsafe(params.String()).
 		AddUnsafe(componentContainerLogQuery)
 
-	return s.executeLogQuery(builder, options)
+	return s.executeLogQuery(ctx, builder, options)
 }
 
-func (s *service) executeLogQuery(builder *kql.Builder, options *LogOptions) (io.Reader, error) {
-	if options == nil {
-		options = &LogOptions{}
-	}
-
-	if options.LimitRows != nil {
-		builder = builder.AddLiteral("| take ").AddInt(int32(*options.LimitRows))
-	}
-
-	timspan := azquery.TimeInterval("")
-	if options.Timeinterval != nil {
-		timspan = options.Timeinterval.AzQueryTimeinterval()
-	}
-
-	query := builder.String()
-	resp, err := s.logsClient.QueryWorkspace(context.TODO(), s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return aztable.NewReader(resp.Results.Tables[0], 3), nil
-}
-
-func (s *service) ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
+func (s *service) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
 	if options == nil {
 		options = &ComponentPodInventoryOptions{}
 	}
@@ -120,7 +98,7 @@ func (s *service) ComponentInventory(appName, envName, componentName string, opt
 	}
 
 	query := builder.String()
-	resp, err := s.logsClient.QueryWorkspace(context.TODO(), s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
+	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +138,29 @@ func (s *service) ComponentInventory(appName, envName, componentName string, opt
 		pods = append(pods, *pod)
 	}
 	return pods, nil
+}
+
+func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, options *LogOptions) (io.Reader, error) {
+	if options == nil {
+		options = &LogOptions{}
+	}
+
+	if options.LimitRows != nil {
+		builder = builder.AddLiteral("| take ").AddInt(int32(*options.LimitRows))
+	}
+
+	timspan := azquery.TimeInterval("")
+	if options.Timeinterval != nil {
+		timspan = options.Timeinterval.AzQueryTimeinterval()
+	}
+
+	query := builder.String()
+	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aztable.NewReader(resp.Results.Tables[0], 3), nil
 }
 
 func mustParseTime(t string) time.Time {

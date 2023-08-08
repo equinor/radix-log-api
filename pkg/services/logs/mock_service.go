@@ -5,6 +5,7 @@
 package logs
 
 import (
+	context "context"
 	io "io"
 	reflect "reflect"
 
@@ -35,61 +36,61 @@ func (m *MockLogService) EXPECT() *MockLogServiceMockRecorder {
 }
 
 // ComponentContainerLog mocks base method.
-func (m *MockLogService) ComponentContainerLog(appName, envName, componentName, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+func (m *MockLogService) ComponentContainerLog(ctx context.Context, appName, envName, componentName, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ComponentContainerLog", appName, envName, componentName, replicaName, containerId, options)
+	ret := m.ctrl.Call(m, "ComponentContainerLog", ctx, appName, envName, componentName, replicaName, containerId, options)
 	ret0, _ := ret[0].(io.Reader)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ComponentContainerLog indicates an expected call of ComponentContainerLog.
-func (mr *MockLogServiceMockRecorder) ComponentContainerLog(appName, envName, componentName, replicaName, containerId, options interface{}) *gomock.Call {
+func (mr *MockLogServiceMockRecorder) ComponentContainerLog(ctx, appName, envName, componentName, replicaName, containerId, options interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentContainerLog", reflect.TypeOf((*MockLogService)(nil).ComponentContainerLog), appName, envName, componentName, replicaName, containerId, options)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentContainerLog", reflect.TypeOf((*MockLogService)(nil).ComponentContainerLog), ctx, appName, envName, componentName, replicaName, containerId, options)
 }
 
 // ComponentInventory mocks base method.
-func (m *MockLogService) ComponentInventory(appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
+func (m *MockLogService) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ComponentInventory", appName, envName, componentName, options)
+	ret := m.ctrl.Call(m, "ComponentInventory", ctx, appName, envName, componentName, options)
 	ret0, _ := ret[0].([]Pod)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ComponentInventory indicates an expected call of ComponentInventory.
-func (mr *MockLogServiceMockRecorder) ComponentInventory(appName, envName, componentName, options interface{}) *gomock.Call {
+func (mr *MockLogServiceMockRecorder) ComponentInventory(ctx, appName, envName, componentName, options interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentInventory", reflect.TypeOf((*MockLogService)(nil).ComponentInventory), appName, envName, componentName, options)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentInventory", reflect.TypeOf((*MockLogService)(nil).ComponentInventory), ctx, appName, envName, componentName, options)
 }
 
 // ComponentLog mocks base method.
-func (m *MockLogService) ComponentLog(appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
+func (m *MockLogService) ComponentLog(ctx context.Context, appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ComponentLog", appName, envName, componentName, options)
+	ret := m.ctrl.Call(m, "ComponentLog", ctx, appName, envName, componentName, options)
 	ret0, _ := ret[0].(io.Reader)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ComponentLog indicates an expected call of ComponentLog.
-func (mr *MockLogServiceMockRecorder) ComponentLog(appName, envName, componentName, options interface{}) *gomock.Call {
+func (mr *MockLogServiceMockRecorder) ComponentLog(ctx, appName, envName, componentName, options interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentLog", reflect.TypeOf((*MockLogService)(nil).ComponentLog), appName, envName, componentName, options)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentLog", reflect.TypeOf((*MockLogService)(nil).ComponentLog), ctx, appName, envName, componentName, options)
 }
 
 // ComponentPodLog mocks base method.
-func (m *MockLogService) ComponentPodLog(appName, envName, componentName, replicaName string, options *LogOptions) (io.Reader, error) {
+func (m *MockLogService) ComponentPodLog(ctx context.Context, appName, envName, componentName, replicaName string, options *LogOptions) (io.Reader, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ComponentPodLog", appName, envName, componentName, replicaName, options)
+	ret := m.ctrl.Call(m, "ComponentPodLog", ctx, appName, envName, componentName, replicaName, options)
 	ret0, _ := ret[0].(io.Reader)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ComponentPodLog indicates an expected call of ComponentPodLog.
-func (mr *MockLogServiceMockRecorder) ComponentPodLog(appName, envName, componentName, replicaName, options interface{}) *gomock.Call {
+func (mr *MockLogServiceMockRecorder) ComponentPodLog(ctx, appName, envName, componentName, replicaName, options interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentPodLog", reflect.TypeOf((*MockLogService)(nil).ComponentPodLog), appName, envName, componentName, replicaName, options)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentPodLog", reflect.TypeOf((*MockLogService)(nil).ComponentPodLog), ctx, appName, envName, componentName, replicaName, options)
 }

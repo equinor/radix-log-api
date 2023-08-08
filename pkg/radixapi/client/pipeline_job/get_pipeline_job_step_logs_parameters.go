@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetPipelineJobStepLogsParams creates a new GetPipelineJobStepLogsParams object,
@@ -52,10 +53,12 @@ func NewGetPipelineJobStepLogsParamsWithHTTPClient(client *http.Client) *GetPipe
 	}
 }
 
-/* GetPipelineJobStepLogsParams contains all the parameters to send to the API endpoint
-   for the get pipeline job step logs operation.
+/*
+GetPipelineJobStepLogsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get pipeline job step logs operation.
+
+	Typically these are written to a http.Request.
 */
 type GetPipelineJobStepLogsParams struct {
 
@@ -63,7 +66,7 @@ type GetPipelineJobStepLogsParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -167,13 +170,13 @@ func (o *GetPipelineJobStepLogsParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the get pipeline job step logs params
-func (o *GetPipelineJobStepLogsParams) WithImpersonateGroup(impersonateGroup *string) *GetPipelineJobStepLogsParams {
+func (o *GetPipelineJobStepLogsParams) WithImpersonateGroup(impersonateGroup []string) *GetPipelineJobStepLogsParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the get pipeline job step logs params
-func (o *GetPipelineJobStepLogsParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *GetPipelineJobStepLogsParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -264,9 +267,14 @@ func (o *GetPipelineJobStepLogsParams) WriteToRequest(r runtime.ClientRequest, r
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -348,4 +356,21 @@ func (o *GetPipelineJobStepLogsParams) WriteToRequest(r runtime.ClientRequest, r
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamGetPipelineJobStepLogs binds the parameter Impersonate-Group
+func (o *GetPipelineJobStepLogsParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

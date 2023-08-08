@@ -65,7 +65,7 @@ func (s *authnTestSuite) Test_MissingTokenInBearerAuthorizationHeader() {
 
 func (s *authnTestSuite) Test_JwtValidatorTokenUnauthorized() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(apierrors.NewUnauthorizedError()).Times(1)
+	s.JwtValidator.EXPECT().Validate(gomock.Any(), token).Return(apierrors.NewUnauthorizedError()).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -75,7 +75,7 @@ func (s *authnTestSuite) Test_JwtValidatorTokenUnauthorized() {
 
 func (s *authnTestSuite) Test_JwtValidatorTokenGenericError() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(errors.New("generic error")).Times(1)
+	s.JwtValidator.EXPECT().Validate(gomock.Any(), token).Return(errors.New("generic error")).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -85,7 +85,7 @@ func (s *authnTestSuite) Test_JwtValidatorTokenGenericError() {
 
 func (s *authnTestSuite) Test_SuccessfulAuthentication() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.JwtValidator.EXPECT().Validate(gomock.Any(), token).Return(nil).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
