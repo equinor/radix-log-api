@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetTektonPipelineRunTaskStepsParams creates a new GetTektonPipelineRunTaskStepsParams object,
@@ -52,10 +53,12 @@ func NewGetTektonPipelineRunTaskStepsParamsWithHTTPClient(client *http.Client) *
 	}
 }
 
-/* GetTektonPipelineRunTaskStepsParams contains all the parameters to send to the API endpoint
-   for the get tekton pipeline run task steps operation.
+/*
+GetTektonPipelineRunTaskStepsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get tekton pipeline run task steps operation.
+
+	Typically these are written to a http.Request.
 */
 type GetTektonPipelineRunTaskStepsParams struct {
 
@@ -63,7 +66,7 @@ type GetTektonPipelineRunTaskStepsParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -149,13 +152,13 @@ func (o *GetTektonPipelineRunTaskStepsParams) SetHTTPClient(client *http.Client)
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the get tekton pipeline run task steps params
-func (o *GetTektonPipelineRunTaskStepsParams) WithImpersonateGroup(impersonateGroup *string) *GetTektonPipelineRunTaskStepsParams {
+func (o *GetTektonPipelineRunTaskStepsParams) WithImpersonateGroup(impersonateGroup []string) *GetTektonPipelineRunTaskStepsParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the get tekton pipeline run task steps params
-func (o *GetTektonPipelineRunTaskStepsParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *GetTektonPipelineRunTaskStepsParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -224,9 +227,14 @@ func (o *GetTektonPipelineRunTaskStepsParams) WriteToRequest(r runtime.ClientReq
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -262,4 +270,21 @@ func (o *GetTektonPipelineRunTaskStepsParams) WriteToRequest(r runtime.ClientReq
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamGetTektonPipelineRunTaskSteps binds the parameter Impersonate-Group
+func (o *GetTektonPipelineRunTaskStepsParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

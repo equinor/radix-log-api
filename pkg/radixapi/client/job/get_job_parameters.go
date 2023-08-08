@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetJobParams creates a new GetJobParams object,
@@ -52,10 +53,12 @@ func NewGetJobParamsWithHTTPClient(client *http.Client) *GetJobParams {
 	}
 }
 
-/* GetJobParams contains all the parameters to send to the API endpoint
-   for the get job operation.
+/*
+GetJobParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get job operation.
+
+	Typically these are written to a http.Request.
 */
 type GetJobParams struct {
 
@@ -63,7 +66,7 @@ type GetJobParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -149,13 +152,13 @@ func (o *GetJobParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the get job params
-func (o *GetJobParams) WithImpersonateGroup(impersonateGroup *string) *GetJobParams {
+func (o *GetJobParams) WithImpersonateGroup(impersonateGroup []string) *GetJobParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the get job params
-func (o *GetJobParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *GetJobParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -224,9 +227,14 @@ func (o *GetJobParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -262,4 +270,21 @@ func (o *GetJobParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamGetJob binds the parameter Impersonate-Group
+func (o *GetJobParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

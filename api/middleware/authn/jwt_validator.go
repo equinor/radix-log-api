@@ -11,7 +11,7 @@ import (
 )
 
 type JwtValidator interface {
-	Validate(token string) error
+	Validate(ctx context.Context, token string) error
 }
 
 type jwtValidator struct {
@@ -29,7 +29,7 @@ func NewValidator(issuerUrl string, audience string) (JwtValidator, error) {
 	return &jwtValidator{cacheProvider: provider, issuerURL: issuerUrl, audience: audience}, nil
 }
 
-func (v *jwtValidator) Validate(token string) error {
+func (v *jwtValidator) Validate(ctx context.Context, token string) error {
 	validator, err := validator.New(
 		v.cacheProvider.KeyFunc,
 		validator.RS256,
@@ -39,7 +39,7 @@ func (v *jwtValidator) Validate(token string) error {
 	if err != nil {
 		return err
 	}
-	_, err = validator.ValidateToken(context.TODO(), token)
+	_, err = validator.ValidateToken(ctx, token)
 	if err != nil {
 		return apierrors.NewUnauthorizedError(apierrors.WithCause(err))
 	}

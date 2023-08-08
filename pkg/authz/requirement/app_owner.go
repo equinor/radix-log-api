@@ -25,7 +25,7 @@ func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContex
 	}
 
 	_, err := r.applicationClient.GetApplication(
-		application.NewGetApplicationParams().WithAppName(params.AppName),
+		application.NewGetApplicationParams().WithAppName(params.AppName).WithContext(ctx.GinCtx().Request.Context()),
 		httptransport.BearerToken(ctx.User().Token()))
 
 	switch err.(type) {

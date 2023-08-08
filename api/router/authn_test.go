@@ -10,6 +10,7 @@ import (
 	"github.com/equinor/radix-log-api/api/controllers"
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
+	"github.com/equinor/radix-log-api/internal/tests/match"
 	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
 	"github.com/gin-gonic/gin"
@@ -65,7 +66,7 @@ func (s *authnTestSuite) Test_MissingTokenInBearerAuthorizationHeader() {
 
 func (s *authnTestSuite) Test_JwtValidatorTokenUnauthorized() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(apierrors.NewUnauthorizedError()).Times(1)
+	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(apierrors.NewUnauthorizedError()).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -75,7 +76,7 @@ func (s *authnTestSuite) Test_JwtValidatorTokenUnauthorized() {
 
 func (s *authnTestSuite) Test_JwtValidatorTokenGenericError() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(errors.New("generic error")).Times(1)
+	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(errors.New("generic error")).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -85,7 +86,7 @@ func (s *authnTestSuite) Test_JwtValidatorTokenGenericError() {
 
 func (s *authnTestSuite) Test_SuccessfulAuthentication() {
 	token := "anytoken"
-	s.JwtValidator.EXPECT().Validate(token).Return(nil).Times(1)
+	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
 
 	req, _ := request.New("/api/v1/any", request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()

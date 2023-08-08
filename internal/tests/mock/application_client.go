@@ -175,6 +175,26 @@ func (mr *MockRadixApiApplicationClientMockRecorder) GetBuildSecrets(params, aut
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuildSecrets", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).GetBuildSecrets), varargs...)
 }
 
+// GetDeployKeyAndSecret mocks base method.
+func (m *MockRadixApiApplicationClient) GetDeployKeyAndSecret(params *application.GetDeployKeyAndSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.GetDeployKeyAndSecretOK, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{params, authInfo}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDeployKeyAndSecret", varargs...)
+	ret0, _ := ret[0].(*application.GetDeployKeyAndSecretOK)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDeployKeyAndSecret indicates an expected call of GetDeployKeyAndSecret.
+func (mr *MockRadixApiApplicationClientMockRecorder) GetDeployKeyAndSecret(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{params, authInfo}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeployKeyAndSecret", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).GetDeployKeyAndSecret), varargs...)
+}
+
 // GetDeployments mocks base method.
 func (m *MockRadixApiApplicationClient) GetDeployments(params *application.GetDeploymentsParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.GetDeploymentsOK, error) {
 	m.ctrl.T.Helper()
@@ -276,14 +296,14 @@ func (mr *MockRadixApiApplicationClientMockRecorder) ModifyRegistrationDetails(p
 }
 
 // RegenerateDeployKey mocks base method.
-func (m *MockRadixApiApplicationClient) RegenerateDeployKey(params *application.RegenerateDeployKeyParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.RegenerateDeployKeyOK, error) {
+func (m *MockRadixApiApplicationClient) RegenerateDeployKey(params *application.RegenerateDeployKeyParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.RegenerateDeployKeyNoContent, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{params, authInfo}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RegenerateDeployKey", varargs...)
-	ret0, _ := ret[0].(*application.RegenerateDeployKeyOK)
+	ret0, _ := ret[0].(*application.RegenerateDeployKeyNoContent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
