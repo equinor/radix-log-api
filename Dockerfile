@@ -1,9 +1,5 @@
 FROM golang:1.20 as builder
 
-# RUN apk update && \
-#     apk add ca-certificates && \
-#     apk add --no-cache gcc musl-dev 
-
 WORKDIR /build
 
 COPY go.mod go.sum ./
