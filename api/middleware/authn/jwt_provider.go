@@ -33,7 +33,7 @@ func (a *jwtProvider) Authenticate(req *http.Request) (TokenPrincipal, error) {
 	if len(token) == 0 {
 		return nil, nil
 	}
-	err := a.validator.Validate(token)
+	err := a.validator.Validate(req.Context(), token)
 	if err != nil {
 		return nil, err
 	}

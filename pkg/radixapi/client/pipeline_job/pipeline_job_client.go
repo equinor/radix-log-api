@@ -54,7 +54,7 @@ type ClientService interface {
 }
 
 /*
-  GetApplicationJob gets the detail of a given pipeline job for a given application
+GetApplicationJob gets the detail of a given pipeline job for a given application
 */
 func (a *Client) GetApplicationJob(params *GetApplicationJobParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetApplicationJobOK, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) GetApplicationJob(params *GetApplicationJobParams, authInfo run
 }
 
 /*
-  GetApplicationJobs gets the summary of jobs for a given application
+GetApplicationJobs gets the summary of jobs for a given application
 */
 func (a *Client) GetApplicationJobs(params *GetApplicationJobsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetApplicationJobsOK, error) {
 	// TODO: Validate the params before sending
@@ -132,7 +132,7 @@ func (a *Client) GetApplicationJobs(params *GetApplicationJobsParams, authInfo r
 }
 
 /*
-  GetPipelineJobStepLogs gets logs of a pipeline job step
+GetPipelineJobStepLogs gets logs of a pipeline job step
 */
 func (a *Client) GetPipelineJobStepLogs(params *GetPipelineJobStepLogsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetPipelineJobStepLogsOK, error) {
 	// TODO: Validate the params before sending
@@ -171,7 +171,7 @@ func (a *Client) GetPipelineJobStepLogs(params *GetPipelineJobStepLogsParams, au
 }
 
 /*
-  GetTektonPipelineRun gets a pipeline run for a pipeline job
+GetTektonPipelineRun gets a pipeline run for a pipeline job
 */
 func (a *Client) GetTektonPipelineRun(params *GetTektonPipelineRunParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunOK, error) {
 	// TODO: Validate the params before sending
@@ -210,7 +210,7 @@ func (a *Client) GetTektonPipelineRun(params *GetTektonPipelineRunParams, authIn
 }
 
 /*
-  GetTektonPipelineRunTask gets list of pipeline run task of a pipeline job
+GetTektonPipelineRunTask gets list of pipeline run task of a pipeline job
 */
 func (a *Client) GetTektonPipelineRunTask(params *GetTektonPipelineRunTaskParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunTaskOK, error) {
 	// TODO: Validate the params before sending
@@ -249,7 +249,7 @@ func (a *Client) GetTektonPipelineRunTask(params *GetTektonPipelineRunTaskParams
 }
 
 /*
-  GetTektonPipelineRunTaskStepLogs gets logs of pipeline runs for a pipeline job
+GetTektonPipelineRunTaskStepLogs gets logs of pipeline runs for a pipeline job
 */
 func (a *Client) GetTektonPipelineRunTaskStepLogs(params *GetTektonPipelineRunTaskStepLogsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunTaskStepLogsOK, error) {
 	// TODO: Validate the params before sending
@@ -288,7 +288,7 @@ func (a *Client) GetTektonPipelineRunTaskStepLogs(params *GetTektonPipelineRunTa
 }
 
 /*
-  GetTektonPipelineRunTaskSteps gets list of steps for a pipeline run task of a pipeline job
+GetTektonPipelineRunTaskSteps gets list of steps for a pipeline run task of a pipeline job
 */
 func (a *Client) GetTektonPipelineRunTaskSteps(params *GetTektonPipelineRunTaskStepsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunTaskStepsOK, error) {
 	// TODO: Validate the params before sending
@@ -327,7 +327,7 @@ func (a *Client) GetTektonPipelineRunTaskSteps(params *GetTektonPipelineRunTaskS
 }
 
 /*
-  GetTektonPipelineRunTasks gets list of pipeline run tasks of a pipeline job
+GetTektonPipelineRunTasks gets list of pipeline run tasks of a pipeline job
 */
 func (a *Client) GetTektonPipelineRunTasks(params *GetTektonPipelineRunTasksParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunTasksOK, error) {
 	// TODO: Validate the params before sending
@@ -366,7 +366,7 @@ func (a *Client) GetTektonPipelineRunTasks(params *GetTektonPipelineRunTasksPara
 }
 
 /*
-  GetTektonPipelineRuns gets list of pipeline runs for a pipeline job
+GetTektonPipelineRuns gets list of pipeline runs for a pipeline job
 */
 func (a *Client) GetTektonPipelineRuns(params *GetTektonPipelineRunsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTektonPipelineRunsOK, error) {
 	// TODO: Validate the params before sending
@@ -405,7 +405,7 @@ func (a *Client) GetTektonPipelineRuns(params *GetTektonPipelineRunsParams, auth
 }
 
 /*
-  StopApplicationJob stops job
+StopApplicationJob stops job
 */
 func (a *Client) StopApplicationJob(params *StopApplicationJobParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*StopApplicationJobNoContent, error) {
 	// TODO: Validate the params before sending

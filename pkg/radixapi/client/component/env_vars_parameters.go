@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewEnvVarsParams creates a new EnvVarsParams object,
@@ -52,10 +53,12 @@ func NewEnvVarsParamsWithHTTPClient(client *http.Client) *EnvVarsParams {
 	}
 }
 
-/* EnvVarsParams contains all the parameters to send to the API endpoint
-   for the env vars operation.
+/*
+EnvVarsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the env vars operation.
+
+	Typically these are written to a http.Request.
 */
 type EnvVarsParams struct {
 
@@ -63,7 +66,7 @@ type EnvVarsParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -143,13 +146,13 @@ func (o *EnvVarsParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the env vars params
-func (o *EnvVarsParams) WithImpersonateGroup(impersonateGroup *string) *EnvVarsParams {
+func (o *EnvVarsParams) WithImpersonateGroup(impersonateGroup []string) *EnvVarsParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the env vars params
-func (o *EnvVarsParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *EnvVarsParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -207,9 +210,14 @@ func (o *EnvVarsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regis
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -240,4 +248,21 @@ func (o *EnvVarsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regis
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamEnvVars binds the parameter Impersonate-Group
+func (o *EnvVarsParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

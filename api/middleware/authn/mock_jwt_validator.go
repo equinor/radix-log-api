@@ -5,6 +5,7 @@
 package authn
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -34,15 +35,15 @@ func (m *MockJwtValidator) EXPECT() *MockJwtValidatorMockRecorder {
 }
 
 // Validate mocks base method.
-func (m *MockJwtValidator) Validate(token string) error {
+func (m *MockJwtValidator) Validate(ctx context.Context, token string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Validate", token)
+	ret := m.ctrl.Call(m, "Validate", ctx, token)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Validate indicates an expected call of Validate.
-func (mr *MockJwtValidatorMockRecorder) Validate(token interface{}) *gomock.Call {
+func (mr *MockJwtValidatorMockRecorder) Validate(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockJwtValidator)(nil).Validate), token)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockJwtValidator)(nil).Validate), ctx, token)
 }

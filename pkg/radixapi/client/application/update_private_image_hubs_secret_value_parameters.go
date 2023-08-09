@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/equinor/radix-log-api/pkg/radixapi/models"
 )
@@ -54,10 +55,12 @@ func NewUpdatePrivateImageHubsSecretValueParamsWithHTTPClient(client *http.Clien
 	}
 }
 
-/* UpdatePrivateImageHubsSecretValueParams contains all the parameters to send to the API endpoint
-   for the update private image hubs secret value operation.
+/*
+UpdatePrivateImageHubsSecretValueParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the update private image hubs secret value operation.
+
+	Typically these are written to a http.Request.
 */
 type UpdatePrivateImageHubsSecretValueParams struct {
 
@@ -65,7 +68,7 @@ type UpdatePrivateImageHubsSecretValueParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -145,13 +148,13 @@ func (o *UpdatePrivateImageHubsSecretValueParams) SetHTTPClient(client *http.Cli
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the update private image hubs secret value params
-func (o *UpdatePrivateImageHubsSecretValueParams) WithImpersonateGroup(impersonateGroup *string) *UpdatePrivateImageHubsSecretValueParams {
+func (o *UpdatePrivateImageHubsSecretValueParams) WithImpersonateGroup(impersonateGroup []string) *UpdatePrivateImageHubsSecretValueParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the update private image hubs secret value params
-func (o *UpdatePrivateImageHubsSecretValueParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *UpdatePrivateImageHubsSecretValueParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -209,9 +212,14 @@ func (o *UpdatePrivateImageHubsSecretValueParams) WriteToRequest(r runtime.Clien
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -242,4 +250,21 @@ func (o *UpdatePrivateImageHubsSecretValueParams) WriteToRequest(r runtime.Clien
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamUpdatePrivateImageHubsSecretValue binds the parameter Impersonate-Group
+func (o *UpdatePrivateImageHubsSecretValueParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

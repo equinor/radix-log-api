@@ -60,7 +60,7 @@ func (o *RegenerateMachineUserTokenReader) ReadResponse(response runtime.ClientR
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /applications/{appName}/regenerate-machine-user-token] regenerateMachineUserToken", response, response.Code())
 	}
 }
 
@@ -69,7 +69,8 @@ func NewRegenerateMachineUserTokenOK() *RegenerateMachineUserTokenOK {
 	return &RegenerateMachineUserTokenOK{}
 }
 
-/* RegenerateMachineUserTokenOK describes a response with status code 200, with default header values.
+/*
+RegenerateMachineUserTokenOK describes a response with status code 200, with default header values.
 
 Successful regenerate machine-user token
 */
@@ -77,9 +78,44 @@ type RegenerateMachineUserTokenOK struct {
 	Payload *models.MachineUser
 }
 
+// IsSuccess returns true when this regenerate machine user token o k response has a 2xx status code
+func (o *RegenerateMachineUserTokenOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this regenerate machine user token o k response has a 3xx status code
+func (o *RegenerateMachineUserTokenOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token o k response has a 4xx status code
+func (o *RegenerateMachineUserTokenOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this regenerate machine user token o k response has a 5xx status code
+func (o *RegenerateMachineUserTokenOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this regenerate machine user token o k response a status code equal to that given
+func (o *RegenerateMachineUserTokenOK) IsCode(code int) bool {
+	return code == 200
+}
+
+// Code gets the status code for the regenerate machine user token o k response
+func (o *RegenerateMachineUserTokenOK) Code() int {
+	return 200
+}
+
 func (o *RegenerateMachineUserTokenOK) Error() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenOK  %+v", 200, o.Payload)
 }
+
+func (o *RegenerateMachineUserTokenOK) String() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenOK  %+v", 200, o.Payload)
+}
+
 func (o *RegenerateMachineUserTokenOK) GetPayload() *models.MachineUser {
 	return o.Payload
 }
@@ -101,14 +137,49 @@ func NewRegenerateMachineUserTokenUnauthorized() *RegenerateMachineUserTokenUnau
 	return &RegenerateMachineUserTokenUnauthorized{}
 }
 
-/* RegenerateMachineUserTokenUnauthorized describes a response with status code 401, with default header values.
+/*
+RegenerateMachineUserTokenUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
 type RegenerateMachineUserTokenUnauthorized struct {
 }
 
+// IsSuccess returns true when this regenerate machine user token unauthorized response has a 2xx status code
+func (o *RegenerateMachineUserTokenUnauthorized) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this regenerate machine user token unauthorized response has a 3xx status code
+func (o *RegenerateMachineUserTokenUnauthorized) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token unauthorized response has a 4xx status code
+func (o *RegenerateMachineUserTokenUnauthorized) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this regenerate machine user token unauthorized response has a 5xx status code
+func (o *RegenerateMachineUserTokenUnauthorized) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this regenerate machine user token unauthorized response a status code equal to that given
+func (o *RegenerateMachineUserTokenUnauthorized) IsCode(code int) bool {
+	return code == 401
+}
+
+// Code gets the status code for the regenerate machine user token unauthorized response
+func (o *RegenerateMachineUserTokenUnauthorized) Code() int {
+	return 401
+}
+
 func (o *RegenerateMachineUserTokenUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenUnauthorized ", 401)
+}
+
+func (o *RegenerateMachineUserTokenUnauthorized) String() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenUnauthorized ", 401)
 }
 
@@ -122,14 +193,49 @@ func NewRegenerateMachineUserTokenForbidden() *RegenerateMachineUserTokenForbidd
 	return &RegenerateMachineUserTokenForbidden{}
 }
 
-/* RegenerateMachineUserTokenForbidden describes a response with status code 403, with default header values.
+/*
+RegenerateMachineUserTokenForbidden describes a response with status code 403, with default header values.
 
 Forbidden
 */
 type RegenerateMachineUserTokenForbidden struct {
 }
 
+// IsSuccess returns true when this regenerate machine user token forbidden response has a 2xx status code
+func (o *RegenerateMachineUserTokenForbidden) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this regenerate machine user token forbidden response has a 3xx status code
+func (o *RegenerateMachineUserTokenForbidden) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token forbidden response has a 4xx status code
+func (o *RegenerateMachineUserTokenForbidden) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this regenerate machine user token forbidden response has a 5xx status code
+func (o *RegenerateMachineUserTokenForbidden) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this regenerate machine user token forbidden response a status code equal to that given
+func (o *RegenerateMachineUserTokenForbidden) IsCode(code int) bool {
+	return code == 403
+}
+
+// Code gets the status code for the regenerate machine user token forbidden response
+func (o *RegenerateMachineUserTokenForbidden) Code() int {
+	return 403
+}
+
 func (o *RegenerateMachineUserTokenForbidden) Error() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenForbidden ", 403)
+}
+
+func (o *RegenerateMachineUserTokenForbidden) String() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenForbidden ", 403)
 }
 
@@ -143,14 +249,49 @@ func NewRegenerateMachineUserTokenNotFound() *RegenerateMachineUserTokenNotFound
 	return &RegenerateMachineUserTokenNotFound{}
 }
 
-/* RegenerateMachineUserTokenNotFound describes a response with status code 404, with default header values.
+/*
+RegenerateMachineUserTokenNotFound describes a response with status code 404, with default header values.
 
 Not found
 */
 type RegenerateMachineUserTokenNotFound struct {
 }
 
+// IsSuccess returns true when this regenerate machine user token not found response has a 2xx status code
+func (o *RegenerateMachineUserTokenNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this regenerate machine user token not found response has a 3xx status code
+func (o *RegenerateMachineUserTokenNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token not found response has a 4xx status code
+func (o *RegenerateMachineUserTokenNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this regenerate machine user token not found response has a 5xx status code
+func (o *RegenerateMachineUserTokenNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this regenerate machine user token not found response a status code equal to that given
+func (o *RegenerateMachineUserTokenNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the regenerate machine user token not found response
+func (o *RegenerateMachineUserTokenNotFound) Code() int {
+	return 404
+}
+
 func (o *RegenerateMachineUserTokenNotFound) Error() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenNotFound ", 404)
+}
+
+func (o *RegenerateMachineUserTokenNotFound) String() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenNotFound ", 404)
 }
 
@@ -164,14 +305,49 @@ func NewRegenerateMachineUserTokenConflict() *RegenerateMachineUserTokenConflict
 	return &RegenerateMachineUserTokenConflict{}
 }
 
-/* RegenerateMachineUserTokenConflict describes a response with status code 409, with default header values.
+/*
+RegenerateMachineUserTokenConflict describes a response with status code 409, with default header values.
 
 Conflict
 */
 type RegenerateMachineUserTokenConflict struct {
 }
 
+// IsSuccess returns true when this regenerate machine user token conflict response has a 2xx status code
+func (o *RegenerateMachineUserTokenConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this regenerate machine user token conflict response has a 3xx status code
+func (o *RegenerateMachineUserTokenConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token conflict response has a 4xx status code
+func (o *RegenerateMachineUserTokenConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this regenerate machine user token conflict response has a 5xx status code
+func (o *RegenerateMachineUserTokenConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this regenerate machine user token conflict response a status code equal to that given
+func (o *RegenerateMachineUserTokenConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the regenerate machine user token conflict response
+func (o *RegenerateMachineUserTokenConflict) Code() int {
+	return 409
+}
+
 func (o *RegenerateMachineUserTokenConflict) Error() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenConflict ", 409)
+}
+
+func (o *RegenerateMachineUserTokenConflict) String() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenConflict ", 409)
 }
 
@@ -185,14 +361,49 @@ func NewRegenerateMachineUserTokenInternalServerError() *RegenerateMachineUserTo
 	return &RegenerateMachineUserTokenInternalServerError{}
 }
 
-/* RegenerateMachineUserTokenInternalServerError describes a response with status code 500, with default header values.
+/*
+RegenerateMachineUserTokenInternalServerError describes a response with status code 500, with default header values.
 
 Internal server error
 */
 type RegenerateMachineUserTokenInternalServerError struct {
 }
 
+// IsSuccess returns true when this regenerate machine user token internal server error response has a 2xx status code
+func (o *RegenerateMachineUserTokenInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this regenerate machine user token internal server error response has a 3xx status code
+func (o *RegenerateMachineUserTokenInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this regenerate machine user token internal server error response has a 4xx status code
+func (o *RegenerateMachineUserTokenInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this regenerate machine user token internal server error response has a 5xx status code
+func (o *RegenerateMachineUserTokenInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this regenerate machine user token internal server error response a status code equal to that given
+func (o *RegenerateMachineUserTokenInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
+// Code gets the status code for the regenerate machine user token internal server error response
+func (o *RegenerateMachineUserTokenInternalServerError) Code() int {
+	return 500
+}
+
 func (o *RegenerateMachineUserTokenInternalServerError) Error() string {
+	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenInternalServerError ", 500)
+}
+
+func (o *RegenerateMachineUserTokenInternalServerError) String() string {
 	return fmt.Sprintf("[POST /applications/{appName}/regenerate-machine-user-token][%d] regenerateMachineUserTokenInternalServerError ", 500)
 }
 

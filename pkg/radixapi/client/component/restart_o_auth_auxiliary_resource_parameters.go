@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewRestartOAuthAuxiliaryResourceParams creates a new RestartOAuthAuxiliaryResourceParams object,
@@ -52,10 +53,12 @@ func NewRestartOAuthAuxiliaryResourceParamsWithHTTPClient(client *http.Client) *
 	}
 }
 
-/* RestartOAuthAuxiliaryResourceParams contains all the parameters to send to the API endpoint
-   for the restart o auth auxiliary resource operation.
+/*
+RestartOAuthAuxiliaryResourceParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the restart o auth auxiliary resource operation.
+
+	Typically these are written to a http.Request.
 */
 type RestartOAuthAuxiliaryResourceParams struct {
 
@@ -63,7 +66,7 @@ type RestartOAuthAuxiliaryResourceParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -143,13 +146,13 @@ func (o *RestartOAuthAuxiliaryResourceParams) SetHTTPClient(client *http.Client)
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the restart o auth auxiliary resource params
-func (o *RestartOAuthAuxiliaryResourceParams) WithImpersonateGroup(impersonateGroup *string) *RestartOAuthAuxiliaryResourceParams {
+func (o *RestartOAuthAuxiliaryResourceParams) WithImpersonateGroup(impersonateGroup []string) *RestartOAuthAuxiliaryResourceParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the restart o auth auxiliary resource params
-func (o *RestartOAuthAuxiliaryResourceParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *RestartOAuthAuxiliaryResourceParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -207,9 +210,14 @@ func (o *RestartOAuthAuxiliaryResourceParams) WriteToRequest(r runtime.ClientReq
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -240,4 +248,21 @@ func (o *RestartOAuthAuxiliaryResourceParams) WriteToRequest(r runtime.ClientReq
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamRestartOAuthAuxiliaryResource binds the parameter Impersonate-Group
+func (o *RestartOAuthAuxiliaryResourceParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }

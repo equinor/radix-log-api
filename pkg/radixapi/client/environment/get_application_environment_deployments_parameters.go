@@ -53,10 +53,12 @@ func NewGetApplicationEnvironmentDeploymentsParamsWithHTTPClient(client *http.Cl
 	}
 }
 
-/* GetApplicationEnvironmentDeploymentsParams contains all the parameters to send to the API endpoint
-   for the get application environment deployments operation.
+/*
+GetApplicationEnvironmentDeploymentsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get application environment deployments operation.
+
+	Typically these are written to a http.Request.
 */
 type GetApplicationEnvironmentDeploymentsParams struct {
 
@@ -64,7 +66,7 @@ type GetApplicationEnvironmentDeploymentsParams struct {
 
 	   Works only with custom setup of cluster. Allow impersonation of test group (Required if Impersonate-User is set)
 	*/
-	ImpersonateGroup *string
+	ImpersonateGroup []string
 
 	/* ImpersonateUser.
 
@@ -144,13 +146,13 @@ func (o *GetApplicationEnvironmentDeploymentsParams) SetHTTPClient(client *http.
 }
 
 // WithImpersonateGroup adds the impersonateGroup to the get application environment deployments params
-func (o *GetApplicationEnvironmentDeploymentsParams) WithImpersonateGroup(impersonateGroup *string) *GetApplicationEnvironmentDeploymentsParams {
+func (o *GetApplicationEnvironmentDeploymentsParams) WithImpersonateGroup(impersonateGroup []string) *GetApplicationEnvironmentDeploymentsParams {
 	o.SetImpersonateGroup(impersonateGroup)
 	return o
 }
 
 // SetImpersonateGroup adds the impersonateGroup to the get application environment deployments params
-func (o *GetApplicationEnvironmentDeploymentsParams) SetImpersonateGroup(impersonateGroup *string) {
+func (o *GetApplicationEnvironmentDeploymentsParams) SetImpersonateGroup(impersonateGroup []string) {
 	o.ImpersonateGroup = impersonateGroup
 }
 
@@ -208,9 +210,14 @@ func (o *GetApplicationEnvironmentDeploymentsParams) WriteToRequest(r runtime.Cl
 
 	if o.ImpersonateGroup != nil {
 
-		// header param Impersonate-Group
-		if err := r.SetHeaderParam("Impersonate-Group", *o.ImpersonateGroup); err != nil {
-			return err
+		// binding items for Impersonate-Group
+		joinedImpersonateGroup := o.bindParamImpersonateGroup(reg)
+
+		// header array param Impersonate-Group
+		if len(joinedImpersonateGroup) > 0 {
+			if err := r.SetHeaderParam("Impersonate-Group", joinedImpersonateGroup[0]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -253,4 +260,21 @@ func (o *GetApplicationEnvironmentDeploymentsParams) WriteToRequest(r runtime.Cl
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamGetApplicationEnvironmentDeployments binds the parameter Impersonate-Group
+func (o *GetApplicationEnvironmentDeploymentsParams) bindParamImpersonateGroup(formats strfmt.Registry) []string {
+	impersonateGroupIR := o.ImpersonateGroup
+
+	var impersonateGroupIC []string
+	for _, impersonateGroupIIR := range impersonateGroupIR { // explode []string
+
+		impersonateGroupIIV := impersonateGroupIIR // string as string
+		impersonateGroupIC = append(impersonateGroupIC, impersonateGroupIIV)
+	}
+
+	// items.CollectionFormat: ""
+	impersonateGroupIS := swag.JoinByFormat(impersonateGroupIC, "")
+
+	return impersonateGroupIS
 }
