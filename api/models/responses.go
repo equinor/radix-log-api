@@ -1,6 +1,6 @@
 package models
 
-// ComponentInventoryResponse response
-type ComponentInventoryResponse struct {
+// InventoryResponse response
+type InventoryResponse struct {
 	Replicas []Replica `json:"replicas"`
 }

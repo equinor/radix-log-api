@@ -24,6 +24,6 @@ type LogOptions struct {
 	LimitRows    *int
 }
 
-type ComponentPodInventoryOptions struct {
+type InventoryOptions struct {
 	Timeinterval *TimeInterval
 }
