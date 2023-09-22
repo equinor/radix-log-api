@@ -18,26 +18,26 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func Test_LogControllerReplicaLogTestSuite(t *testing.T) {
-	suite.Run(t, new(logControllerReplicaLogTestSuite))
+func Test_LogControllerComponentReplicaLogTestSuite(t *testing.T) {
+	suite.Run(t, new(logControllerComponentReplicaLogTestSuite))
 }
 
-type logControllerReplicaLogTestSuite struct {
+type logControllerComponentReplicaLogTestSuite struct {
 	controllerTestSuite
 }
 
-func (s *logControllerReplicaLogTestSuite) SetupTest() {
+func (s *logControllerComponentReplicaLogTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
 	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_Success() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_Success() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
 	log := "line1\nline2"
 	s.LogService.EXPECT().ComponentPodLog(match.IsContext(), appName, envName, compName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
@@ -48,12 +48,12 @@ func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_Success() {
 	s.Equal(log, string(actual))
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_ResponseAsAttachment() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_ResponseAsAttachment() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
 	log := "line1\nline2"
 	s.LogService.EXPECT().ComponentPodLog(match.IsContext(), appName, envName, compName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("file", "true")), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("file", "true")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
@@ -64,54 +64,54 @@ func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_ResponseAsAttachment(
 	s.Equal(log, string(actual))
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_WithParams() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_WithParams() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
 	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
 	s.LogService.EXPECT().ComponentPodLog(match.IsContext(), appName, envName, compName, replicaName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_TailNegative() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_TailNegative() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("tail", strconv.Itoa(-1))), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("tail", strconv.Itoa(-1))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_StartNonDate() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_StartNonDate() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("start", "notadate")), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("start", "notadate")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_EndNonDate() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_EndNonDate() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("end", "notadate")), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("end", "notadate")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_FileNonBoolean() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_FileNonBoolean() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("file", "notabool")), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName, request.WithQueryParam("file", "notabool")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerReplicaLogTestSuite) Test_ReplicaLog_LogServiceError() {
+func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_LogServiceError() {
 	appName, envName, compName, replicaName := "anyapp", "anyenv", "anycomp", "anyreplica"
 	s.LogService.EXPECT().ComponentPodLog(match.IsContext(), appName, envName, compName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
-	req, _ := request.New(request.ReplicaLogUrl(appName, envName, compName, replicaName), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.ComponentReplicaLogUrl(appName, envName, compName, replicaName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	s.Equal(http.StatusInternalServerError, w.Code)

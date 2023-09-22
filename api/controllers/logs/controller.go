@@ -58,6 +58,12 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 		},
 		{
 			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/environments/:envName/jobcomponents/:jobComponentName/jobs/:jobName/log",
+			Handler:               c.GetJobLog,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
+		{
+			Method:                http.MethodGet,
 			Path:                  "/applications/:appName/environments/:envName/jobcomponents/:jobComponentName/jobs/:jobName/replicas/:replicaName/log",
 			Handler:               c.GetJobReplicaLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
