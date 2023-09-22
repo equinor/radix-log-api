@@ -238,9 +238,6 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 }
 
 func mustParseTime(t string) time.Time {
-	if t == "" {
-		fmt.Println("")
-	}
 	parsed, err := time.Parse(time.RFC3339, t)
 	if err != nil {
 		panic(err)
