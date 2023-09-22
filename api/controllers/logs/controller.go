@@ -58,8 +58,14 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 		},
 		{
 			Method:                http.MethodGet,
-			Path:                  "/applications/:appName/environments/:envName/jobcomponents/:jobComponentName/jobs/:jobName/log",
-			Handler:               c.GetJobLog,
+			Path:                  "/applications/:appName/environments/:envName/jobcomponents/:jobComponentName/jobs/:jobName/replicas/:replicaName/log",
+			Handler:               c.GetJobReplicaLog,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
+		{
+			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/environments/:envName/jobcomponents/:jobComponentName/jobs/:jobName/replicas/:replicaName/containers/:containerId/log",
+			Handler:               c.GetJobContainerLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
 	}
@@ -132,7 +138,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 }
 
 // GetComponentReplicaLog godoc
-// @Summary Get log for a replica
+// @Summary Get log for a component replica
 // @Tags Logs
 // @Produce plain
 // @Security ApiKeyAuth
@@ -168,7 +174,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 }
 
 // GetComponentContainerLog godoc
-// @Summary Get log for a container
+// @Summary Get log for a component container
 // @Tags Logs
 // @Produce plain
 // @Security ApiKeyAuth
@@ -272,6 +278,84 @@ func (c *controller) GetJobLog(ctx *gin.Context) {
 
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
 		return c.appLogsService.JobLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, options)
+	})
+}
+
+// GetJobReplicaLog godoc
+// @Summary Get log for a job replica
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 500 {object} errors.Status
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param jobComponentName path string true "Job Component Name"
+// @Param jobName path string true "Job Name"
+// @Param replicaName path string true "Replica Name"
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
+// @Param file query boolean false "Response as attachment"
+// @Router /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/log [get]
+func (c *controller) GetJobReplicaLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.Env
+		params.JobComponent
+		params.Job
+		params.Replica
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.JobPodLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, options)
+	})
+}
+
+// GetJobContainerLog godoc
+// @Summary Get log for a job container
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 500 {object} errors.Status
+// @Param appName path string true "Application Name"
+// @Param envName path string true "Environment Name"
+// @Param jobComponentName path string true "Job Component Name"
+// @Param jobName path string true "Job Name"
+// @Param replicaName path string true "Replica Name"
+// @Param containerId path string true "Container ID"
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
+// @Param file query boolean false "Response as attachment"
+// @Router /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/containers/{containerId}/log [get]
+func (c *controller) GetJobContainerLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.Env
+		params.JobComponent
+		params.Job
+		params.Replica
+		params.Container
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.JobContainerLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, params.ContainerId, options)
 	})
 }
 

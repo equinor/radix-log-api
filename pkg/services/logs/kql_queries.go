@@ -60,9 +60,10 @@ var (
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s 
-	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), LastTimeGenerated=max(TimeGenerated) by Name, ContainerID
+	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp) by Name, ContainerID
     | join kind=inner ContainerInventory on ContainerID 
-    | distinct Name, PodCreationTimeStamp, LastTimeGenerated, ContainerID, ContainerCreationTimeStamp=CreatedTime`,
+    | project Name, PodCreationTimeStamp, ContainerID, ContainerLastKnownTimeStamp=coalesce(FinishedTime, TimeGenerated), CreatedTime
+    | summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(CreatedTime), LastTimeGenerated=max(ContainerLastKnownTimeStamp) by Name, ContainerID`,
 		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
 
 	jobLogQuery string = fmt.Sprintf(`KubePodInventory
@@ -72,4 +73,20 @@ var (
 	| summarize by ContainerID
 	`+joinContainerLog,
 		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
+
+	jobPodLogQuery string = fmt.Sprintf(`KubePodInventory
+	| where Namespace == %s and Name == %s and isnotempty(ContainerID) == true
+	| extend d=parse_json(PodLabel)[0]
+	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s 
+	| summarize by ContainerID
+	`+joinContainerLog,
+		paramNamespace, paramPodName, paramAppName, paramJobComponentName, paramJobName)
+
+	jobContainerLogQuery string = fmt.Sprintf(`KubePodInventory
+	| where Namespace == %s and Name == %s and ContainerID == %s
+	| extend d=parse_json(PodLabel)[0]
+	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s 
+	| summarize by ContainerID
+	`+joinContainerLog,
+		paramNamespace, paramPodName, paramContainerId, paramAppName, paramJobComponentName, paramJobName)
 )
