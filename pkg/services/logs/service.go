@@ -76,11 +76,7 @@ func (s *service) ComponentContainerLog(ctx context.Context, appName, envName, c
 	return s.executeLogQuery(ctx, builder, options)
 }
 
-func (s *service) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
-	if options == nil {
-		options = &ComponentPodInventoryOptions{}
-	}
-
+func (s *service) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *InventoryOptions) ([]Pod, error) {
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
 			paramNamespace:     kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
@@ -90,7 +86,85 @@ func (s *service) ComponentInventory(ctx context.Context, appName, envName, comp
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(componentInventory)
+		AddUnsafe(componentInventoryQuery)
+
+	return s.executeInventoryQuery(ctx, builder, options)
+}
+
+func (s *service) JobInventory(ctx context.Context, appName, envName, jobComponentName, jobName string, options *InventoryOptions) ([]Pod, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:        kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+			paramAppName:          kusto.ParamType{Type: types.String, Default: appName},
+			paramJobComponentName: kusto.ParamType{Type: types.String, Default: jobComponentName},
+			paramJobName:          kusto.ParamType{Type: types.String, Default: jobName},
+		},
+	)
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(jobInventoryQuery)
+
+	return s.executeInventoryQuery(ctx, builder, options)
+}
+
+func (s *service) JobLog(ctx context.Context, appName, envName, jobComponentName, jobName string, options *LogOptions) (io.Reader, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:        kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+			paramAppName:          kusto.ParamType{Type: types.String, Default: appName},
+			paramJobComponentName: kusto.ParamType{Type: types.String, Default: jobComponentName},
+			paramJobName:          kusto.ParamType{Type: types.String, Default: jobName},
+		},
+	)
+
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(jobLogQuery)
+
+	return s.executeLogQuery(ctx, builder, options)
+}
+
+func (s *service) JobPodLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName string, options *LogOptions) (io.Reader, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:        kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+			paramAppName:          kusto.ParamType{Type: types.String, Default: appName},
+			paramJobComponentName: kusto.ParamType{Type: types.String, Default: jobComponentName},
+			paramJobName:          kusto.ParamType{Type: types.String, Default: jobName},
+			paramPodName:          kusto.ParamType{Type: types.String, Default: replicaName},
+		},
+	)
+
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(jobPodLogQuery)
+
+	return s.executeLogQuery(ctx, builder, options)
+}
+
+func (s *service) JobContainerLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:        kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-%s", appName, envName)},
+			paramAppName:          kusto.ParamType{Type: types.String, Default: appName},
+			paramJobComponentName: kusto.ParamType{Type: types.String, Default: jobComponentName},
+			paramJobName:          kusto.ParamType{Type: types.String, Default: jobName},
+			paramPodName:          kusto.ParamType{Type: types.String, Default: replicaName},
+			paramContainerId:      kusto.ParamType{Type: types.String, Default: containerId},
+		},
+	)
+
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(jobContainerLogQuery)
+
+	return s.executeLogQuery(ctx, builder, options)
+}
+
+func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builder, options *InventoryOptions) ([]Pod, error) {
+	if options == nil {
+		options = &InventoryOptions{}
+	}
 
 	timspan := azquery.TimeInterval("")
 	if options.Timeinterval != nil {
@@ -164,9 +238,6 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 }
 
 func mustParseTime(t string) time.Time {
-	if t == "" {
-		fmt.Println("")
-	}
 	parsed, err := time.Parse(time.RFC3339, t)
 	if err != nil {
 		panic(err)

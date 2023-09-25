@@ -73,7 +73,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ComponentInventoryResponse"
+                            "$ref": "#/definitions/models.InventoryResponse"
                         }
                     },
                     "400": {
@@ -216,7 +216,7 @@ const docTemplate = `{
                 "tags": [
                     "Logs"
                 ],
-                "summary": "Get log for a container",
+                "summary": "Get log for a component container",
                 "parameters": [
                     {
                         "type": "string",
@@ -330,7 +330,7 @@ const docTemplate = `{
                 "tags": [
                     "Logs"
                 ],
-                "summary": "Get log for a replica",
+                "summary": "Get log for a component replica",
                 "parameters": [
                     {
                         "type": "string",
@@ -423,6 +423,442 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get inventory (pods and containers) for a job",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InventoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/containers/{containerId}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job container",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Container ID",
+                        "name": "containerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job replica",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -434,17 +870,6 @@ const docTemplate = `{
                 },
                 "reason": {
                     "type": "string"
-                }
-            }
-        },
-        "models.ComponentInventoryResponse": {
-            "type": "object",
-            "properties": {
-                "replicas": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Replica"
-                    }
                 }
             }
         },
@@ -462,6 +887,17 @@ const docTemplate = `{
                 "lastKnown": {
                     "type": "string",
                     "example": "2023-01-31T08:00:00Z"
+                }
+            }
+        },
+        "models.InventoryResponse": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Replica"
+                    }
                 }
             }
         },

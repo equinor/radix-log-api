@@ -9,5 +9,9 @@ type Service interface {
 	ComponentLog(ctx context.Context, appName, envName, componentName string, options *LogOptions) (io.Reader, error)
 	ComponentPodLog(ctx context.Context, appName, envName, componentName, replicaName string, options *LogOptions) (io.Reader, error)
 	ComponentContainerLog(ctx context.Context, appName, envName, componentName, replicaName, containerId string, options *LogOptions) (io.Reader, error)
-	ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error)
+	ComponentInventory(ctx context.Context, appName, envName, componentName string, options *InventoryOptions) ([]Pod, error)
+	JobInventory(ctx context.Context, appName, envName, jobComponentName, jobName string, options *InventoryOptions) ([]Pod, error)
+	JobLog(ctx context.Context, appName, envName, jobComponentName, jobName string, options *LogOptions) (io.Reader, error)
+	JobPodLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName string, options *LogOptions) (io.Reader, error)
+	JobContainerLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName, containerId string, options *LogOptions) (io.Reader, error)
 }

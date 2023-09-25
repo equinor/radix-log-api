@@ -51,7 +51,7 @@ func (mr *MockLogServiceMockRecorder) ComponentContainerLog(ctx, appName, envNam
 }
 
 // ComponentInventory mocks base method.
-func (m *MockLogService) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *ComponentPodInventoryOptions) ([]Pod, error) {
+func (m *MockLogService) ComponentInventory(ctx context.Context, appName, envName, componentName string, options *InventoryOptions) ([]Pod, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ComponentInventory", ctx, appName, envName, componentName, options)
 	ret0, _ := ret[0].([]Pod)
@@ -93,4 +93,64 @@ func (m *MockLogService) ComponentPodLog(ctx context.Context, appName, envName, 
 func (mr *MockLogServiceMockRecorder) ComponentPodLog(ctx, appName, envName, componentName, replicaName, options interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComponentPodLog", reflect.TypeOf((*MockLogService)(nil).ComponentPodLog), ctx, appName, envName, componentName, replicaName, options)
+}
+
+// JobContainerLog mocks base method.
+func (m *MockLogService) JobContainerLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "JobContainerLog", ctx, appName, envName, jobComponentName, jobName, replicaName, containerId, options)
+	ret0, _ := ret[0].(io.Reader)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// JobContainerLog indicates an expected call of JobContainerLog.
+func (mr *MockLogServiceMockRecorder) JobContainerLog(ctx, appName, envName, jobComponentName, jobName, replicaName, containerId, options interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobContainerLog", reflect.TypeOf((*MockLogService)(nil).JobContainerLog), ctx, appName, envName, jobComponentName, jobName, replicaName, containerId, options)
+}
+
+// JobInventory mocks base method.
+func (m *MockLogService) JobInventory(ctx context.Context, appName, envName, jobComponentName, jobName string, options *InventoryOptions) ([]Pod, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "JobInventory", ctx, appName, envName, jobComponentName, jobName, options)
+	ret0, _ := ret[0].([]Pod)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// JobInventory indicates an expected call of JobInventory.
+func (mr *MockLogServiceMockRecorder) JobInventory(ctx, appName, envName, jobComponentName, jobName, options interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobInventory", reflect.TypeOf((*MockLogService)(nil).JobInventory), ctx, appName, envName, jobComponentName, jobName, options)
+}
+
+// JobLog mocks base method.
+func (m *MockLogService) JobLog(ctx context.Context, appName, envName, jobComponentName, jobName string, options *LogOptions) (io.Reader, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "JobLog", ctx, appName, envName, jobComponentName, jobName, options)
+	ret0, _ := ret[0].(io.Reader)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// JobLog indicates an expected call of JobLog.
+func (mr *MockLogServiceMockRecorder) JobLog(ctx, appName, envName, jobComponentName, jobName, options interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobLog", reflect.TypeOf((*MockLogService)(nil).JobLog), ctx, appName, envName, jobComponentName, jobName, options)
+}
+
+// JobPodLog mocks base method.
+func (m *MockLogService) JobPodLog(ctx context.Context, appName, envName, jobComponentName, jobName, replicaName string, options *LogOptions) (io.Reader, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "JobPodLog", ctx, appName, envName, jobComponentName, jobName, replicaName, options)
+	ret0, _ := ret[0].(io.Reader)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// JobPodLog indicates an expected call of JobPodLog.
+func (mr *MockLogServiceMockRecorder) JobPodLog(ctx, appName, envName, jobComponentName, jobName, replicaName, options interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobPodLog", reflect.TypeOf((*MockLogService)(nil).JobPodLog), ctx, appName, envName, jobComponentName, jobName, replicaName, options)
 }

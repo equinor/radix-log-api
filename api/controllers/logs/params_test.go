@@ -52,25 +52,25 @@ func Test_AsComponentPodInventoryOptions(t *testing.T) {
 	type scenarioSpec struct {
 		name     string
 		param    inventoryParams
-		expected logservice.ComponentPodInventoryOptions
+		expected logservice.InventoryOptions
 	}
 	start, end := time.Now(), time.Now().Add(1*time.Second)
 	scenarios := []scenarioSpec{
 		{
 			name:     "empty param",
 			param:    inventoryParams{},
-			expected: logservice.ComponentPodInventoryOptions{},
+			expected: logservice.InventoryOptions{},
 		},
 
 		{
 			name:     "start param",
 			param:    inventoryParams{timeIntervalParams: timeIntervalParams{Start: &start}},
-			expected: logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start}},
+			expected: logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start}},
 		},
 		{
 			name:     "end param",
 			param:    inventoryParams{timeIntervalParams: timeIntervalParams{End: &end}},
-			expected: logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{End: end}},
+			expected: logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{End: end}},
 		},
 	}
 
@@ -78,7 +78,7 @@ func Test_AsComponentPodInventoryOptions(t *testing.T) {
 		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, scenario.expected, scenario.param.AsComponentPodInventoryOptions())
+			assert.Equal(t, scenario.expected, scenario.param.AsInventoryOptions())
 		})
 	}
 }
