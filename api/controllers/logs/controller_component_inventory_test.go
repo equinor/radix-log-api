@@ -53,12 +53,12 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 			},
 		},
 	}
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(inventory, nil).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
 
 	req, _ := request.New(request.ComponentInventoryUrl(appName, envName, compName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
-	expected := models.ComponentInventoryResponse{Replicas: []models.Replica{
+	expected := models.InventoryResponse{Replicas: []models.Replica{
 		{
 			Name:              inventory[0].Name,
 			CreationTimestamp: inventory[0].CreationTimestamp,
@@ -77,7 +77,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 			},
 		},
 	}}
-	var actual models.ComponentInventoryResponse
+	var actual models.InventoryResponse
 	s.Equal(http.StatusOK, w.Code)
 	json.NewDecoder(w.Body).Decode(&actual)
 	s.Equal(expected, actual)
@@ -86,7 +86,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_WithParams() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
 	start, end := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour))
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
 	req, _ := request.New(
 		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
@@ -121,7 +121,7 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Inval
 
 func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_LogServiceError() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.ComponentPodInventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New(
 		request.ComponentInventoryUrl(appName, envName, compName),

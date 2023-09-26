@@ -39,9 +39,9 @@ type inventoryParams struct {
 	timeIntervalParams
 }
 
-// AsComponentPodInventoryOptions converts the parameters to ComponentPodInventoryOptions parameters
-func (p *inventoryParams) AsComponentPodInventoryOptions() logservice.ComponentPodInventoryOptions {
-	var options logservice.ComponentPodInventoryOptions
+// AsInventoryOptions converts the parameters to AsInventoryOptions parameters
+func (p *inventoryParams) AsInventoryOptions() logservice.InventoryOptions {
+	var options logservice.InventoryOptions
 	if p.Start != nil || p.End != nil {
 		timeInverval := logservice.TimeInterval{}
 		if p.Start != nil {
