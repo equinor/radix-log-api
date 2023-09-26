@@ -1,13 +1,15 @@
 module github.com/equinor/radix-log-api
 
-go 1.20
+go 1.21
+
+toolchain go1.21.0
 
 require (
 	github.com/Azure/azure-kusto-go v0.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery v1.1.0
 	github.com/auth0/go-jwt-middleware/v2 v2.1.0
-	github.com/equinor/radix-common v1.4.0
+	github.com/equinor/radix-common v1.5.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.1
