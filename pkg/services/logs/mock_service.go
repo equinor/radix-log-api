@@ -155,6 +155,21 @@ func (mr *MockLogServiceMockRecorder) JobPodLog(ctx, appName, envName, jobCompon
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobPodLog", reflect.TypeOf((*MockLogService)(nil).JobPodLog), ctx, appName, envName, jobComponentName, jobName, replicaName, options)
 }
 
+// PipelineJobContainerLog mocks base method.
+func (m *MockLogService) PipelineJobContainerLog(ctx context.Context, appName, pipelineJobName, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PipelineJobContainerLog", ctx, appName, pipelineJobName, replicaName, containerId, options)
+	ret0, _ := ret[0].(io.Reader)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PipelineJobContainerLog indicates an expected call of PipelineJobContainerLog.
+func (mr *MockLogServiceMockRecorder) PipelineJobContainerLog(ctx, appName, pipelineJobName, replicaName, containerId, options interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PipelineJobContainerLog", reflect.TypeOf((*MockLogService)(nil).PipelineJobContainerLog), ctx, appName, pipelineJobName, replicaName, containerId, options)
+}
+
 // PipelineJobInventory mocks base method.
 func (m *MockLogService) PipelineJobInventory(ctx context.Context, appName, pipelineJobName string, options *InventoryOptions) ([]Pod, error) {
 	m.ctrl.T.Helper()

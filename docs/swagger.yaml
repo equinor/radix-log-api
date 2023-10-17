@@ -669,6 +669,78 @@ paths:
       summary: Get inventory (pods and containers) for a pipeline job
       tags:
       - Inventory
+  /applications/{appName}/pipelinejobs/{pipelineJobName}/replicas/{replicaName}/containers/{containerId}/log:
+    get:
+      parameters:
+      - description: Application Name
+        in: path
+        name: appName
+        required: true
+        type: string
+      - description: Pipeline Job Name
+        in: path
+        name: pipelineJobName
+        required: true
+        type: string
+      - description: Replica Name
+        in: path
+        name: replicaName
+        required: true
+        type: string
+      - description: Container ID
+        in: path
+        name: containerId
+        required: true
+        type: string
+      - description: Number of rows to return from the tail of the log
+        example: 100
+        in: query
+        name: tail
+        type: integer
+      - description: Start time
+        example: "2023-05-01T08:15:00+02:00"
+        format: date-time
+        in: query
+        name: start
+        type: string
+      - description: End time
+        example: "2023-05-02T12:00:00Z"
+        format: date-time
+        in: query
+        name: end
+        type: string
+      - description: Response as attachment
+        in: query
+        name: file
+        type: boolean
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Status'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.Status'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/errors.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Get log for a pipeline job container
+      tags:
+      - Logs
 schemes:
 - http
 - https

@@ -107,20 +107,6 @@ func (s *service) JobInventory(ctx context.Context, appName, envName, jobCompone
 	return s.executeInventoryQuery(ctx, builder, options)
 }
 
-func (s *service) PipelineJobInventory(ctx context.Context, appName, pipelineJobName string, options *InventoryOptions) ([]Pod, error) {
-	params := kusto.NewDefinitions().Must(
-		kusto.ParamTypes{
-			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
-			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
-		},
-	)
-	builder := kql.New("").
-		AddUnsafe(params.String()).
-		AddUnsafe(pipelineJobInventoryQuery)
-
-	return s.executeInventoryQuery(ctx, builder, options)
-}
-
 func (s *service) JobLog(ctx context.Context, appName, envName, jobComponentName, jobName string, options *LogOptions) (io.Reader, error) {
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
@@ -171,6 +157,38 @@ func (s *service) JobContainerLog(ctx context.Context, appName, envName, jobComp
 	builder := kql.New("").
 		AddUnsafe(params.String()).
 		AddUnsafe(jobContainerLogQuery)
+
+	return s.executeLogQuery(ctx, builder, options)
+}
+
+func (s *service) PipelineJobInventory(ctx context.Context, appName, pipelineJobName string, options *InventoryOptions) ([]Pod, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
+			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
+		},
+	)
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(pipelineJobInventoryQuery)
+
+	return s.executeInventoryQuery(ctx, builder, options)
+}
+
+func (s *service) PipelineJobContainerLog(ctx context.Context, appName, pipelineJobName string, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
+			paramAppName:         kusto.ParamType{Type: types.String, Default: appName},
+			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
+			paramPodName:         kusto.ParamType{Type: types.String, Default: replicaName},
+			paramContainerId:     kusto.ParamType{Type: types.String, Default: containerId},
+		},
+	)
+
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(pipelineJobContainerLogQuery)
 
 	return s.executeLogQuery(ctx, builder, options)
 }
