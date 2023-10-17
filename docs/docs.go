@@ -859,6 +859,86 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/applications/{appName}/pipelinejobs/{pipelineJobName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get inventory (pods and containers) for a pipeline job",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pipeline Job Name",
+                        "name": "pipelineJobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InventoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -887,6 +967,10 @@ const docTemplate = `{
                 "lastKnown": {
                     "type": "string",
                     "example": "2023-01-31T08:00:00Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "web"
                 }
             }
         },

@@ -10,6 +10,7 @@ const (
 	paramComponentName    = "ParamComponentName"
 	paramJobComponentName = "ParamJobComponentName"
 	paramJobName          = "ParamJobName"
+	paramPipelineJobName  = "ParamPipelineJobName"
 	paramPodName          = "ParamPodName"
 	paramContainerId      = "ParamContainerId"
 )
@@ -65,6 +66,17 @@ var (
     | project Name, PodCreationTimeStamp, ContainerID, ContainerLastKnownTimeStamp=coalesce(FinishedTime, TimeGenerated), CreatedTime
     | summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(CreatedTime), LastTimeGenerated=max(ContainerLastKnownTimeStamp) by Name, ContainerID`,
 		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
+
+	pipelineJobInventoryQuery string = fmt.Sprintf(`KubePodInventory
+	| where Namespace == %s and isnotempty(ContainerID) == true
+	| extend d=parse_json(PodLabel)[0]
+	| where d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
+	| extend ContainerNameShort=replace_string(ContainerName, strcat(PodUid,"/"), "")
+	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp) by Name, ContainerID, ContainerNameShort
+	| join kind=inner ContainerInventory on ContainerID 
+	| project Name, PodCreationTimeStamp, ContainerID, ContainerNameShort, ContainerLastKnownTimeStamp=coalesce(FinishedTime, TimeGenerated), CreatedTime
+	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(CreatedTime), LastTimeGenerated=max(ContainerLastKnownTimeStamp) by Name, ContainerID, ContainerNameShort`,
+		paramNamespace, paramPipelineJobName)
 
 	jobLogQuery string = fmt.Sprintf(`KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
