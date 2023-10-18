@@ -44,7 +44,7 @@ type getApplicationAuthMatcher struct {
 func (m *getApplicationAuthMatcher) Matches(x interface{}) bool {
 	if authWriter, ok := x.(runtime.ClientAuthInfoWriter); ok {
 		req := fakeClientRequest{}
-		authWriter.AuthenticateRequest(&req, nil)
+		_ = authWriter.AuthenticateRequest(&req, nil)
 		return req.authorizationHeader == "Bearer "+m.token
 	}
 	return false
