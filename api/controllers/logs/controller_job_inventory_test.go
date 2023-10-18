@@ -79,7 +79,7 @@ func (s *logControllerJobInventoryTestSuite) Test_JobInventory_Success() {
 	}}
 	var actual models.InventoryResponse
 	s.Equal(http.StatusOK, w.Code)
-	json.NewDecoder(w.Body).Decode(&actual)
+	_ = json.NewDecoder(w.Body).Decode(&actual)
 	s.Equal(expected, actual)
 }
 

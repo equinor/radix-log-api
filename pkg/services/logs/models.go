@@ -11,6 +11,7 @@ type Pod struct {
 
 type Container struct {
 	Id                string
+	Name              string
 	CreationTimestamp time.Time
 	LastKnown         time.Time
 }

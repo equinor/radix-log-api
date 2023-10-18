@@ -161,6 +161,38 @@ func (s *service) JobContainerLog(ctx context.Context, appName, envName, jobComp
 	return s.executeLogQuery(ctx, builder, options)
 }
 
+func (s *service) PipelineJobInventory(ctx context.Context, appName, pipelineJobName string, options *InventoryOptions) ([]Pod, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
+			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
+		},
+	)
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(pipelineJobInventoryQuery)
+
+	return s.executeInventoryQuery(ctx, builder, options)
+}
+
+func (s *service) PipelineJobContainerLog(ctx context.Context, appName, pipelineJobName string, replicaName, containerId string, options *LogOptions) (io.Reader, error) {
+	params := kusto.NewDefinitions().Must(
+		kusto.ParamTypes{
+			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
+			paramAppName:         kusto.ParamType{Type: types.String, Default: appName},
+			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
+			paramPodName:         kusto.ParamType{Type: types.String, Default: replicaName},
+			paramContainerId:     kusto.ParamType{Type: types.String, Default: containerId},
+		},
+	)
+
+	builder := kql.New("").
+		AddUnsafe(params.String()).
+		AddUnsafe(pipelineJobContainerLogQuery)
+
+	return s.executeLogQuery(ctx, builder, options)
+}
+
 func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builder, options *InventoryOptions) ([]Pod, error) {
 	if options == nil {
 		options = &InventoryOptions{}
@@ -177,19 +209,15 @@ func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builde
 		return nil, err
 	}
 
-	colMap := map[string]int{}
-	for i, col := range resp.Tables[0].Columns {
-		colMap[*col.Name] = i
-	}
-
+	reader := newTableReader(resp.Tables[0])
 	podmap := slice.Reduce(resp.Tables[0].Rows, map[string]*Pod{}, func(acc map[string]*Pod, row azquery.Row) map[string]*Pod {
-		podName := row[colMap["Name"]].(string)
-		lastTimeGenerated := mustParseTime(row[colMap["LastTimeGenerated"]].(string))
+		podName := reader.Value(row, "Name", "").(string)
+		lastTimeGenerated := mustParseTime(reader.Value(row, "LastTimeGenerated", "").(string))
 		pod, ok := acc[podName]
 		if !ok {
 			pod = &Pod{
 				Name:              podName,
-				CreationTimestamp: mustParseTime(row[colMap["PodCreationTimeStamp"]].(string)),
+				CreationTimestamp: mustParseTime(reader.Value(row, "PodCreationTimeStamp", "").(string)),
 				LastKnown:         lastTimeGenerated,
 				Containers:        []Container{},
 			}
@@ -199,9 +227,10 @@ func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builde
 		}
 		pod.Containers = append(pod.Containers,
 			Container{
-				Id:                row[colMap["ContainerID"]].(string),
+				Id:                reader.Value(row, "ContainerID", "").(string),
+				Name:              reader.Value(row, "ContainerNameShort", "").(string),
 				LastKnown:         lastTimeGenerated,
-				CreationTimestamp: mustParseTime(row[colMap["ContainerCreationTimeStamp"]].(string)),
+				CreationTimestamp: mustParseTime(reader.Value(row, "ContainerCreationTimeStamp", "").(string)),
 			})
 		acc[podName] = pod
 		return acc

@@ -74,6 +74,18 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 			Handler:               c.GetJobContainerLog,
 			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
 		},
+		{
+			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/pipelinejobs/:pipelineJobName",
+			Handler:               c.GetPipelineJobInventory,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
+		{
+			Method:                http.MethodGet,
+			Path:                  "/applications/:appName/pipelinejobs/:pipelineJobName/replicas/:replicaName/containers/:containerId/log",
+			Handler:               c.GetPipelineJobContainerLog,
+			AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		},
 	}
 }
 
@@ -100,7 +112,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 		params.Component
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -134,7 +146,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 		params.Component
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -170,7 +182,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 		params.Replica
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -208,7 +220,7 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 		params.Container
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -242,7 +254,7 @@ func (c *controller) GetJobInventory(ctx *gin.Context) {
 		params.Job
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -278,7 +290,7 @@ func (c *controller) GetJobLog(ctx *gin.Context) {
 		params.Job
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -316,7 +328,7 @@ func (c *controller) GetJobReplicaLog(ctx *gin.Context) {
 		params.Replica
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -356,7 +368,7 @@ func (c *controller) GetJobContainerLog(ctx *gin.Context) {
 		params.Container
 	}
 	if err := ctx.BindUri(&params); err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -365,10 +377,76 @@ func (c *controller) GetJobContainerLog(ctx *gin.Context) {
 	})
 }
 
+// GetPipelineJobInventory godoc
+// @Summary Get inventory (pods and containers) for a pipeline job
+// @Tags Inventory
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.InventoryResponse
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 500 {object} errors.Status
+// @Param appName path string true "Application Name"
+// @Param pipelineJobName path string true "Pipeline Job Name"
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
+// @Router /applications/{appName}/pipelinejobs/{pipelineJobName} [get]
+func (c *controller) GetPipelineJobInventory(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.PipelineJob
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.handleInventoryRequest(ctx, func(options *logservice.InventoryOptions) ([]logservice.Pod, error) {
+		return c.appLogsService.PipelineJobInventory(ctx.Request.Context(), params.AppName, params.PipelineJobName, options)
+	})
+}
+
+// GetPipelineJobContainerLog godoc
+// @Summary Get log for a pipeline job container
+// @Tags Logs
+// @Produce plain
+// @Security ApiKeyAuth
+// @Success 200 {string} string
+// @Failure 400 {object} errors.Status
+// @Failure 401 {object} errors.Status
+// @Failure 403 {object} errors.Status
+// @Failure 500 {object} errors.Status
+// @Param appName path string true "Application Name"
+// @Param pipelineJobName path string true "Pipeline Job Name"
+// @Param replicaName path string true "Replica Name"
+// @Param containerId path string true "Container ID"
+// @Param tail query integer false "Number of rows to return from the tail of the log" example(100)
+// @Param start query string false "Start time" format(date-time) example(2023-05-01T08:15:00+02:00)
+// @Param end query string false "End time" format(date-time) example(2023-05-02T12:00:00Z)
+// @Param file query boolean false "Response as attachment"
+// @Router /applications/{appName}/pipelinejobs/{pipelineJobName}/replicas/{replicaName}/containers/{containerId}/log [get]
+func (c *controller) GetPipelineJobContainerLog(ctx *gin.Context) {
+	var params struct {
+		params.App
+		params.PipelineJob
+		params.Replica
+		params.Container
+	}
+	if err := ctx.BindUri(&params); err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
+		return c.appLogsService.PipelineJobContainerLog(ctx.Request.Context(), params.AppName, params.PipelineJobName, params.ReplicaName, params.ContainerId, options)
+	})
+}
+
 func (c *controller) handleInventoryRequest(ctx *gin.Context, inventorySource func(options *logservice.InventoryOptions) ([]logservice.Pod, error)) {
 	queryParams, err := paramsFromContext[inventoryParams](ctx)
 	if err != nil {
-		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		_ = ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
 		ctx.Abort()
 		return
 	}
@@ -376,7 +454,7 @@ func (c *controller) handleInventoryRequest(ctx *gin.Context, inventorySource fu
 	options := queryParams.AsInventoryOptions()
 	pods, err := inventorySource(&options)
 	if err != nil {
-		ctx.Error(err)
+		_ = ctx.Error(err)
 		ctx.Abort()
 		return
 	}
@@ -388,7 +466,7 @@ func (c *controller) handleInventoryRequest(ctx *gin.Context, inventorySource fu
 func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options *logservice.LogOptions) (io.Reader, error)) {
 	queryParams, err := paramsFromContext[logParams](ctx)
 	if err != nil {
-		ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
+		_ = ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
 		ctx.Abort()
 		return
 	}
@@ -396,7 +474,7 @@ func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options *
 	logOptions := queryParams.AsLogOptions()
 	logReader, err := logSource(&logOptions)
 	if err != nil {
-		ctx.Error(err)
+		_ = ctx.Error(err)
 		ctx.Abort()
 		return
 	}
