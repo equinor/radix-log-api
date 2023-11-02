@@ -59,7 +59,7 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 			if userTyped, ok := user.(authn.TokenPrincipal); ok {
 				authCtx.user = userTyped
 			} else {
-				ctx.Error(errInvalidUserTypeInContext)
+				_ = ctx.Error(errInvalidUserTypeInContext)
 				ctx.Abort()
 				return
 			}
@@ -67,7 +67,7 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 
 		policies, err := a.getPoliciesByName(policyNames)
 		if err != nil {
-			ctx.Error(err)
+			_ = ctx.Error(err)
 			ctx.Abort()
 			return
 		}
@@ -78,7 +78,7 @@ func (a *authorizer) Authorize(policyNames ...string) gin.HandlerFunc {
 
 		for _, policy := range policies {
 			if err := policy.ValidatePolicy(&authCtx); err != nil {
-				ctx.Error(err)
+				_ = ctx.Error(err)
 				ctx.Abort()
 				return
 			}

@@ -17,22 +17,22 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func Test_LogControllerComponentInventoryTestSuite(t *testing.T) {
-	suite.Run(t, new(logControllerComponentInventoryTestSuite))
+func Test_LogControllerPipelineJobInventoryTestSuite(t *testing.T) {
+	suite.Run(t, new(logControllerPipelineJobInventoryTestSuite))
 }
 
-type logControllerComponentInventoryTestSuite struct {
+type logControllerPipelineJobInventoryTestSuite struct {
 	controllerTestSuite
 }
 
-func (s *logControllerComponentInventoryTestSuite) SetupTest() {
+func (s *logControllerPipelineJobInventoryTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
 	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
 }
 
-func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Success() {
-	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_Success() {
+	appName, pipelineJobName := "anyapp", "anypipelinejob"
 	pod1BaseTime, pod2BaseTime := time.Now(), time.Now().Add(1*time.Hour)
 	inventory := []logservice.Pod{
 		{
@@ -53,9 +53,9 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 			},
 		},
 	}
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
 
-	req, _ := request.New(request.ComponentInventoryUrl(appName, envName, compName), request.WithBearerAuthorization("anytoken"))
+	req, _ := request.New(request.PipelineJobInventoryUrl(appName, pipelineJobName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
 	s.sut().ServeHTTP(w, req)
 	expected := models.InventoryResponse{Replicas: []models.Replica{
@@ -83,13 +83,13 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Succe
 	s.Equal(expected, actual)
 }
 
-func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_WithParams() {
-	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_WithParams() {
+	appName, pipelineJobName := "anyapp", "anypipelinejob"
 	start, end := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour))
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
 	req, _ := request.New(
-		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
+		request.PipelineJobInventoryUrl(appName, pipelineJobName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
 		request.WithBearerAuthorization("anytoken"),
 	)
 	w := httptest.NewRecorder()
@@ -97,10 +97,10 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_WithP
 	s.Equal(http.StatusOK, w.Code)
 }
 
-func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_InvalidParam_StartNonData() {
-	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_InvalidParam_StartNonData() {
+	appName, pipelineJobName := "anyapp", "anypipelinejob"
 	req, _ := request.New(
-		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("start", "notadate")),
+		request.PipelineJobInventoryUrl(appName, pipelineJobName, request.WithQueryParam("start", "notadate")),
 		request.WithBearerAuthorization("anytoken"),
 	)
 	w := httptest.NewRecorder()
@@ -108,10 +108,10 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Inval
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_InvalidParam_EndNonDate() {
-	appName, envName, compName := "anyapp", "anyenv", "anycomp"
+func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_InvalidParam_EndNonDate() {
+	appName, pipelineJobName := "anyapp", "anypipelinejob"
 	req, _ := request.New(
-		request.ComponentInventoryUrl(appName, envName, compName, request.WithQueryParam("end", "notadate")),
+		request.PipelineJobInventoryUrl(appName, pipelineJobName, request.WithQueryParam("end", "notadate")),
 		request.WithBearerAuthorization("anytoken"),
 	)
 	w := httptest.NewRecorder()
@@ -119,12 +119,12 @@ func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_Inval
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *logControllerComponentInventoryTestSuite) Test_ComponentInventory_LogServiceError() {
-	appName, envName, compName := "anyapp", "anyenv", "anycomp"
-	s.LogService.EXPECT().ComponentInventory(match.IsContext(), appName, envName, compName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_LogServiceError() {
+	appName, pipelineJobName := "anyapp", "anypipelinejob"
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New(
-		request.ComponentInventoryUrl(appName, envName, compName),
+		request.PipelineJobInventoryUrl(appName, pipelineJobName),
 		request.WithBearerAuthorization("anytoken"),
 	)
 	w := httptest.NewRecorder()

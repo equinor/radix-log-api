@@ -21,7 +21,7 @@ func New(auths ...AuthenticationProvider) gin.HandlerFunc {
 		for _, auth := range auths {
 			user, err := auth.Authenticate(ctx.Request)
 			if err != nil {
-				ctx.Error(err)
+				_ = ctx.Error(err)
 				ctx.Abort()
 				return
 			}

@@ -47,6 +47,14 @@ func JobContainerLogUrl(appName, envName, jobComponentName, jobName, replicaName
 	return URL(fmt.Sprintf("/api/v1/applications/%s/environments/%s/jobcomponents/%s/jobs/%s/replicas/%s/containers/%s/log", appName, envName, jobComponentName, jobName, replicaName, containerID), options...)
 }
 
+func PipelineJobInventoryUrl(appName, pipelineJobName string, options ...UrlOption) string {
+	return URL(fmt.Sprintf("/api/v1/applications/%s/pipelinejobs/%s", appName, pipelineJobName), options...)
+}
+
+func PipelineJobContainerLogUrl(appName, pipelineJobName, replicaName, containerID string, options ...UrlOption) string {
+	return URL(fmt.Sprintf("/api/v1/applications/%s/pipelinejobs/%s/replicas/%s/containers/%s/log", appName, pipelineJobName, replicaName, containerID), options...)
+}
+
 func URL(path string, options ...UrlOption) string {
 	u := &url.URL{Path: path}
 
