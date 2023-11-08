@@ -30,6 +30,10 @@ Also needed:
 
 Clone the repo into your `GOPATH` and run `go mod download`.
 
+### Contribution
+
+Want to contribute? Follow these [contributing guidlines](./CONTRIBUTING.md)
+
 ### Swagger
 
 Swagger docs are generated using [https://github.com/swaggo/swag](https://github.com/swaggo/swag). The [Declarative Comments Format](https://github.com/swaggo/swag#declarative-comments-format) describes how to configure the swagger spec.
@@ -55,3 +59,7 @@ Copy file `.env.template` to `.env`
 Radix Log API follows the [standard procedure](https://github.com/equinor/radix-private/blob/master/docs/how-we-work/development-practices.md#standard-radix-applications) defined in _how we work_. 
 
 Radix Log API is installed as a Radix application in [script](https://github.com/equinor/radix-platform/blob/master/scripts/install_base_components.sh) when setting up a cluster.
+
+------------------
+
+[Security notification](./SECURITY.md)
