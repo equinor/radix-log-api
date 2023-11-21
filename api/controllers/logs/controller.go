@@ -90,6 +90,7 @@ func (c *controller) Endpoints() []controllers.Endpoint {
 }
 
 // GetComponentInventory godoc
+// @Id getComponentInventory
 // @Summary Get inventory (pods and containers) for a component
 // @Tags Inventory
 // @Produce json
@@ -122,6 +123,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 }
 
 // GetComponentLog godoc
+// @Id getComponentLog
 // @Summary Get log for a component
 // @Tags Logs
 // @Produce plain
@@ -156,6 +158,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 }
 
 // GetComponentReplicaLog godoc
+// @Id getComponentReplicaLog
 // @Summary Get log for a component replica
 // @Tags Logs
 // @Produce plain
@@ -192,6 +195,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 }
 
 // GetComponentContainerLog godoc
+// @Id getComponentContainerLog
 // @Summary Get log for a component container
 // @Tags Logs
 // @Produce plain
@@ -230,6 +234,7 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 }
 
 // GetJobInventory godoc
+// @Id getJobInventory
 // @Summary Get inventory (pods and containers) for a job
 // @Tags Inventory
 // @Produce json
@@ -264,6 +269,7 @@ func (c *controller) GetJobInventory(ctx *gin.Context) {
 }
 
 // GetJobLog godoc
+// @Id getJobLog
 // @Summary Get log for a job
 // @Tags Logs
 // @Produce plain
@@ -300,6 +306,7 @@ func (c *controller) GetJobLog(ctx *gin.Context) {
 }
 
 // GetJobReplicaLog godoc
+// @Id getJobReplicaLog
 // @Summary Get log for a job replica
 // @Tags Logs
 // @Produce plain
@@ -338,6 +345,7 @@ func (c *controller) GetJobReplicaLog(ctx *gin.Context) {
 }
 
 // GetJobContainerLog godoc
+// @Id getJobContainerLog
 // @Summary Get log for a job container
 // @Tags Logs
 // @Produce plain
@@ -378,6 +386,7 @@ func (c *controller) GetJobContainerLog(ctx *gin.Context) {
 }
 
 // GetPipelineJobInventory godoc
+// @Id getPipelineJobInventory
 // @Summary Get inventory (pods and containers) for a pipeline job
 // @Tags Inventory
 // @Produce json
@@ -408,6 +417,7 @@ func (c *controller) GetPipelineJobInventory(ctx *gin.Context) {
 }
 
 // GetPipelineJobContainerLog godoc
+// @Id getPipelineJobContainerLog
 // @Summary Get log for a pipeline job container
 // @Tags Logs
 // @Produce plain

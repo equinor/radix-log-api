@@ -50,6 +50,7 @@ info:
 paths:
   /applications/{appName}/environments/{envName}/components/{componentName}:
     get:
+      operationId: getComponentInventory
       parameters:
       - description: Application Name
         in: path
@@ -108,6 +109,7 @@ paths:
       - Inventory
   /applications/{appName}/environments/{envName}/components/{componentName}/log:
     get:
+      operationId: getComponentLog
       parameters:
       - description: Application Name
         in: path
@@ -175,6 +177,7 @@ paths:
       - Logs
   /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log:
     get:
+      operationId: getComponentContainerLog
       parameters:
       - description: Application Name
         in: path
@@ -252,6 +255,7 @@ paths:
       - Logs
   /applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log:
     get:
+      operationId: getComponentReplicaLog
       parameters:
       - description: Application Name
         in: path
@@ -324,6 +328,7 @@ paths:
       - Logs
   /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}:
     get:
+      operationId: getJobInventory
       parameters:
       - description: Application Name
         in: path
@@ -387,6 +392,7 @@ paths:
       - Inventory
   /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/log:
     get:
+      operationId: getJobLog
       parameters:
       - description: Application Name
         in: path
@@ -459,6 +465,7 @@ paths:
       - Logs
   ? /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/containers/{containerId}/log
   : get:
+      operationId: getJobContainerLog
       parameters:
       - description: Application Name
         in: path
@@ -541,6 +548,7 @@ paths:
       - Logs
   /applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/log:
     get:
+      operationId: getJobReplicaLog
       parameters:
       - description: Application Name
         in: path
@@ -618,6 +626,7 @@ paths:
       - Logs
   /applications/{appName}/pipelinejobs/{pipelineJobName}:
     get:
+      operationId: getPipelineJobInventory
       parameters:
       - description: Application Name
         in: path
@@ -671,6 +680,7 @@ paths:
       - Inventory
   /applications/{appName}/pipelinejobs/{pipelineJobName}/replicas/{replicaName}/containers/{containerId}/log:
     get:
+      operationId: getPipelineJobContainerLog
       parameters:
       - description: Application Name
         in: path
