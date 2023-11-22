@@ -23,6 +23,7 @@
                     "Inventory"
                 ],
                 "summary": "Get inventory (pods and containers) for a component",
+                "operationId": "getComponentInventory",
                 "parameters": [
                     {
                         "type": "string",
@@ -110,6 +111,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a component",
+                "operationId": "getComponentLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -210,6 +212,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a component container",
+                "operationId": "getComponentContainerLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -324,6 +327,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a component replica",
+                "operationId": "getComponentReplicaLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -431,6 +435,7 @@
                     "Inventory"
                 ],
                 "summary": "Get inventory (pods and containers) for a job",
+                "operationId": "getJobInventory",
                 "parameters": [
                     {
                         "type": "string",
@@ -525,6 +530,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a job",
+                "operationId": "getJobLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -632,6 +638,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a job container",
+                "operationId": "getJobContainerLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -753,6 +760,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a job replica",
+                "operationId": "getJobReplicaLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -867,6 +875,7 @@
                     "Inventory"
                 ],
                 "summary": "Get inventory (pods and containers) for a pipeline job",
+                "operationId": "getPipelineJobInventory",
                 "parameters": [
                     {
                         "type": "string",
@@ -947,6 +956,7 @@
                     "Logs"
                 ],
                 "summary": "Get log for a pipeline job container",
+                "operationId": "getPipelineJobContainerLog",
                 "parameters": [
                     {
                         "type": "string",
