@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: git fetch --no-tags --no-recurse-submodules --depth=1  origin master:master
+      - run: git fetch --no-tags --no-recurse-submodules --depth=1  origin main:main
       - uses: actions/setup-go@v4
         with:
           go-version: '1.21'
@@ -69,7 +69,7 @@ jobs:
         if: always()
         id: breaking
         continue-on-error: true
-        run: swagger diff --break <(git show master:docs/swagger.json) docs/swagger.json > /tmp/swagger_breaking_changes.txt
+        run: swagger diff --break <(git show main:docs/swagger.json) docs/swagger.json > /tmp/swagger_breaking_changes.txt
       - name: Add comment
         if: failure() && steps.breaking.outcome == 'failure'
         uses: mshick/add-pr-comment@v2
