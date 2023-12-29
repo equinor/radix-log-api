@@ -64,7 +64,7 @@ jobs:
       - name: Generate Swagger
         run: swag init
       - name: Validate no changes
-        run: diff <(git show master:docs/swagger.json) ./docs/swagger.json
+        run: diff <(git show main:docs/swagger.json) ./docs/swagger.json
       - name: Check breaking changes
         if: always()
         id: breaking
