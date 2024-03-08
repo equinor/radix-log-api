@@ -3,28 +3,32 @@ package server
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func Run(ctx context.Context, handler http.Handler, cfg *Config) error {
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		Handler: handler,
+		Addr:        fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Handler:     handler,
+		BaseContext: func(_ net.Listener) context.Context { return ctx },
 	}
-	logrus.Infof("starting server with address %s", srv.Addr)
-	go startHttp(srv)
+
+	log.Ctx(ctx).Info().Msgf("API is serving on address %s", srv.Addr)
+	go startHttp(ctx, srv)
 	<-ctx.Done()
 	return srv.Close()
 }
 
-func startHttp(s *http.Server) {
+func startHttp(ctx context.Context, s *http.Server) {
+	logger := log.Ctx(ctx)
 	if err := s.ListenAndServe(); err != nil {
 		if err == http.ErrServerClosed {
-			logrus.Info("server: shutdown complete")
+			logger.Info().Msg("server closed")
 		} else {
-			logrus.Errorf("server: %s", err)
+			logger.Fatal().Err(err).Msg("server error")
 		}
 	}
 }
