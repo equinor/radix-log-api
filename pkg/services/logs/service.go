@@ -12,6 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 	"github.com/equinor/radix-common/utils/slice"
 	"github.com/equinor/radix-log-api/pkg/aztable"
+	"github.com/rs/zerolog"
 )
 
 type service struct {
@@ -204,6 +205,7 @@ func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builde
 	}
 
 	query := builder.String()
+	zerolog.Ctx(ctx).Debug().Str("query", query).Msg("Execute inventory query")
 	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
 	if err != nil {
 		return nil, err
@@ -258,6 +260,7 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 	}
 
 	query := builder.String()
+	zerolog.Ctx(ctx).Debug().Str("query", query).Msg("Execute log query")
 	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
 	if err != nil {
 		return nil, err
