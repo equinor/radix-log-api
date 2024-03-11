@@ -12,12 +12,19 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Application Application details of an application
 //
 // swagger:model Application
 type Application struct {
+
+	// DNS aliases showing nicer endpoint for application, without "app." subdomain domain
+	DNSAliases []*DNSAlias `json:"dnsAliases"`
+
+	// List of external DNS names and which component and environment incoming requests shall be routed to.
+	DNSExternalAliases []*DNSExternalAlias `json:"dnsExternalAliases"`
 
 	// Environments List of environments for this application
 	Environments []*EnvironmentSummary `json:"environments"`
@@ -28,6 +35,10 @@ type Application struct {
 	// Name the name of the application
 	// Example: radix-canary-golang
 	Name string `json:"name,omitempty"`
+
+	// UserIsAdmin if user is member of application's admin groups
+	// Required: true
+	UserIsAdmin *bool `json:"userIsAdmin"`
 
 	// app alias
 	AppAlias *ApplicationAlias `json:"appAlias,omitempty"`
@@ -40,11 +51,23 @@ type Application struct {
 func (m *Application) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateDNSAliases(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDNSExternalAliases(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateEnvironments(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateJobs(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUserIsAdmin(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -59,6 +82,58 @@ func (m *Application) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Application) validateDNSAliases(formats strfmt.Registry) error {
+	if swag.IsZero(m.DNSAliases) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.DNSAliases); i++ {
+		if swag.IsZero(m.DNSAliases[i]) { // not required
+			continue
+		}
+
+		if m.DNSAliases[i] != nil {
+			if err := m.DNSAliases[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("dnsAliases" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("dnsAliases" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Application) validateDNSExternalAliases(formats strfmt.Registry) error {
+	if swag.IsZero(m.DNSExternalAliases) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.DNSExternalAliases); i++ {
+		if swag.IsZero(m.DNSExternalAliases[i]) { // not required
+			continue
+		}
+
+		if m.DNSExternalAliases[i] != nil {
+			if err := m.DNSExternalAliases[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("dnsExternalAliases" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("dnsExternalAliases" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -114,6 +189,15 @@ func (m *Application) validateJobs(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Application) validateUserIsAdmin(formats strfmt.Registry) error {
+
+	if err := validate.Required("userIsAdmin", "body", m.UserIsAdmin); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Application) validateAppAlias(formats strfmt.Registry) error {
 	if swag.IsZero(m.AppAlias) { // not required
 		return nil
@@ -156,6 +240,14 @@ func (m *Application) validateRegistration(formats strfmt.Registry) error {
 func (m *Application) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateDNSAliases(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateDNSExternalAliases(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateEnvironments(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -175,6 +267,56 @@ func (m *Application) ContextValidate(ctx context.Context, formats strfmt.Regist
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Application) contextValidateDNSAliases(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.DNSAliases); i++ {
+
+		if m.DNSAliases[i] != nil {
+
+			if swag.IsZero(m.DNSAliases[i]) { // not required
+				return nil
+			}
+
+			if err := m.DNSAliases[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("dnsAliases" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("dnsAliases" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Application) contextValidateDNSExternalAliases(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.DNSExternalAliases); i++ {
+
+		if m.DNSExternalAliases[i] != nil {
+
+			if swag.IsZero(m.DNSExternalAliases[i]) { // not required
+				return nil
+			}
+
+			if err := m.DNSExternalAliases[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("dnsExternalAliases" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("dnsExternalAliases" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

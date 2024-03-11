@@ -9,8 +9,68 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build docker image
       env:
         REF: ${{ github. sha }}
       run: docker build -t radix-log-api:${REF##*/} .
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.55.2
+
+  test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Install dependencies
+        run: go mod download
+      - name: Run Tests
+        run: go test -cover `go list ./... | grep -v 'pkg/client'`
+
+  test-swagger:
+    name: Test Swagger
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --no-tags --no-recurse-submodules --depth=1  origin main:main
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Install dependencies
+        run: go mod download
+      - name: Install Swagger
+        run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
+      - name: Install Swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+      - name: Generate Swagger
+        run: swag init
+      - name: Validate no changes
+        run: diff <(git show main:docs/swagger.json) ./docs/swagger.json
+      - name: Check breaking changes
+        if: always()
+        id: breaking
+        continue-on-error: true
+        run: swagger diff --break <(git show main:docs/swagger.json) docs/swagger.json > /tmp/swagger_breaking_changes.txt
+      - name: Add comment
+        if: failure() && steps.breaking.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: breaking-comment
+          preformatted: true
+          message-path: /tmp/swagger_breaking_changes.txt
