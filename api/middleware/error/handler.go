@@ -6,7 +6,6 @@ import (
 
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 func ErrorHandler(ctx *gin.Context) {
@@ -19,8 +18,6 @@ func ErrorHandler(ctx *gin.Context) {
 
 	var apiStatus apierrors.Status
 	for _, e := range ctx.Errors {
-		logrus.Error(e)
-
 		if errors.Is(e, context.Canceled) {
 			return
 		}
