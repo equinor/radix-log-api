@@ -58,5 +58,6 @@ func initLogger(ctx *cli.Context) error {
 		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.TimeOnly})
 	}
 	ctx.Context = logger.WithContext(ctx.Context)
+	zerolog.DefaultContextLogger = &logger
 	return nil
 }

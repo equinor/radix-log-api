@@ -63,7 +63,7 @@ func buildLogService(cliCtx *cli.Context) (logservice.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	logService := logservice.New(logsClient, cliCtx.String(LogAnalyticsWorkspaceId))
+	logService := logservice.New(logsClient, cliCtx.String(LogAnalyticsWorkspaceId), logservice.ContainerLogTypeV1)
 	return logService, nil
 }
 

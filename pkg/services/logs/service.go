@@ -15,15 +15,35 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type ContainerLogType int
+
+const (
+	ContainerLogTypeV1 ContainerLogType = iota
+	ContainerLogTypeV2
+	ContainerLogTypeBoth
+)
+
 type service struct {
-	logsClient  *azquery.LogsClient
-	workspaceId string
+	logsClient           *azquery.LogsClient
+	workspaceId          string
+	containerLogJoinName string
 }
 
-func New(logsClient *azquery.LogsClient, workspaceId string) Service {
+func New(logsClient *azquery.LogsClient, workspaceId string, logType ContainerLogType) Service {
+	var containerLogJoinName string
+	switch logType {
+	case ContainerLogTypeV1:
+		containerLogJoinName = joinContainerLogV1
+	case ContainerLogTypeV2:
+		containerLogJoinName = joinContainerLogV2
+	case ContainerLogTypeBoth:
+		containerLogJoinName = joinContainerBoth
+	}
+
 	return &service{
-		logsClient:  logsClient,
-		workspaceId: workspaceId,
+		logsClient:           logsClient,
+		workspaceId:          workspaceId,
+		containerLogJoinName: containerLogJoinName,
 	}
 }
 
@@ -38,7 +58,7 @@ func (s *service) ComponentLog(ctx context.Context, appName, envName, componentN
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(componentLogQuery)
+		AddUnsafe(getComponentLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -54,7 +74,7 @@ func (s *service) ComponentPodLog(ctx context.Context, appName, envName, compone
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(componentPodLogQuery)
+		AddUnsafe(getComponentPodLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -72,7 +92,7 @@ func (s *service) ComponentContainerLog(ctx context.Context, appName, envName, c
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(componentContainerLogQuery)
+		AddUnsafe(getComponentContainerLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -87,7 +107,7 @@ func (s *service) ComponentInventory(ctx context.Context, appName, envName, comp
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(componentInventoryQuery)
+		AddUnsafe(getComponentInventoryQuery())
 
 	return s.executeInventoryQuery(ctx, builder, options)
 }
@@ -103,7 +123,7 @@ func (s *service) JobInventory(ctx context.Context, appName, envName, jobCompone
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(jobInventoryQuery)
+		AddUnsafe(getJobInventoryQuery())
 
 	return s.executeInventoryQuery(ctx, builder, options)
 }
@@ -120,7 +140,7 @@ func (s *service) JobLog(ctx context.Context, appName, envName, jobComponentName
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(jobLogQuery)
+		AddUnsafe(getJobLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -138,7 +158,7 @@ func (s *service) JobPodLog(ctx context.Context, appName, envName, jobComponentN
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(jobPodLogQuery)
+		AddUnsafe(getJobPodLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -157,7 +177,7 @@ func (s *service) JobContainerLog(ctx context.Context, appName, envName, jobComp
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(jobContainerLogQuery)
+		AddUnsafe(getJobContainerLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -171,7 +191,7 @@ func (s *service) PipelineJobInventory(ctx context.Context, appName, pipelineJob
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(pipelineJobInventoryQuery)
+		AddUnsafe(getPipelineJobInventoryQuery())
 
 	return s.executeInventoryQuery(ctx, builder, options)
 }
@@ -189,7 +209,7 @@ func (s *service) PipelineJobContainerLog(ctx context.Context, appName, pipeline
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(pipelineJobContainerLogQuery)
+		AddUnsafe(getPipelineJobContainerLogQuery(joinContainerLogV1))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
