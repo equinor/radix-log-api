@@ -23,14 +23,13 @@ var (
 	| sort by TimeGenerated desc`
 
 	joinContainerLogV2 = `| join kind=inner ContainerLogV2 on $left.ContainerID==$right.ContainerId
-	| extend LogEntry = LogMessage
-	| extend Name = PodName
-	| project TimeGenerated, Name, ContainerID, LogEntry
+	| project TimeGenerated, Name, ContainerID, LogEntry=LogMessage
 	| sort by TimeGenerated desc`
 
-	joinContainerBoth = `| join kind=inner ContainerLog on $left.ContainerID==$right.ContainerID
-	| project TimeGenerated, Name, ContainerID, LogEntry
-	| sort by TimeGenerated desc`
+	joinContainerBoth = `| join kind=leftouter ContainerLog on $left.ContainerID==$right.ContainerID
+    | join kind=leftouter ContainerLogV2 on $left.ContainerID==$right.ContainerId
+    | project TimeGenerated=coalesce(TimeGenerated, TimeGenerated1),ContainerID, Name, LogEntry=coalesce(LogEntry, LogMessage)
+    | sort by TimeGenerated desc`
 )
 
 func getComponentInventoryQuery() string {
@@ -49,7 +48,7 @@ func getComponentLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramAppName, paramComponentName)
 }
@@ -59,7 +58,7 @@ func getComponentPodLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and Name == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramPodName, paramAppName, paramComponentName)
 }
@@ -69,7 +68,7 @@ func getComponentContainerLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramPodName, paramContainerId, paramAppName, paramComponentName)
 }
@@ -91,7 +90,7 @@ func getJobLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
 }
@@ -101,7 +100,7 @@ func getJobPodLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and Name == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramPodName, paramAppName, paramJobComponentName, paramJobName)
 }
@@ -111,7 +110,7 @@ func getJobContainerLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramPodName, paramContainerId, paramAppName, paramJobComponentName, paramJobName)
 }
@@ -134,7 +133,7 @@ func getPipelineJobContainerLogQuery(joinContainerLog string) string {
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
 	| where d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
-	| summarize by ContainerID
+	| summarize by ContainerID,Name
 	`+joinContainerLog,
 		paramNamespace, paramPodName, paramContainerId, paramPipelineJobName)
 }
