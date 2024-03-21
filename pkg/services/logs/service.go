@@ -13,38 +13,46 @@ import (
 	"github.com/equinor/radix-common/utils/slice"
 	"github.com/equinor/radix-log-api/pkg/aztable"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-type ContainerLogType int
+type ContainerLogType string
 
 const (
-	ContainerLogTypeV1 ContainerLogType = iota
-	ContainerLogTypeV2
-	ContainerLogTypeBoth
+	ContainerLogTypeV1   ContainerLogType = "ContainerLog"
+	ContainerLogTypeV2   ContainerLogType = "ContainerLogV2"
+	ContainerLogTypeBoth ContainerLogType = "Both"
 )
 
 type service struct {
-	logsClient           *azquery.LogsClient
-	workspaceId          string
-	containerLogJoinName string
+	logsClient        *azquery.LogsClient
+	workspaceId       string
+	containerLogQuery string
 }
 
-func New(logsClient *azquery.LogsClient, workspaceId string, logType ContainerLogType) Service {
-	var containerLogJoinName string
-	switch logType {
-	case ContainerLogTypeV1:
-		containerLogJoinName = joinContainerLogV1
-	case ContainerLogTypeV2:
-		containerLogJoinName = joinContainerLogV2
-	case ContainerLogTypeBoth:
-		containerLogJoinName = joinContainerBoth
-	}
-
+func New(ctx context.Context, logsClient *azquery.LogsClient, workspaceId string, logType ContainerLogType) Service {
 	return &service{
-		logsClient:           logsClient,
-		workspaceId:          workspaceId,
-		containerLogJoinName: containerLogJoinName,
+		logsClient:        logsClient,
+		workspaceId:       workspaceId,
+		containerLogQuery: getContainerJoinQuery(ctx, logType),
 	}
+}
+
+// TODO: Remove this when legacy ContainerLog is no longer in use
+func getContainerJoinQuery(ctx context.Context, logType ContainerLogType) string {
+	var containerLogQuery string
+	switch logType {
+	case ContainerLogTypeV2:
+		log.Info().Str("table", "ContainerLogV2").Msg("Configuring Log Analytics")
+		containerLogQuery = joinContainerLogV2
+	case ContainerLogTypeBoth:
+		log.Info().Str("table", "ContainerLog,ContainerLogV2").Msgf("Configuring Log Analytics")
+		containerLogQuery = joinContainerBoth
+	default:
+		log.Info().Str("table", "ContainerLog").Msg("Configuring Log Analytics")
+		containerLogQuery = joinContainerLogV1
+	}
+	return containerLogQuery
 }
 
 func (s *service) ComponentLog(ctx context.Context, appName, envName, componentName string, options *LogOptions) (io.Reader, error) {
@@ -58,7 +66,7 @@ func (s *service) ComponentLog(ctx context.Context, appName, envName, componentN
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getComponentLogQuery(joinContainerLogV1))
+		AddUnsafe(getComponentLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -74,7 +82,7 @@ func (s *service) ComponentPodLog(ctx context.Context, appName, envName, compone
 	)
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getComponentPodLogQuery(joinContainerLogV1))
+		AddUnsafe(getComponentPodLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -92,7 +100,7 @@ func (s *service) ComponentContainerLog(ctx context.Context, appName, envName, c
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getComponentContainerLogQuery(joinContainerLogV1))
+		AddUnsafe(getComponentContainerLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -140,7 +148,7 @@ func (s *service) JobLog(ctx context.Context, appName, envName, jobComponentName
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getJobLogQuery(joinContainerLogV1))
+		AddUnsafe(getJobLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -158,7 +166,7 @@ func (s *service) JobPodLog(ctx context.Context, appName, envName, jobComponentN
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getJobPodLogQuery(joinContainerLogV1))
+		AddUnsafe(getJobPodLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -177,7 +185,7 @@ func (s *service) JobContainerLog(ctx context.Context, appName, envName, jobComp
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getJobContainerLogQuery(joinContainerLogV1))
+		AddUnsafe(getJobContainerLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }
@@ -209,7 +217,7 @@ func (s *service) PipelineJobContainerLog(ctx context.Context, appName, pipeline
 
 	builder := kql.New("").
 		AddUnsafe(params.String()).
-		AddUnsafe(getPipelineJobContainerLogQuery(joinContainerLogV1))
+		AddUnsafe(getPipelineJobContainerLogQuery(s.containerLogQuery))
 
 	return s.executeLogQuery(ctx, builder, options)
 }

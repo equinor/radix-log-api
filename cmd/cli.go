@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -52,12 +53,15 @@ func initLogger(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("unknown log level `%s`", ctx.String(logLevel))
 	}
-	zerolog.SetGlobalLevel(level)
-	logger := log.Logger
+
+	var logWriter io.Writer = os.Stderr
 	if ctx.Bool(logPretty) {
-		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.TimeOnly})
+		logWriter = &zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.TimeOnly}
 	}
-	ctx.Context = logger.WithContext(ctx.Context)
+
+	logger := zerolog.New(logWriter).Level(level).With().Timestamp().Logger()
+
+	log.Logger = logger
 	zerolog.DefaultContextLogger = &logger
 	return nil
 }

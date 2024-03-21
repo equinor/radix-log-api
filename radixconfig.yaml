@@ -25,6 +25,7 @@ spec:
         LOG_API_LOG_LEVEL: "info"
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
+        LOG_API_LOG_ANALYTICS_TABLE: ContainerLog # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
       secrets:
         - "AZURE_CLIENT_ID"
         - "AZURE_CLIENT_SECRET"
@@ -38,4 +39,4 @@ spec:
       environmentConfig:
         - environment: prod
           replicas: 2
-      
+
