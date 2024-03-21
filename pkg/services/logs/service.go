@@ -30,18 +30,21 @@ type service struct {
 	containerLogQuery string
 }
 
-func New(ctx context.Context, logsClient *azquery.LogsClient, workspaceId string, logType ContainerLogType) Service {
+func New(logsClient *azquery.LogsClient, workspaceId string, logType ContainerLogType) Service {
 	return &service{
 		logsClient:        logsClient,
 		workspaceId:       workspaceId,
-		containerLogQuery: getContainerJoinQuery(ctx, logType),
+		containerLogQuery: getContainerJoinQuery(logType),
 	}
 }
 
 // TODO: Remove this when legacy ContainerLog is no longer in use
-func getContainerJoinQuery(ctx context.Context, logType ContainerLogType) string {
+func getContainerJoinQuery(logType ContainerLogType) string {
 	var containerLogQuery string
 	switch logType {
+	case ContainerLogTypeV1:
+		log.Info().Str("table", "ContainerLog").Msg("Configuring Log Analytics")
+		containerLogQuery = joinContainerLogV1
 	case ContainerLogTypeV2:
 		log.Info().Str("table", "ContainerLogV2").Msg("Configuring Log Analytics")
 		containerLogQuery = joinContainerLogV2
@@ -49,7 +52,7 @@ func getContainerJoinQuery(ctx context.Context, logType ContainerLogType) string
 		log.Info().Str("table", "ContainerLog,ContainerLogV2").Msgf("Configuring Log Analytics")
 		containerLogQuery = joinContainerBoth
 	default:
-		log.Info().Str("table", "ContainerLog").Msg("Configuring Log Analytics")
+		log.Warn().Str("table", "ContainerLog").Msg("Configuring Log Analytics, unknown Log Type, fallback to default")
 		containerLogQuery = joinContainerLogV1
 	}
 	return containerLogQuery
