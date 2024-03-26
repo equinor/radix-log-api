@@ -226,6 +226,9 @@ func (s *service) PipelineJobContainerLog(ctx context.Context, appName, pipeline
 }
 
 func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builder, options *InventoryOptions) ([]Pod, error) {
+	logger := zerolog.Ctx(ctx)
+	debugEvent := logger.Debug()
+
 	if options == nil {
 		options = &InventoryOptions{}
 	}
@@ -233,13 +236,17 @@ func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builde
 	timspan := azquery.TimeInterval("")
 	if options.Timeinterval != nil {
 		timspan = options.Timeinterval.AzQueryTimeinterval()
+		debugEvent.Time("start", options.Timeinterval.Start).Time("end", options.Timeinterval.End)
 	}
 
 	query := builder.String()
-	zerolog.Ctx(ctx).Debug().Str("query", query).Msg("Execute inventory query")
+	debugEvent.Str("query", query).Msg("Execute inventory query")
 	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
 	if err != nil {
 		return nil, err
+	}
+	if resp.Error != nil {
+		logger.Warn().Err(resp.Error).Msg("Inventory query returned a warning")
 	}
 
 	reader := newTableReader(resp.Tables[0])
@@ -277,27 +284,41 @@ func (s *service) executeInventoryQuery(ctx context.Context, builder *kql.Builde
 }
 
 func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, options *LogOptions) (io.Reader, error) {
+	logger := zerolog.Ctx(ctx)
+	debugEvent := logger.Debug()
+
 	if options == nil {
 		options = &LogOptions{}
 	}
 
 	if options.LimitRows != nil {
 		builder = builder.AddLiteral("| take ").AddInt(int32(*options.LimitRows))
+		debugEvent.Int("limit_rows", *options.LimitRows)
 	}
 
 	timspan := azquery.TimeInterval("")
 	if options.Timeinterval != nil {
 		timspan = options.Timeinterval.AzQueryTimeinterval()
+		debugEvent.Time("start", options.Timeinterval.Start).Time("end", options.Timeinterval.End)
 	}
 
 	query := builder.String()
-	zerolog.Ctx(ctx).Debug().Str("query", query).Msg("Execute log query")
+	debugEvent.Str("query", query).Msg("Execute log query")
+
 	resp, err := s.logsClient.QueryWorkspace(ctx, s.workspaceId, azquery.Body{Query: &query, Timespan: &timspan}, nil)
 	if err != nil {
 		return nil, err
 	}
+	// TODO: Max response from log analytics is 64MB. Result is truncated if limit is exceeded.
+	// When result is trucated, the reason is described in resp.Error.
+	// Tried `set notruncation` (https://aka.ms/kustoquerylimits) but it had no effect.
+	// For now we just log a warning if response contain an error, but perhaps we must forward the
+	// error to the user.
+	if resp.Error != nil {
+		logger.Warn().Err(resp.Error).Msg("Log query returned a warning")
+	}
 
-	return aztable.NewReader(resp.Results.Tables[0], 3), nil
+	return aztable.NewReader(resp.Results.Tables[0], 1), nil
 }
 
 func mustParseTime(t string) time.Time {

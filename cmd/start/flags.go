@@ -71,7 +71,7 @@ var flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:    RadixAPIScheme,
-		Usage:   "Radix API sceme",
+		Usage:   "Radix API scheme",
 		Value:   "https",
 		EnvVars: []string{"LOG_API_RADIX_API_SCHEME"},
 	},

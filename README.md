@@ -9,11 +9,12 @@ The Radix Log API gives access to container logs from Azure Log Analytics Worksp
 
 | Name | Type | Required | Description | Default |
 | ---- | ---- | -------- | ----------- | ------- |
-| host | string | No | Host name or IP for the server | "8000" |
-| port | string | No | Port that the server listens to | "" |
+| host | string | No | Host name or IP for the server | "" |
+| port | string | No | Port that the server listens to | "8000" |
 | auth-issuer | string | Yes | The expected issuer (`iss` claim) for JWT used as bearer token in authorization header for incoming requests | "" |
 | auth-audience | string | Yes | The expected audience (aud) for JWT used as bearer token in authorization header for incoming requests | "" |
 | log-analytics-workspace-id | string | Yes | The workspace ID for the Azure Log Analytic Workspace to collect container logs from | "" |
+| log-analytics-log-table | string | No | The log analytics table to read logs from. Valid values `ContainerLog`, `ContainerLogV2` or `Both` | Both |
 | radix-api-host | string | Yes | FQDN to the Radix API server  | "" |
 | radix-api-path | string | No | Base path for Radix API | "/api/v1" |
 | radix-api-scheme | string | No | The Radix API HTTP scheme (https or http) | "https" |
