@@ -48,7 +48,7 @@ var flags = []cli.Flag{
 		Name:     LogAnalyticsLogTable,
 		Usage:    "Log Analytics workspace table to query. ContainerLogV2, ContainerLog or Both. Defaults to ContainerLog",
 		Required: true,
-		EnvVars:  []string{"LOG_API_LOG_ANALYTICS_TABLE"},
+		EnvVars:  []string{"LOG_API_LOG_ANALYTICS_LOG_TABLE"},
 	},
 	&cli.StringFlag{
 		Name:     LogAnalyticsWorkspaceId,
