@@ -25,6 +25,7 @@ spec:
         LOG_API_LOG_LEVEL: "info"
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
+        LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
       secrets:
         - "AZURE_CLIENT_ID"
         - "AZURE_CLIENT_SECRET"
@@ -32,10 +33,10 @@ spec:
         requests:
           cpu: 100m
           memory: 200M
-        limits:
-          cpu: 500m
-          memory: 1G
       environmentConfig:
         - environment: prod
           replicas: 2
-      
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1G
