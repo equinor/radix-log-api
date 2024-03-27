@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -25,7 +26,7 @@ func Run(ctx context.Context, handler http.Handler, cfg *Config) error {
 func startHttp(ctx context.Context, s *http.Server) {
 	logger := log.Ctx(ctx)
 	if err := s.ListenAndServe(); err != nil {
-		if err == http.ErrServerClosed {
+		if errors.Is(err, http.ErrServerClosed) {
 			logger.Info().Msg("server closed")
 		} else {
 			logger.Fatal().Err(err).Msg("server error")

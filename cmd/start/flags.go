@@ -13,6 +13,7 @@ const (
 	AuthIssuer              = "auth-issuer"
 	AuthAudience            = "auth-audience"
 	LogAnalyticsWorkspaceId = "log-analytics-workspace-id"
+	LogAnalyticsLogTable    = "log-analytics-log-table"
 	RadixAPIHost            = "radix-api-host"
 	RadixAPIPath            = "radix-api-path"
 	RadixAPIScheme          = "radix-api-scheme"
@@ -44,6 +45,12 @@ var flags = []cli.Flag{
 		EnvVars:  []string{"LOG_API_AUTH_AUDIENCE"},
 	},
 	&cli.StringFlag{
+		Name:     LogAnalyticsLogTable,
+		Usage:    "Log Analytics workspace table to query. ContainerLogV2, ContainerLog or Both. Defaults to ContainerLog",
+		Required: true,
+		EnvVars:  []string{"LOG_API_LOG_ANALYTICS_LOG_TABLE"},
+	},
+	&cli.StringFlag{
 		Name:     LogAnalyticsWorkspaceId,
 		Usage:    "Log Analytics workspace ID",
 		Required: true,
@@ -64,7 +71,7 @@ var flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:    RadixAPIScheme,
-		Usage:   "Radix API sceme",
+		Usage:   "Radix API scheme",
 		Value:   "https",
 		EnvVars: []string{"LOG_API_RADIX_API_SCHEME"},
 	},
