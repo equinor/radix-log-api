@@ -33,10 +33,10 @@ spec:
         requests:
           cpu: 100m
           memory: 200M
-        limits:
-          cpu: 500m
-          memory: 1G
       environmentConfig:
         - environment: prod
           replicas: 2
-
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1G
