@@ -43,9 +43,9 @@ Mocks used in tests are generated with `gomock`. You need to regenerate mocks by
 
 There is one `radixconfig` file per cluster. File `radixconfig.yaml.tpl` is the template used to generate these files. Run `make radixconfigs` to regenerate if changes are made to the template.
 
-The Radix API Client is generated from the `swagger.json` hosted on `https://api.radix.equinor.com/swaggerui/swagger.json`. Run `make radixapiclient` on regular intervals to update the client code with changes made to the source.
+Run `make generate` to run all code generations described above.
 
-Run `make generate` to run all code generations described in this section.
+The Radix API Client is generated from the `swagger.json` hosted on `https://api.radix.equinor.com/swaggerui/swagger.json`. Run `make radixapiclient` on regular intervals to update the client code with changes made to the source. This code generation is **NOT** included in `make generate`.
 
 ### Running locally
 

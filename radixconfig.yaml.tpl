@@ -25,7 +25,7 @@ spec:
         LOG_API_PORT: "8000"
         LOG_API_AUTH_ISSUER: "https://sts.windows.net/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/"
         LOG_API_AUTH_AUDIENCE: "6dae42f8-4368-4678-94ff-3960e28e3630"
-        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: "TBA"
+        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: "TBAx"
         LOG_API_LOG_LEVEL: "info"
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
