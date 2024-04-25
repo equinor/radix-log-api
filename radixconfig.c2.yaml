@@ -19,7 +19,7 @@ spec:
       publicPort: http
       identity:
         azure:
-          clientId: a8b35d63-7baa-4de1-8d13-ee2d49c6c944      
+          clientId: ac2eb093-8396-4f37-b43c-4bef2b5f9948      
       variables:
         # AZURE_TENANT_ID: "3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
         LOG_API_PORT: "8000"

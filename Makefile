@@ -39,9 +39,9 @@ mocks: bootstrap
 .PHONY: radixconfigs
 radixconfigs:
 	AZURE_CLIENT_ID=eef3ea0a-a1f8-4eb2-bac7-1c63b939e457 envsubst < radixconfig.yaml.tpl > radixconfig.dev.yaml
-	AZURE_CLIENT_ID=64ead1ac-43da-4fd6-b1c1-6c6e9747dedc envsubst < radixconfig.yaml.tpl > radixconfig.playground.yaml
-	AZURE_CLIENT_ID=4ce6649f-1e7d-4293-8ecf-411ddfa00dce envsubst < radixconfig.yaml.tpl > radixconfig.platform.yaml
-	AZURE_CLIENT_ID=a8b35d63-7baa-4de1-8d13-ee2d49c6c944 envsubst < radixconfig.yaml.tpl > radixconfig.c2.yaml
+	AZURE_CLIENT_ID=d5ce79f3-3b26-46ad-992c-59f9a913b635 envsubst < radixconfig.yaml.tpl > radixconfig.playground.yaml
+	AZURE_CLIENT_ID=a9489564-b5aa-404e-8a82-a21f2faa175f envsubst < radixconfig.yaml.tpl > radixconfig.platform.yaml
+	AZURE_CLIENT_ID=ac2eb093-8396-4f37-b43c-4bef2b5f9948 envsubst < radixconfig.yaml.tpl > radixconfig.c2.yaml
 
 .PHONY: generate
 generate: radixconfigs mocks swagger
