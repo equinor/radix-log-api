@@ -1,7 +1,7 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-  name: radix-log-api
+  name: radix-log-api-test
 spec:
   environments:
     - name: qa
@@ -19,7 +19,7 @@ spec:
       publicPort: http
       identity:
         azure:
-          clientId: 31816177-d769-4392-8430-b2357f59c701      
+          clientId: eef3ea0a-a1f8-4eb2-bac7-1c63b939e457      
       variables:
         # AZURE_TENANT_ID: "3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
         LOG_API_PORT: "8000"
