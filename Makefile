@@ -44,7 +44,7 @@ radixconfigs:
 	AZURE_CLIENT_ID=a8b35d63-7baa-4de1-8d13-ee2d49c6c944 envsubst < radixconfig.yaml.tpl > radixconfig.c2.yaml
 
 .PHONY: generate
-generate: generate-radixconfig # radixapiclient mocks swagger
+generate: radixconfigs # radixapiclient mocks swagger
 
 .PHONY: verify-generate
 verify-generate: generate
