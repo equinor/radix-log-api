@@ -1,7 +1,7 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-  name: radix-log-api-test
+  name: radix-log-api
 spec:
   environments:
     - name: qa
