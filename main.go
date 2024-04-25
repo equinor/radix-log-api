@@ -10,7 +10,7 @@ import (
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
 // @name						Authorization
-// @description					Bearer token is currently not supported by go-swag. Use "Bearer <JWT>" in value.
+// @description					Bearer is currently not supported by go-swag. Use "Bearer <JWT>" in value.
 func main() {
 	cmd.Run()
 }
