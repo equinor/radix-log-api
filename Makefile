@@ -36,8 +36,8 @@ mocks: bootstrap
 	mockgen -source ./api/middleware/authz/policy.go -destination ./api/middleware/authz/mock_policy.go -package authz
 	mockgen -source ./pkg/radixapi/client/application/application_client.go -mock_names ClientService=MockRadixApiApplicationClient -destination ./internal/tests/mock/application_client.go -package mock
 
-.PHONY: generate-radixconfig
-generate-radixconfig:
+.PHONY: radixconfigs
+radixconfigs:
 	AZURE_CLIENT_ID=31816177-d769-4392-8430-b2357f59c701 envsubst < radixconfig.yaml.tpl > radixconfig.dev.yaml
 	AZURE_CLIENT_ID=64ead1ac-43da-4fd6-b1c1-6c6e9747dedc envsubst < radixconfig.yaml.tpl > radixconfig.playground.yaml
 	AZURE_CLIENT_ID=4ce6649f-1e7d-4293-8ecf-411ddfa00dce envsubst < radixconfig.yaml.tpl > radixconfig.platform.yaml

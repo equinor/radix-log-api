@@ -55,8 +55,8 @@ jobs:
         run: |
           make verify-generate
 
-  test-swagger:
-    name: Test Swagger
+  report-swagger-changes:
+    name: Report Changes In Swagger Spec
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,10 +70,10 @@ jobs:
         run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
       - name: Install Swag
         run: go install github.com/swaggo/swag/cmd/swag@latest
-      - name: Generate Swagger
-        run: swag init
-      - name: Validate no changes
-        run: diff <(git show main:docs/swagger.json) ./docs/swagger.json
+      # - name: Generate Swagger
+      #   run: swag init
+      # - name: Validate no changes
+      #   run: diff <(git show main:docs/swagger.json) ./docs/swagger.json
       - name: Check breaking changes
         if: always()
         id: breaking

@@ -35,15 +35,17 @@ Clone the repo into your `GOPATH` and run `go mod download`.
 
 Want to contribute? Follow these [contributing guidlines](./CONTRIBUTING.md)
 
-### Swagger
+### Code Generation
 
-Swagger docs are generated using [https://github.com/swaggo/swag](https://github.com/swaggo/swag). The [Declarative Comments Format](https://github.com/swaggo/swag#declarative-comments-format) describes how to configure the swagger spec.
+Swagger docs are generated using [https://github.com/swaggo/swag](https://github.com/swaggo/swag). The [Declarative Comments Format](https://github.com/swaggo/swag#declarative-comments-format) describes how to configure the swagger spec. Run `make swagger` if changes are made to the swagger definition in code files.
 
-### Generating mocks
-We use gomock to generate mocks used in unit test.
-You need to regenerate mocks if you make changes to any of the interface types used by the application
+Mocks used in tests are generated with `gomock`. You need to regenerate mocks by running `make mocks` if you make changes to any of the interface types used by the application.
 
-`make mocks`
+There is one `radixconfig` file per cluster. File `radixconfig.yaml.tpl` is the template used to generate these files. Run `make radixconfigs` to regenerate if changes are made to the template.
+
+The Radix API Client is generated from the `swagger.json` hosted on `https://api.radix.equinor.com/swaggerui/swagger.json`. Run `make radixapiclient` on regular intervals to update the client code with changes made to the source.
+
+Run `make generate` to run all code generations described in this section.
 
 ### Running locally
 
