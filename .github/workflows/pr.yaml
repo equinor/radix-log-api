@@ -43,6 +43,18 @@ jobs:
       - name: Run Tests
         run: go test -cover `go list ./... | grep -v 'pkg/client'`
 
+  verify-code-generation:
+    name: Verify Code Generation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Verify Code Generation
+        run: |
+          make verify-generate
+
   test-swagger:
     name: Test Swagger
     runs-on: ubuntu-latest

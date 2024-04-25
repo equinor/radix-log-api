@@ -70,13 +70,13 @@ type Component struct {
 
 	// Status of the component
 	// Example: Consistent
-	// Enum: [Stopped Consistent Reconciling Restarting Outdated]
+	// Enum: ["Stopped","Consistent","Reconciling","Restarting","Outdated"]
 	Status string `json:"status,omitempty"`
 
 	// Type of component
 	// Example: component
 	// Required: true
-	// Enum: [component job]
+	// Enum: ["component","job"]
 	Type *string `json:"type"`
 
 	// Variable names map to values. From radixconfig.yaml
@@ -93,6 +93,9 @@ type Component struct {
 
 	// oauth2
 	Oauth2 *OAuth2AuxiliaryResource `json:"oauth2,omitempty"`
+
+	// resources
+	Resources *ResourceRequirements `json:"resources,omitempty"`
 }
 
 // Validate validates this component
@@ -140,6 +143,10 @@ func (m *Component) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOauth2(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResources(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -415,6 +422,25 @@ func (m *Component) validateOauth2(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Component) validateResources(formats strfmt.Registry) error {
+	if swag.IsZero(m.Resources) { // not required
+		return nil
+	}
+
+	if m.Resources != nil {
+		if err := m.Resources.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("resources")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("resources")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this component based on the context it is used
 func (m *Component) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -444,6 +470,10 @@ func (m *Component) ContextValidate(ctx context.Context, formats strfmt.Registry
 	}
 
 	if err := m.contextValidateOauth2(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateResources(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -604,6 +634,27 @@ func (m *Component) contextValidateOauth2(ctx context.Context, formats strfmt.Re
 				return ve.ValidateName("oauth2")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("oauth2")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Component) contextValidateResources(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Resources != nil {
+
+		if swag.IsZero(m.Resources) { // not required
+			return nil
+		}
+
+		if err := m.Resources.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("resources")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("resources")
 			}
 			return err
 		}

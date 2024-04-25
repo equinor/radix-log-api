@@ -17,8 +17,11 @@ spec:
         - name: http
           port: 8000
       publicPort: http
+      identity:
+        azure:
+          clientId: 31816177-d769-4392-8430-b2357f59c701      
       variables:
-        AZURE_TENANT_ID: "3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
+        # AZURE_TENANT_ID: "3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
         LOG_API_PORT: "8000"
         LOG_API_AUTH_ISSUER: "https://sts.windows.net/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/"
         LOG_API_AUTH_AUDIENCE: "6dae42f8-4368-4678-94ff-3960e28e3630"
@@ -27,9 +30,9 @@ spec:
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
         LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
-      secrets:
-        - "AZURE_CLIENT_ID"
-        - "AZURE_CLIENT_SECRET"
+      # secrets:
+      #   - "AZURE_CLIENT_ID"
+      #   - "AZURE_CLIENT_SECRET"
       resources:
         requests:
           cpu: 100m
