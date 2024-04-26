@@ -21,18 +21,14 @@ spec:
         azure:
           clientId: ac2eb093-8396-4f37-b43c-4bef2b5f9948      
       variables:
-        # AZURE_TENANT_ID: "3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
         LOG_API_PORT: "8000"
         LOG_API_AUTH_ISSUER: "https://sts.windows.net/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/"
         LOG_API_AUTH_AUDIENCE: "6dae42f8-4368-4678-94ff-3960e28e3630"
-        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: "TBA"
+        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: 4f4ff917-823c-4f80-8a46-4fbe7de5a32e
         LOG_API_LOG_LEVEL: "info"
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
         LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
-      # secrets:
-      #   - "AZURE_CLIENT_ID"
-      #   - "AZURE_CLIENT_SECRET"
       resources:
         requests:
           cpu: 100m
