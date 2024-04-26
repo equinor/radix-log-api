@@ -315,26 +315,6 @@ func (mr *MockRadixApiApplicationClientMockRecorder) RegenerateDeployKey(params,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateDeployKey", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).RegenerateDeployKey), varargs...)
 }
 
-// RegenerateMachineUserToken mocks base method.
-func (m *MockRadixApiApplicationClient) RegenerateMachineUserToken(params *application.RegenerateMachineUserTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.RegenerateMachineUserTokenOK, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{params, authInfo}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RegenerateMachineUserToken", varargs...)
-	ret0, _ := ret[0].(*application.RegenerateMachineUserTokenOK)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RegenerateMachineUserToken indicates an expected call of RegenerateMachineUserToken.
-func (mr *MockRadixApiApplicationClientMockRecorder) RegenerateMachineUserToken(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{params, authInfo}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateMachineUserToken", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).RegenerateMachineUserToken), varargs...)
-}
-
 // RestartApplication mocks base method.
 func (m *MockRadixApiApplicationClient) RestartApplication(params *application.RestartApplicationParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.RestartApplicationOK, error) {
 	m.ctrl.T.Helper()
@@ -405,6 +385,26 @@ func (mr *MockRadixApiApplicationClientMockRecorder) StopApplication(params, aut
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{params, authInfo}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopApplication", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).StopApplication), varargs...)
+}
+
+// TriggerPipelineApplyConfig mocks base method.
+func (m *MockRadixApiApplicationClient) TriggerPipelineApplyConfig(params *application.TriggerPipelineApplyConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.TriggerPipelineApplyConfigOK, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{params, authInfo}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "TriggerPipelineApplyConfig", varargs...)
+	ret0, _ := ret[0].(*application.TriggerPipelineApplyConfigOK)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TriggerPipelineApplyConfig indicates an expected call of TriggerPipelineApplyConfig.
+func (mr *MockRadixApiApplicationClientMockRecorder) TriggerPipelineApplyConfig(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{params, authInfo}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TriggerPipelineApplyConfig", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).TriggerPipelineApplyConfig), varargs...)
 }
 
 // TriggerPipelineBuild mocks base method.
