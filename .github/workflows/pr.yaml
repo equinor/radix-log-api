@@ -41,10 +41,23 @@ jobs:
       - name: Install dependencies
         run: go mod download
       - name: Run Tests
-        run: go test -cover `go list ./... | grep -v 'pkg/client'`
+        run: |
+          make test
 
-  test-swagger:
-    name: Test Swagger
+  verify-code-generation:
+    name: Verify Code Generation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Verify Code Generation
+        run: |
+          make verify-generate
+
+  report-swagger-changes:
+    name: Report Changes In Swagger Spec
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,16 +65,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - name: Install dependencies
-        run: go mod download
       - name: Install Swagger
         run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
-      - name: Install Swag
-        run: go install github.com/swaggo/swag/cmd/swag@latest
-      - name: Generate Swagger
-        run: swag init
-      - name: Validate no changes
-        run: diff <(git show main:docs/swagger.json) ./docs/swagger.json
       - name: Check breaking changes
         if: always()
         id: breaking

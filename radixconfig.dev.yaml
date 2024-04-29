@@ -1,0 +1,42 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: radix-log-api
+spec:
+  environments:
+    - name: qa
+      build:
+        from: main
+    - name: prod
+      build:
+        from: release
+  components:
+    - name: server
+      readOnlyFileSystem: true
+      ports:
+        - name: http
+          port: 8000
+      publicPort: http
+      identity:
+        azure:
+          clientId: eef3ea0a-a1f8-4eb2-bac7-1c63b939e457      
+      variables:
+        LOG_API_PORT: "8000"
+        LOG_API_AUTH_ISSUER: "https://sts.windows.net/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/"
+        LOG_API_AUTH_AUDIENCE: "6dae42f8-4368-4678-94ff-3960e28e3630"
+        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: 744f4b25-b47d-4ad2-8f5d-f97382a81251
+        LOG_API_LOG_LEVEL: "info"
+        LOG_API_LOG_PRETTY: "false"
+        GIN_MODE: "release"
+        LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200M
+      environmentConfig:
+        - environment: prod
+          replicas: 2
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1G
