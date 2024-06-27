@@ -21,6 +21,7 @@ spec:
         - name: http
           port: 8000
       publicPort: http
+      foo: bar
       identity:
         azure:
           clientId: ${AZURE_CLIENT_ID}      
