@@ -21,7 +21,6 @@ spec:
         - name: http
           port: 8000
       publicPort: http
-      foo: bar
       identity:
         azure:
           clientId: ac2eb093-8396-4f37-b43c-4bef2b5f9948      
