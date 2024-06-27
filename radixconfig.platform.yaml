@@ -5,6 +5,8 @@ kind: RadixApplication
 metadata:
   name: radix-log-api
 spec:
+  build:
+    useBuildKit: true
   environments:
     - name: qa
       build:
