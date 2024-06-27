@@ -26,9 +26,9 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.55.2
+          version: v1.58.2
 
   test:
     name: Unit Test
@@ -66,7 +66,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: Install Swagger
-        run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
+        run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
       - name: Check breaking changes
         if: always()
         id: breaking
@@ -79,3 +79,31 @@ jobs:
           message-id: breaking-comment
           preformatted: true
           message-path: /tmp/swagger_breaking_changes.txt
+
+  test-radixconfig:
+    name: Test RadixConfig
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Fake TOKEN FOR RADIX CLI'
+        run: echo "APP_SERVICE_ACCOUNT_TOKEN=dummy" >> $GITHUB_ENV
+      - uses: actions/checkout@v4
+
+      - name: 'Validate DEV'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.dev.yaml
+
+      - name: 'Validate Playground'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.playground.yaml
+
+      - name: 'Validate Platform'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.platform.yaml
+
+      - name: 'Validate C2'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.c2.yaml
