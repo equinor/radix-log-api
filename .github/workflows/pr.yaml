@@ -88,16 +88,6 @@ jobs:
         run: echo "APP_SERVICE_ACCOUNT_TOKEN=dummy" >> $GITHUB_ENV
       - uses: actions/checkout@v4
 
-      - name: 'Validate DEV'
-        uses: equinor/radix-github-actions@v1
-        with:
-          args: validate radix-config --config-file radixconfig.dev.yaml
-
-      - name: 'Validate Playground'
-        uses: equinor/radix-github-actions@v1
-        with:
-          args: validate radix-config --config-file radixconfig.playground.yaml
-
       - name: 'Validate Platform'
         uses: equinor/radix-github-actions@v1
         with:
@@ -107,3 +97,13 @@ jobs:
         uses: equinor/radix-github-actions@v1
         with:
           args: validate radix-config --config-file radixconfig.c2.yaml
+
+      - name: 'Validate DEV'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.dev.yaml
+
+      - name: 'Validate Playground'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.playground.yaml
