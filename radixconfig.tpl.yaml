@@ -1,8 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/equinor/radix-operator/release/json-schema/radixapplication.json
+
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
   name: radix-log-api
 spec:
+  build:
+    useBuildKit: true
   environments:
     - name: qa
       build:
@@ -34,6 +38,19 @@ spec:
           cpu: 100m
           memory: 200M
       environmentConfig:
+        - environment: qa
+          runtime:
+            architecture: arm64
+          horizontalScaling:
+            maxReplicas: 1
+            minReplicas: 0
+            triggers:
+              - name: cron
+                cron:
+                  timezone: Europe/Oslo
+                  start: 0 7 * * 1-5 # 07:00 Monday - Friday
+                  end: 0 17 * * 1-5 # 17:00 Monday - Friday
+                  desiredReplicas: 1            
         - environment: prod
           replicas: 2
           resources:

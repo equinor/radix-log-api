@@ -1,20 +1,16 @@
-FROM golang:1.22 as builder
-
-WORKDIR /build
-
+# Build stage
+FROM docker.io/golang:1.22-alpine3.20 as builder
+ENV CGO_ENABLED=0 \
+    GOOS=linux
+WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
-
 COPY . .
+RUN go build -ldflags="-s -w" -o /build/radix-log-api
 
-RUN CGO_ENABLED=0 go build  -installsuffix cgo -ldflags="-s -w" -o /radix-log-api .
-
-RUN useradd -M --uid 1000 radix-log-api
-
-FROM scratch
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /radix-log-api /usr/local/bin/radix-log-api
-COPY --from=builder /etc/passwd /etc/passwd
+# Final stage, ref https://github.com/GoogleContainerTools/distroless/blob/main/base/README.md for distroless
+FROM gcr.io/distroless/static
+WORKDIR /app
+COPY --from=builder /build/radix-log-api .
 USER 1000
-
-ENTRYPOINT ["/usr/local/bin/radix-log-api"]
+ENTRYPOINT ["/app/radix-log-api"]
