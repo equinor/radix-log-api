@@ -21,6 +21,8 @@ spec:
         - name: http
           port: 8000
       publicPort: http
+      runtime:
+        architecture: arm64
       identity:
         azure:
           clientId: eef3ea0a-a1f8-4eb2-bac7-1c63b939e457      
@@ -39,8 +41,6 @@ spec:
           memory: 200M
       environmentConfig:
         - environment: qa
-          runtime:
-            architecture: arm64
           horizontalScaling:
             maxReplicas: 1
             minReplicas: 0
