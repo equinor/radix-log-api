@@ -4,9 +4,7 @@ on:
   pull_request:
     branches:
     - main
-  push:
-    branches:
-    - update-workflows
+
 jobs:
   build:
     name: Build
