@@ -31,8 +31,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/equinor/radix-common v1.9.2 h1:pOYN/mSAoPe6KO/Nvudfd5DUETbLv4nLTLzFPr62ADw=
-github.com/equinor/radix-common v1.9.2/go.mod h1:ekn86U68NT4ccSdt3GT+ukpiclzfuhr96a7zBJKv/jw=
+github.com/equinor/radix-common v1.9.3 h1:dLKFzYy8/XyEG9Zygi0rMWIYGCddai/ILwUqjBiGYxQ=
+github.com/equinor/radix-common v1.9.3/go.mod h1:+g0Wj0D40zz29DjNkYKVmCVeYy4OsFWKI7Qi9rA6kpY=
 github.com/gabriel-vasile/mimetype v1.4.3 h1:in2uUcidCuFcDKtdcBxlR0rJ1+fsokWf+uqxgUFjbI0=
 github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
 github.com/gin-contrib/cors v1.7.2 h1:oLDHxdg8W/XDoN/8zamqk/Drgt4oVZDvaV0YmvVICQw=
