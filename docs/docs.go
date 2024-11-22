@@ -1071,6 +1071,9 @@ const docTemplate = `{
         },
         "models.Container": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "creationTimestamp": {
                     "type": "string",
@@ -1103,6 +1106,9 @@ const docTemplate = `{
         },
         "models.Replica": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "containers": {
                     "type": "array",
@@ -1119,7 +1125,6 @@ const docTemplate = `{
                     "example": "2023-01-31T08:00:00Z"
                 },
                 "name": {
-                    "description": "required: true",
                     "type": "string",
                     "example": "web-7db5f9c99b-nwn2w"
                 }

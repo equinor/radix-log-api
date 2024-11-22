@@ -21,6 +21,8 @@ definitions:
       name:
         example: web
         type: string
+    required:
+    - id
     type: object
   models.InventoryResponse:
     properties:
@@ -42,9 +44,10 @@ definitions:
         example: "2023-01-31T08:00:00Z"
         type: string
       name:
-        description: 'required: true'
         example: web-7db5f9c99b-nwn2w
         type: string
+    required:
+    - name
     type: object
 info:
   contact: {}
