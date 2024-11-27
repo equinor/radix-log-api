@@ -1071,6 +1071,9 @@ const docTemplate = `{
         },
         "models.Container": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "creationTimestamp": {
                     "type": "string",
@@ -1103,6 +1106,9 @@ const docTemplate = `{
         },
         "models.Replica": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "containers": {
                     "type": "array",

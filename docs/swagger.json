@@ -1065,6 +1065,9 @@
         },
         "models.Container": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "creationTimestamp": {
                     "type": "string",
@@ -1097,6 +1100,9 @@
         },
         "models.Replica": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "containers": {
                     "type": "array",

@@ -21,6 +21,8 @@ definitions:
       name:
         example: web
         type: string
+    required:
+    - id
     type: object
   models.InventoryResponse:
     properties:
@@ -44,6 +46,8 @@ definitions:
       name:
         example: web-7db5f9c99b-nwn2w
         type: string
+    required:
+    - name
     type: object
 info:
   contact: {}
