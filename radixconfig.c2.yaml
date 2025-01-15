@@ -36,6 +36,9 @@ spec:
         GIN_MODE: "release"
         LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
       resources:
+        limits:
+          cpu: 100m
+          memory: 200M
         requests:
           cpu: 100m
           memory: 200M
@@ -54,6 +57,8 @@ spec:
         - environment: prod
           replicas: 2
           resources:
+            limits:
+              cpu: 100m
             requests:
               cpu: 100m
               memory: 1G
