@@ -34,7 +34,7 @@ spec:
         LOG_API_LOG_LEVEL: "info"
         LOG_API_LOG_PRETTY: "false"
         GIN_MODE: "release"
-        LOG_API_LOG_ANALYTICS_LOG_TABLE: Both # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
+        LOG_API_LOG_ANALYTICS_LOG_TABLE: ContainerLogV2 # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
       resources:
         limits:
           cpu: 100m
