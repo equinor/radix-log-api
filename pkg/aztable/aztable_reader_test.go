@@ -174,8 +174,6 @@ func TestInvalidColumnData(t *testing.T) {
 	buf := make([]byte, 10)
 	n, err := reader.Read(buf)
 
-	// The reader should return an error with message "unexpected data in log"
-	// when encountering non-string values in the log column.
 	assert.Equal(t, 0, n)
-	assert.Equal(t, "unexpected data in log", err.Error())
+	assert.ErrorIs(t, err, aztable.ErrUnexpectedData)
 }
