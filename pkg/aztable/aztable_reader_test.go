@@ -174,8 +174,8 @@ func TestInvalidColumnData(t *testing.T) {
 	buf := make([]byte, 10)
 	n, err := reader.Read(buf)
 
-	// With the improved implementation, we should get EOF instead of an error
-	// since we skip non-string values
+	// The reader should return an error with message "unexpected data in log"
+	// when encountering non-string values in the log column.
 	assert.Equal(t, 0, n)
 	assert.Equal(t, "unexpected data in log", err.Error())
 }
