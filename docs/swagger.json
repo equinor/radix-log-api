@@ -1,1089 +1,1136 @@
 {
-	"schemes": ["http", "https"],
-	"swagger": "2.0",
-	"info": {
-		"contact": {}
-	},
-	"basePath": "/api/v1",
-	"paths": {
-		"/applications/{appName}/environments/{envName}/components/{componentName}": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["application/json"],
-				"tags": ["Inventory"],
-				"summary": "Get inventory (pods and containers) for a component",
-				"operationId": "getComponentInventory",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Component Name",
-						"name": "componentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/models.InventoryResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/components/{componentName}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a component",
-				"operationId": "getComponentLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Component Name",
-						"name": "componentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a component container",
-				"operationId": "getComponentContainerLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Component Name",
-						"name": "componentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Replica Name",
-						"name": "replicaName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Container ID",
-						"name": "containerId",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a component replica",
-				"operationId": "getComponentReplicaLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Component Name",
-						"name": "componentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Replica Name",
-						"name": "replicaName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["application/json"],
-				"tags": ["Inventory"],
-				"summary": "Get inventory (pods and containers) for a job",
-				"operationId": "getJobInventory",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Component Name",
-						"name": "jobComponentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Name",
-						"name": "jobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/models.InventoryResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a job",
-				"operationId": "getJobLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Component Name",
-						"name": "jobComponentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Name",
-						"name": "jobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/containers/{containerId}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a job container",
-				"operationId": "getJobContainerLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Component Name",
-						"name": "jobComponentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Name",
-						"name": "jobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Replica Name",
-						"name": "replicaName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Container ID",
-						"name": "containerId",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a job replica",
-				"operationId": "getJobReplicaLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Environment Name",
-						"name": "envName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Component Name",
-						"name": "jobComponentName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Job Name",
-						"name": "jobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Replica Name",
-						"name": "replicaName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/pipelinejobs/{pipelineJobName}": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["application/json"],
-				"tags": ["Inventory"],
-				"summary": "Get inventory (pods and containers) for a pipeline job",
-				"operationId": "getPipelineJobInventory",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Pipeline Job Name",
-						"name": "pipelineJobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/models.InventoryResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		},
-		"/applications/{appName}/pipelinejobs/{pipelineJobName}/replicas/{replicaName}/containers/{containerId}/log": {
-			"get": {
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"produces": ["text/plain"],
-				"tags": ["Logs"],
-				"summary": "Get log for a pipeline job container",
-				"operationId": "getPipelineJobContainerLog",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "Application Name",
-						"name": "appName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Pipeline Job Name",
-						"name": "pipelineJobName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Replica Name",
-						"name": "replicaName",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "Container ID",
-						"name": "containerId",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"example": 100,
-						"description": "Number of rows to return from the tail of the log",
-						"name": "tail",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-01T08:15:00+02:00",
-						"description": "Start time",
-						"name": "start",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"format": "date-time",
-						"example": "2023-05-02T12:00:00Z",
-						"description": "End time",
-						"name": "end",
-						"in": "query"
-					},
-					{
-						"type": "boolean",
-						"description": "Response as attachment",
-						"name": "file",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/errors.Status"
-						}
-					}
-				}
-			}
-		}
-	},
-	"definitions": {
-		"errors.Status": {
-			"type": "object",
-			"properties": {
-				"message": {
-					"type": "string"
-				},
-				"reason": {
-					"type": "string"
-				}
-			}
-		},
-		"models.Container": {
-			"type": "object",
-			"required": ["id"],
-			"properties": {
-				"creationTimestamp": {
-					"type": "string",
-					"example": "2023-01-31T08:00:00Z"
-				},
-				"id": {
-					"type": "string",
-					"example": "d40ba550f05b252da60e5b873c32204368ecb5b9e17ea123738d318be4e5295b"
-				},
-				"lastKnown": {
-					"type": "string",
-					"example": "2023-01-31T08:00:00Z"
-				},
-				"name": {
-					"type": "string",
-					"example": "web"
-				}
-			}
-		},
-		"models.InventoryResponse": {
-			"type": "object",
-			"properties": {
-				"replicas": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/models.Replica"
-					}
-				}
-			}
-		},
-		"models.Replica": {
-			"type": "object",
-			"required": ["name"],
-			"properties": {
-				"containers": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/models.Container"
-					}
-				},
-				"creationTimestamp": {
-					"type": "string",
-					"example": "2023-01-31T08:00:00Z"
-				},
-				"lastKnown": {
-					"type": "string",
-					"example": "2023-01-31T08:00:00Z"
-				},
-				"name": {
-					"type": "string",
-					"example": "web-7db5f9c99b-nwn2w"
-				}
-			}
-		}
-	},
-	"securityDefinitions": {
-		"ApiKeyAuth": {
-			"description": "Bearer is currently not supported by go-swag. Use \"Bearer \u003cJWT\u003e\" in value.",
-			"type": "apiKey",
-			"name": "Authorization",
-			"in": "header"
-		}
-	}
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/applications/{appName}/environments/{envName}/components/{componentName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get inventory (pods and containers) for a component",
+                "operationId": "getComponentInventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Component Name",
+                        "name": "componentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InventoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/components/{componentName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a component",
+                "operationId": "getComponentLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Component Name",
+                        "name": "componentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/containers/{containerId}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a component container",
+                "operationId": "getComponentContainerLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Component Name",
+                        "name": "componentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Container ID",
+                        "name": "containerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/components/{componentName}/replicas/{replicaName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a component replica",
+                "operationId": "getComponentReplicaLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Component Name",
+                        "name": "componentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get inventory (pods and containers) for a job",
+                "operationId": "getJobInventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InventoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job",
+                "operationId": "getJobLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/containers/{containerId}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job container",
+                "operationId": "getJobContainerLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Container ID",
+                        "name": "containerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/environments/{envName}/jobcomponents/{jobComponentName}/jobs/{jobName}/replicas/{replicaName}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a job replica",
+                "operationId": "getJobReplicaLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Environment Name",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Component Name",
+                        "name": "jobComponentName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Name",
+                        "name": "jobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/pipelinejobs/{pipelineJobName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get inventory (pods and containers) for a pipeline job",
+                "operationId": "getPipelineJobInventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pipeline Job Name",
+                        "name": "pipelineJobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InventoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{appName}/pipelinejobs/{pipelineJobName}/replicas/{replicaName}/containers/{containerId}/log": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Get log for a pipeline job container",
+                "operationId": "getPipelineJobContainerLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application Name",
+                        "name": "appName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pipeline Job Name",
+                        "name": "pipelineJobName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Replica Name",
+                        "name": "replicaName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Container ID",
+                        "name": "containerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Number of rows to return from the tail of the log",
+                        "name": "tail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-01T08:15:00+02:00",
+                        "description": "Start time",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-02T12:00:00Z",
+                        "description": "End time",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Response as attachment",
+                        "name": "file",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Status"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "errors.Status": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Container": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "creationTimestamp": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "d40ba550f05b252da60e5b873c32204368ecb5b9e17ea123738d318be4e5295b"
+                },
+                "lastKnown": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "web"
+                }
+            }
+        },
+        "models.InventoryResponse": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Replica"
+                    }
+                }
+            }
+        },
+        "models.Replica": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Container"
+                    }
+                },
+                "creationTimestamp": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "lastKnown": {
+                    "type": "string",
+                    "example": "2023-01-31T08:00:00Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "web-7db5f9c99b-nwn2w"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Bearer is currently not supported by go-swag. Use \"Bearer \u003cJWT\u003e\" in value.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
 }
