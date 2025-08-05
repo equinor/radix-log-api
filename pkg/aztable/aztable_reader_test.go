@@ -97,7 +97,7 @@ func TestAzTableReader(t *testing.T) {
 
 			// Read all content
 			buf := new(bytes.Buffer)
-			_, err := io.Copy(buf, reader) // Ignoring error as io.Copy always returns EOF at the end
+			_, err := io.Copy(buf, reader)
 			assert.ErrorIs(t, err, tt.expectedErr)
 			assert.Equal(t, tt.expected, buf.String())
 		})
