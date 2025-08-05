@@ -1,4 +1,4 @@
-package aztable
+package aztable_test
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/equinor/radix-log-api/pkg/aztable"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,6 +16,7 @@ func TestAzTableReader(t *testing.T) {
 		tableData   [][]interface{}
 		logColIndex int
 		expected    string
+		expectedErr error
 	}{
 		{
 			name: "reads single row correctly",
@@ -23,6 +25,7 @@ func TestAzTableReader(t *testing.T) {
 			},
 			logColIndex: 1,
 			expected:    "log message content\n",
+			expectedErr: nil,
 		},
 		{
 			name: "reads multiple rows in reverse order",
@@ -33,6 +36,7 @@ func TestAzTableReader(t *testing.T) {
 			},
 			logColIndex: 1,
 			expected:    "third log message\nsecond log message\nfirst log message\n",
+			expectedErr: nil,
 		},
 		{
 			name: "handles empty log message",
@@ -41,6 +45,7 @@ func TestAzTableReader(t *testing.T) {
 			},
 			logColIndex: 1,
 			expected:    "\n",
+			expectedErr: nil,
 		},
 		{
 			name: "handles mixed content with empty lines",
@@ -53,12 +58,25 @@ func TestAzTableReader(t *testing.T) {
 			},
 			logColIndex: 1,
 			expected:    "fifth message\n\nthird message\n\nfirst message\n",
+			expectedErr: nil,
 		},
 		{
 			name:        "handles empty table",
 			tableData:   [][]interface{}{},
 			logColIndex: 1,
 			expected:    "",
+			expectedErr: nil,
+		},
+		{
+			name: "handles content with unknown data types",
+			tableData: [][]interface{}{
+				{"timestamp1", "first message"},
+				{"timestamp2", 1234},
+				{"timestamp3", "third message"},
+			},
+			logColIndex: 1,
+			expected:    "third message\n",
+			expectedErr: aztable.ErrUnexpectedData,
 		},
 	}
 
@@ -75,20 +93,12 @@ func TestAzTableReader(t *testing.T) {
 			}
 
 			// Create a new reader
-			reader := NewReader(table, tt.logColIndex)
+			reader := aztable.NewReader(table, tt.logColIndex)
 
 			// Read all content
 			buf := new(bytes.Buffer)
-			n, _ := io.Copy(buf, reader) // Ignoring error as io.Copy always returns EOF at the end
-
-			if tt.expected == "" {
-				assert.Equal(t, int64(0), n)
-				// If there are no rows, we should get an io.EOF immediately
-			} else {
-				assert.Equal(t, int64(len(tt.expected)), n)
-			}
-			// io.Copy reaches EOF at the end, which is normal and not an error
-
+			_, err := io.Copy(buf, reader) // Ignoring error as io.Copy always returns EOF at the end
+			assert.ErrorIs(t, err, tt.expectedErr)
 			assert.Equal(t, tt.expected, buf.String())
 		})
 	}
@@ -112,7 +122,7 @@ func TestAzTableReaderWithChunkedReading(t *testing.T) {
 	}
 
 	// Create reader
-	reader := NewReader(table, 1)
+	reader := aztable.NewReader(table, 1)
 
 	// Test reading in small chunks
 	buf := new(bytes.Buffer)
@@ -135,7 +145,7 @@ func TestAzTableReaderWithChunkedReading(t *testing.T) {
 
 func TestReaderWithNilSource(t *testing.T) {
 	// Test with nil source
-	reader := NewReader(nil, 0)
+	reader := aztable.NewReader(nil, 0)
 
 	buf := make([]byte, 10)
 	n, err := reader.Read(buf)
@@ -159,7 +169,7 @@ func TestInvalidColumnData(t *testing.T) {
 		Rows: rows,
 	}
 
-	reader := NewReader(table, 1)
+	reader := aztable.NewReader(table, 1)
 
 	buf := make([]byte, 10)
 	n, err := reader.Read(buf)
@@ -167,5 +177,5 @@ func TestInvalidColumnData(t *testing.T) {
 	// With the improved implementation, we should get EOF instead of an error
 	// since we skip non-string values
 	assert.Equal(t, 0, n)
-	assert.Equal(t, io.EOF, err)
+	assert.Equal(t, "unexpected data in log", err.Error())
 }
