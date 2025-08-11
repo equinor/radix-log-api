@@ -5,6 +5,11 @@ import (
 	"io"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/rs/zerolog/log"
+)
+
+var (
+	ErrUnexpectedData = errors.New("unexpected data in log")
 )
 
 type reader struct {
@@ -46,12 +51,20 @@ func (r *reader) copyRow(p []byte) (int, error) {
 	if r.row >= rowCount {
 		return 0, io.EOF
 	}
-	// Read rows in reverse order
-	currRow, ok := r.source.Rows[rowCount-1-r.row][r.logCol].(string)
-	if !ok {
-		return 0, errors.New("unexpected data in log")
+
+	var currRow string
+	field := r.source.Rows[rowCount-1-r.row][r.logCol]
+
+	if field != nil {
+		var ok bool
+		currRow, ok = field.(string)
+		if !ok {
+			log.Warn().Type("type", field).Msg("unknown datatype from Azure Log Analytics (should be string or nil)")
+			return 0, ErrUnexpectedData
+		}
 	}
 	currRow += "\n"
+
 	cp := copy(p, currRow[r.offset:])
 	r.offset += cp
 
