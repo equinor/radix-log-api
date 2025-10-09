@@ -53,7 +53,7 @@ func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_S
 			},
 		},
 	}
-	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, "some-random-id", pipelineJobName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
 
 	req, _ := request.New(request.PipelineJobInventoryUrl(appName, pipelineJobName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -86,7 +86,7 @@ func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_S
 func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_WithParams() {
 	appName, pipelineJobName := "anyapp", "anypipelinejob"
 	start, end := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour))
-	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, "some-random-id", pipelineJobName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
 	req, _ := request.New(
 		request.PipelineJobInventoryUrl(appName, pipelineJobName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
@@ -121,7 +121,7 @@ func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_I
 
 func (s *logControllerPipelineJobInventoryTestSuite) Test_PipelineJobInventory_LogServiceError() {
 	appName, pipelineJobName := "anyapp", "anypipelinejob"
-	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, pipelineJobName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+	s.LogService.EXPECT().PipelineJobInventory(match.IsContext(), appName, "some-random-id", pipelineJobName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New(
 		request.PipelineJobInventoryUrl(appName, pipelineJobName),

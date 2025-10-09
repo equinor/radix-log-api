@@ -35,7 +35,7 @@ func (s *logControllerJobReplicaLogTestSuite) SetupTest() {
 func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_Success() {
 	appName, envName, jobCompName, jobName, replicaName := "anyapp", "anyenv", "anyjobcomp", "anyjob", "anyreplica"
 	log := "line1\nline2"
-	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.JobReplicaLogUrl(appName, envName, jobCompName, jobName, replicaName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -51,7 +51,7 @@ func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_Success() {
 func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_ResponseAsAttachment() {
 	appName, envName, jobCompName, jobName, replicaName := "anyapp", "anyenv", "anyjobcomp", "anyjob", "anyreplica"
 	log := "line1\nline2"
-	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.JobReplicaLogUrl(appName, envName, jobCompName, jobName, replicaName, request.WithQueryParam("file", "true")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -67,7 +67,7 @@ func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_ResponseAsAttachme
 func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_WithParams() {
 	appName, envName, jobCompName, jobName, replicaName := "anyapp", "anyenv", "anyjobcomp", "anyjob", "anyreplica"
 	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
-	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, envName, jobCompName, jobName, replicaName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
+	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, replicaName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
 	req, _ := request.New(request.JobReplicaLogUrl(appName, envName, jobCompName, jobName, replicaName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -109,7 +109,7 @@ func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_InvalidParam_FileN
 
 func (s *logControllerJobReplicaLogTestSuite) Test_ReplicaLog_LogServiceError() {
 	appName, envName, jobCompName, jobName, replicaName := "anyapp", "anyenv", "anyjobcomp", "anyjob", "anyreplica"
-	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
+	s.LogService.EXPECT().JobPodLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, replicaName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
 	req, _ := request.New(request.JobReplicaLogUrl(appName, envName, jobCompName, jobName, replicaName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()

@@ -53,7 +53,7 @@ func (s *logControllerJobInventoryTestSuite) Test_JobInventory_Success() {
 			},
 		},
 	}
-	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
+	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.InventoryOptions{}).Return(inventory, nil).Times(1)
 
 	req, _ := request.New(request.JobInventoryUrl(appName, envName, jobCompName, jobName), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -86,7 +86,7 @@ func (s *logControllerJobInventoryTestSuite) Test_JobInventory_Success() {
 func (s *logControllerJobInventoryTestSuite) Test_JobInventory_WithParams() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyJob"
 	start, end := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour))
-	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
+	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.InventoryOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}}).Times(1)
 
 	req, _ := request.New(
 		request.JobInventoryUrl(appName, envName, jobCompName, jobName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339))),
@@ -121,7 +121,7 @@ func (s *logControllerJobInventoryTestSuite) Test_JobInventory_InvalidParam_EndN
 
 func (s *logControllerJobInventoryTestSuite) Test_JobInventory_LogServiceError() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyJob"
-	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
+	s.LogService.EXPECT().JobInventory(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.InventoryOptions{}).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New(
 		request.JobInventoryUrl(appName, envName, jobCompName, jobName),

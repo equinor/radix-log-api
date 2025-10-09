@@ -35,7 +35,7 @@ func (s *controllerComponentLogTestSuite) SetupTest() {
 func (s *controllerComponentLogTestSuite) Test_ComponentLog_Success() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
 	log := "line1\nline2"
-	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, "some-random-id", envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req := s.newRequest(request.ComponentLogUrl(appName, envName, compName))
 	w := httptest.NewRecorder()
@@ -51,7 +51,7 @@ func (s *controllerComponentLogTestSuite) Test_ComponentLog_Success() {
 func (s *controllerComponentLogTestSuite) Test_ComponentLog_ResponseAsAttachment() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
 	log := "line1\nline2"
-	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, "some-random-id", envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req := s.newRequest(request.ComponentLogUrl(appName, envName, compName, request.WithQueryParam("file", "true")))
 	w := httptest.NewRecorder()
@@ -67,7 +67,7 @@ func (s *controllerComponentLogTestSuite) Test_ComponentLog_ResponseAsAttachment
 func (s *controllerComponentLogTestSuite) Test_ComponentLog_WithParams() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
 	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
-	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, envName, compName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
+	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, "some-random-id", envName, compName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
 	req := s.newRequest(request.ComponentLogUrl(appName, envName, compName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))))
 	w := httptest.NewRecorder()
@@ -109,7 +109,7 @@ func (s *controllerComponentLogTestSuite) Test_ComponentLog_InvalidParam_FileNon
 
 func (s *controllerComponentLogTestSuite) Test_ComponentLog_LogServiceError() {
 	appName, envName, compName := "anyapp", "anyenv", "anycomp"
-	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
+	s.LogService.EXPECT().ComponentLog(match.IsContext(), appName, "some-random-id", envName, compName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
 	req := s.newRequest(request.ComponentLogUrl(appName, envName, compName))
 	w := httptest.NewRecorder()

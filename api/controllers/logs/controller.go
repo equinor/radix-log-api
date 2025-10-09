@@ -9,6 +9,7 @@ import (
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/models"
 	"github.com/equinor/radix-log-api/api/params"
+	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/constants"
 	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/gin-gonic/gin"
@@ -116,9 +117,14 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	c.handleInventoryRequest(ctx, func(options *logservice.InventoryOptions) ([]logservice.Pod, error) {
-		return c.appLogsService.ComponentInventory(ctx.Request.Context(), params.AppName, params.EnvName, params.ComponentName, options)
+		return c.appLogsService.ComponentInventory(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.ComponentName, options)
 	})
 }
 
@@ -152,8 +158,14 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentLog(ctx.Request.Context(), params.AppName, params.EnvName, params.ComponentName, options)
+		return c.appLogsService.ComponentLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.ComponentName, options)
 	})
 }
 
@@ -189,8 +201,14 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentPodLog(ctx.Request.Context(), params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, options)
+		return c.appLogsService.ComponentPodLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.ComponentName, params.ReplicaName, options)
 	})
 }
 
@@ -228,8 +246,14 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.ComponentContainerLog(ctx.Request.Context(), params.AppName, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, options)
+		return c.appLogsService.ComponentContainerLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.ComponentName, params.ReplicaName, params.ContainerId, options)
 	})
 }
 
@@ -263,8 +287,14 @@ func (c *controller) GetJobInventory(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleInventoryRequest(ctx, func(options *logservice.InventoryOptions) ([]logservice.Pod, error) {
-		return c.appLogsService.JobInventory(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, options)
+		return c.appLogsService.JobInventory(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.JobComponentName, params.JobName, options)
 	})
 }
 
@@ -300,8 +330,14 @@ func (c *controller) GetJobLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.JobLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, options)
+		return c.appLogsService.JobLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.JobComponentName, params.JobName, options)
 	})
 }
 
@@ -339,8 +375,14 @@ func (c *controller) GetJobReplicaLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.JobPodLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, options)
+		return c.appLogsService.JobPodLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, options)
 	})
 }
 
@@ -380,8 +422,14 @@ func (c *controller) GetJobContainerLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.JobContainerLog(ctx.Request.Context(), params.AppName, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, params.ContainerId, options)
+		return c.appLogsService.JobContainerLog(ctx.Request.Context(), params.AppName, appId, params.EnvName, params.JobComponentName, params.JobName, params.ReplicaName, params.ContainerId, options)
 	})
 }
 
@@ -411,8 +459,14 @@ func (c *controller) GetPipelineJobInventory(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleInventoryRequest(ctx, func(options *logservice.InventoryOptions) ([]logservice.Pod, error) {
-		return c.appLogsService.PipelineJobInventory(ctx.Request.Context(), params.AppName, params.PipelineJobName, options)
+		return c.appLogsService.PipelineJobInventory(ctx.Request.Context(), params.AppName, appId, params.PipelineJobName, options)
 	})
 }
 
@@ -448,8 +502,14 @@ func (c *controller) GetPipelineJobContainerLog(ctx *gin.Context) {
 		return
 	}
 
+	appId, err := requirement.GetAppId(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.handleLogRequest(ctx, func(options *logservice.LogOptions) (io.Reader, error) {
-		return c.appLogsService.PipelineJobContainerLog(ctx.Request.Context(), params.AppName, params.PipelineJobName, params.ReplicaName, params.ContainerId, options)
+		return c.appLogsService.PipelineJobContainerLog(ctx.Request.Context(), params.AppName, appId, params.PipelineJobName, params.ReplicaName, params.ContainerId, options)
 	})
 }
 
@@ -464,8 +524,7 @@ func (c *controller) handleInventoryRequest(ctx *gin.Context, inventorySource fu
 	options := queryParams.AsInventoryOptions()
 	pods, err := inventorySource(&options)
 	if err != nil {
-		_ = ctx.Error(err)
-		ctx.Abort()
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -476,16 +535,14 @@ func (c *controller) handleInventoryRequest(ctx *gin.Context, inventorySource fu
 func (c *controller) handleLogRequest(ctx *gin.Context, logSource func(options *logservice.LogOptions) (io.Reader, error)) {
 	queryParams, err := paramsFromContext[logParams](ctx)
 	if err != nil {
-		_ = ctx.Error(apierrors.NewBadRequestError(apierrors.WithCause(err)))
-		ctx.Abort()
+		_ = ctx.AbortWithError(http.StatusBadRequest, apierrors.NewBadRequestError(apierrors.WithCause(err)))
 		return
 	}
 
 	logOptions := queryParams.AsLogOptions()
 	logReader, err := logSource(&logOptions)
 	if err != nil {
-		_ = ctx.Error(err)
-		ctx.Abort()
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

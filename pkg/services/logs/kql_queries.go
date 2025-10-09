@@ -7,6 +7,7 @@ import (
 const (
 	paramNamespace        = "ParamNamespace"
 	paramAppName          = "ParamAppName"
+	paramAppId            = "ParamAppId"
 	paramComponentName    = "ParamComponentName"
 	paramJobComponentName = "ParamJobComponentName"
 	paramJobName          = "ParamJobName"
@@ -42,83 +43,83 @@ func getComponentInventoryQuery() string {
 	return fmt.Sprintf(`KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
 	| project TimeGenerated, Name, ContainerID, PodCreationTimeStamp, ContainerCreationTimeStamp=coalesce(ContainerCreationTimeStamp,todatetime(parse_json(ContainerLastStatus)["startedAt"]))
 	| where isnotnull(ContainerCreationTimeStamp)
 	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(ContainerCreationTimeStamp), LastTimeGenerated=max(TimeGenerated) by Name, ContainerID`,
-		paramNamespace, paramAppName, paramComponentName)
+		paramNamespace, paramAppName, paramAppId, paramComponentName)
 }
 
 func getComponentLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramAppName, paramComponentName)
+		paramNamespace, paramAppName, paramAppId, paramComponentName)
 }
 
 func getComponentPodLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and Name == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramPodName, paramAppName, paramComponentName)
+		paramNamespace, paramPodName, paramAppName, paramAppId, paramComponentName)
 }
 
 func getComponentContainerLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and isempty(d["is-job-scheduler-pod"]) and isempty(d["radix-job-type"])
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramPodName, paramContainerId, paramAppName, paramComponentName)
+		paramNamespace, paramPodName, paramContainerId, paramAppName, paramAppId, paramComponentName)
 }
 
 func getJobInventoryQuery() string {
 	return fmt.Sprintf(`KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
 	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp) by Name, ContainerID
     | join kind=inner ContainerInventory on ContainerID
     | project Name, PodCreationTimeStamp, ContainerID, ContainerLastKnownTimeStamp=coalesce(FinishedTime, TimeGenerated), CreatedTime
     | summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(CreatedTime), LastTimeGenerated=max(ContainerLastKnownTimeStamp) by Name, ContainerID`,
-		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
+		paramNamespace, paramAppName, paramAppId, paramJobComponentName, paramJobName)
 }
 
 func getJobLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramAppName, paramJobComponentName, paramJobName)
+		paramNamespace, paramAppName, paramAppId, paramJobComponentName, paramJobName)
 }
 
 func getJobPodLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and Name == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramPodName, paramAppName, paramJobComponentName, paramJobName)
+		paramNamespace, paramPodName, paramAppName, paramAppId, paramJobComponentName, paramJobName)
 }
 
 func getJobContainerLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-app"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
+	| where d["radix-app"] == %s and d["radix-app-id"] == %s and d["radix-component"] == %s and d["radix-job-type"] == "job-scheduler" and d["job-name"] == %s
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramPodName, paramContainerId, paramAppName, paramJobComponentName, paramJobName)
+		paramNamespace, paramPodName, paramContainerId, paramAppName, paramAppId, paramJobComponentName, paramJobName)
 }
 
 func getPipelineJobInventoryQuery() string {
