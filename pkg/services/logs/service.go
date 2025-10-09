@@ -206,6 +206,7 @@ func (s *service) PipelineJobInventory(ctx context.Context, appName, appId, pipe
 		kusto.ParamTypes{
 			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
 			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
+			paramAppId:           kusto.ParamType{Type: types.String, Default: appId},
 		},
 	)
 	builder := kql.New("").
@@ -219,11 +220,10 @@ func (s *service) PipelineJobContainerLog(ctx context.Context, appName, appId, p
 	params := kusto.NewDefinitions().Must(
 		kusto.ParamTypes{
 			paramNamespace:       kusto.ParamType{Type: types.String, Default: fmt.Sprintf("%s-app", appName)},
-			paramAppName:         kusto.ParamType{Type: types.String, Default: appName},
-			paramAppId:           kusto.ParamType{Type: types.String, Default: appId},
-			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
 			paramPodName:         kusto.ParamType{Type: types.String, Default: replicaName},
 			paramContainerId:     kusto.ParamType{Type: types.String, Default: containerId},
+			paramAppId:           kusto.ParamType{Type: types.String, Default: appId},
+			paramPipelineJobName: kusto.ParamType{Type: types.String, Default: pipelineJobName},
 		},
 	)
 

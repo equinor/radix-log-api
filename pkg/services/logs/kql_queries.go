@@ -126,21 +126,21 @@ func getPipelineJobInventoryQuery() string {
 	return fmt.Sprintf(`KubePodInventory
 	| where Namespace == %s and isnotempty(ContainerID) == true
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
+	| where d["radix-app-id"] == %s and d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
 	| extend ContainerNameShort=replace_string(ContainerName, strcat(PodUid,"/"), "")
 	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp) by Name, ContainerID, ContainerNameShort
 	| join kind=inner ContainerInventory on ContainerID
 	| project Name, PodCreationTimeStamp, ContainerID, ContainerNameShort, ContainerLastKnownTimeStamp=coalesce(FinishedTime, TimeGenerated), CreatedTime
 	| summarize PodCreationTimeStamp=min(PodCreationTimeStamp), ContainerCreationTimeStamp=min(CreatedTime), LastTimeGenerated=max(ContainerLastKnownTimeStamp) by Name, ContainerID, ContainerNameShort`,
-		paramNamespace, paramPipelineJobName)
+		paramNamespace, paramAppId, paramPipelineJobName)
 }
 
 func getPipelineJobContainerLogQuery(joinContainerLog string) string {
 	return fmt.Sprintf(`let containers = KubePodInventory
 	| where Namespace == %s and Name == %s and ContainerID == %s
 	| extend d=parse_json(PodLabel)[0]
-	| where d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
+	| where d["radix-app-id"] == %s and d["radix-job-name"] == %s and isempty(d["tekton.dev/task"])
 	| summarize by ContainerID;
 	`+joinContainerLog,
-		paramNamespace, paramPodName, paramContainerId, paramPipelineJobName)
+		paramNamespace, paramPodName, paramContainerId, paramAppId, paramPipelineJobName)
 }
