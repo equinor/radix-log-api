@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -21,12 +22,17 @@ import (
 type Deployment struct {
 
 	// ActiveFrom Timestamp when the deployment starts (or created)
-	// Example: 2006-01-02T15:04:05Z
-	ActiveFrom string `json:"activeFrom,omitempty"`
+	// Required: true
+	// Format: date-time
+	ActiveFrom *strfmt.DateTime `json:"activeFrom"`
 
 	// ActiveTo Timestamp when the deployment ends
-	// Example: 2006-01-02T15:04:05Z
-	ActiveTo string `json:"activeTo,omitempty"`
+	// Format: date-time
+	ActiveTo strfmt.DateTime `json:"activeTo,omitempty"`
+
+	// Name of the branch used to build the deployment
+	// Example: main
+	BuiltFromBranch string `json:"builtFromBranch,omitempty"`
 
 	// Array of components
 	Components []*Component `json:"components"`
@@ -36,11 +42,26 @@ type Deployment struct {
 
 	// Environment the environment this Radix application deployment runs in
 	// Example: prod
-	Environment string `json:"environment,omitempty"`
+	// Required: true
+	Environment *string `json:"environment"`
 
 	// GitCommitHash the hash of the git commit from which radixconfig.yaml was parsed
 	// Example: 4faca8595c5283a9d0f17a623b9255a0d9866a2e
 	GitCommitHash string `json:"gitCommitHash,omitempty"`
+
+	// GitRef Branch or tag to build from
+	// Example: master
+	GitRef string `json:"gitRef,omitempty"`
+
+	// GitRefType When the pipeline job should be built from branch or tag specified in GitRef:
+	// branch
+	// tag
+	// <empty> - either branch or tag
+	//
+	// required false
+	// Example: \"branch\
+	// Enum: ["branch","tag","\"\""]
+	GitRefType string `json:"gitRefType,omitempty"`
 
 	// GitTags the git tags that the git commit hash points to
 	// Example: \"v1.22.1 v1.22.3\
@@ -48,24 +69,54 @@ type Deployment struct {
 
 	// Name the unique name of the Radix application deployment
 	// Example: radix-canary-golang-tzbqi
-	Name string `json:"name,omitempty"`
+	// Required: true
+	Name *string `json:"name"`
 
 	// Namespace where the deployment is stored
 	// Example: radix-canary-golang-dev
 	// Required: true
 	Namespace *string `json:"namespace"`
 
+	// RefreshBuildCache forces to rebuild cache when UseBuildCache is true in the RadixApplication or OverrideUseBuildCache is true
+	RefreshBuildCache *bool `json:"refreshBuildCache,omitempty"`
+
 	// Repository the GitHub repository that the deployment was built from
 	// Example: https://github.com/equinor/radix-canary-golang
 	// Required: true
 	Repository *string `json:"repository"`
+
+	// Defaults to true and requires useBuildKit to have an effect.
+	UseBuildCache *bool `json:"useBuildCache,omitempty"`
+
+	// Enables BuildKit when building Dockerfile.
+	UseBuildKit *bool `json:"useBuildKit,omitempty"`
 }
 
 // Validate validates this deployment
 func (m *Deployment) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateActiveFrom(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateActiveTo(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateComponents(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateEnvironment(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGitRefType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -80,6 +131,31 @@ func (m *Deployment) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Deployment) validateActiveFrom(formats strfmt.Registry) error {
+
+	if err := validate.Required("activeFrom", "body", m.ActiveFrom); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("activeFrom", "body", "date-time", m.ActiveFrom.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Deployment) validateActiveTo(formats strfmt.Registry) error {
+	if swag.IsZero(m.ActiveTo) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("activeTo", "body", "date-time", m.ActiveTo.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -104,6 +180,69 @@ func (m *Deployment) validateComponents(formats strfmt.Registry) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *Deployment) validateEnvironment(formats strfmt.Registry) error {
+
+	if err := validate.Required("environment", "body", m.Environment); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var deploymentTypeGitRefTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["branch","tag","\"\""]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		deploymentTypeGitRefTypePropEnum = append(deploymentTypeGitRefTypePropEnum, v)
+	}
+}
+
+const (
+
+	// DeploymentGitRefTypeBranch captures enum value "branch"
+	DeploymentGitRefTypeBranch string = "branch"
+
+	// DeploymentGitRefTypeTag captures enum value "tag"
+	DeploymentGitRefTypeTag string = "tag"
+
+	// DeploymentGitRefType captures enum value "\"\""
+	DeploymentGitRefType string = "\"\""
+)
+
+// prop value enum
+func (m *Deployment) validateGitRefTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, deploymentTypeGitRefTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Deployment) validateGitRefType(formats strfmt.Registry) error {
+	if swag.IsZero(m.GitRefType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateGitRefTypeEnum("gitRefType", "body", m.GitRefType); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Deployment) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
 	}
 
 	return nil
