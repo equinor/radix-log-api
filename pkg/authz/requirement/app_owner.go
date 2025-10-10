@@ -1,14 +1,15 @@
 package requirement
 
 import (
+	"context"
 	"errors"
 
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authz"
 	"github.com/equinor/radix-log-api/api/params"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
+	"github.com/equinor/radix-log-api/pkg/radixapi/models"
 	"github.com/gin-gonic/gin"
-	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,13 +17,17 @@ const radixAppIDKey = "radixAppId"
 
 var ErrMissingRadixAppID = errors.New("appId is missing from RadixRegistration")
 
-type appOwnerRequirement struct {
-	applicationClient application.ClientService
+type RadixAppProvider interface {
+	GetApplication(ctx context.Context, bearerToken, appName string) (*models.Application, error)
 }
 
-func NewAppOwnerRequirement(applicationClient application.ClientService) authz.Requirement {
+type appOwnerRequirement struct {
+	appProvider RadixAppProvider
+}
+
+func NewAppOwnerRequirement(appProvider RadixAppProvider) authz.Requirement {
 	return &appOwnerRequirement{
-		applicationClient: applicationClient,
+		appProvider: appProvider,
 	}
 }
 
@@ -32,9 +37,7 @@ func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContex
 		return apierrors.NewInternalServerError(apierrors.WithCause(err))
 	}
 
-	ra, err := r.applicationClient.GetApplication(
-		application.NewGetApplicationParams().WithAppName(params.AppName).WithContext(ctx.GinCtx().Request.Context()),
-		httptransport.BearerToken(ctx.User().Token()))
+	ra, err := r.appProvider.GetApplication(ctx.GinCtx().Request.Context(), ctx.User().Token(), params.AppName)
 
 	if err != nil {
 		switch err.(type) {
@@ -49,11 +52,11 @@ func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContex
 		}
 	}
 
-	if ra == nil || ra.Payload == nil || ra.Payload.Registration == nil || ra.Payload.Registration.AppID == nil || *ra.Payload.Registration.AppID == "" {
+	if ra == nil || ra.Registration == nil || ra.Registration.AppID == nil || *ra.Registration.AppID == "" {
 		return apierrors.NewInternalServerError(apierrors.WithCause(ErrMissingRadixAppID))
 	}
 
-	ctx.GinCtx().Set(radixAppIDKey, *ra.Payload.Registration.AppID)
+	ctx.GinCtx().Set(radixAppIDKey, *ra.Registration.AppID)
 	return nil
 }
 

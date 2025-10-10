@@ -29,7 +29,7 @@ type logControllerComponentReplicaLogTestSuite struct {
 func (s *logControllerComponentReplicaLogTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
-	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
+	s.AppProvider.EXPECT().GetApplication(gomock.Any(), gomock.Any(), "anyapp").AnyTimes().Return(anyApp, nil)
 }
 
 func (s *logControllerComponentReplicaLogTestSuite) Test_ReplicaLog_Success() {

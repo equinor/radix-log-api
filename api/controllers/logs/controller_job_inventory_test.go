@@ -28,7 +28,7 @@ type logControllerJobInventoryTestSuite struct {
 func (s *logControllerJobInventoryTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
-	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
+	s.AppProvider.EXPECT().GetApplication(gomock.Any(), gomock.Any(), "anyapp").AnyTimes().Return(anyApp, nil)
 }
 
 func (s *logControllerJobInventoryTestSuite) Test_JobInventory_Success() {

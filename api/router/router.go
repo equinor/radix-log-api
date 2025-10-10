@@ -10,7 +10,6 @@ import (
 	errmiddleware "github.com/equinor/radix-log-api/api/middleware/error"
 	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/constants"
-	applicationclient "github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -18,14 +17,14 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func New(jwtValidator authnmiddleware.JwtValidator, applicationClient applicationclient.ClientService, controllers ...controllers.Controller) (http.Handler, error) {
+func New(jwtValidator authnmiddleware.JwtValidator, appProvider requirement.RadixAppProvider, controllers ...controllers.Controller) (http.Handler, error) {
 	engine := gin.New()
 	engine.RemoveExtraSlash = true
 	engine.Use(commongin.SetZerologLogger(commongin.ZerologLoggerWithRequestId))
 	engine.Use(commongin.ZerologRequestLogger(), gzip.Gzip(gzip.DefaultCompression), gin.Recovery())
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	authz, err := buildAuthorizer(applicationClient)
+	authz, err := buildAuthorizer(appProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +45,7 @@ func mapControllers(controllers []controllers.Controller, router gin.IRoutes, au
 	}
 }
 
-func buildAuthorizer(applicationClient applicationclient.ClientService) (authzmiddleware.Authorizer, error) {
+func buildAuthorizer(applicationClient requirement.RadixAppProvider) (authzmiddleware.Authorizer, error) {
 	appOwnerRequirement := requirement.NewAppOwnerRequirement(applicationClient)
 	auth := authzmiddleware.NewAuthorizer(func(ab authzmiddleware.AuthorizationConfiguration) {
 		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authzmiddleware.PolicyConfiguration) {
