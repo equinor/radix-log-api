@@ -119,7 +119,7 @@ func (c *controller) GetComponentInventory(ctx *gin.Context) {
 	}
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -160,7 +160,7 @@ func (c *controller) GetComponentLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -203,7 +203,7 @@ func (c *controller) GetComponentReplicaLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -248,7 +248,7 @@ func (c *controller) GetComponentContainerLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -289,7 +289,7 @@ func (c *controller) GetJobInventory(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -332,7 +332,7 @@ func (c *controller) GetJobLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -377,7 +377,7 @@ func (c *controller) GetJobReplicaLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -424,7 +424,7 @@ func (c *controller) GetJobContainerLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -461,7 +461,7 @@ func (c *controller) GetPipelineJobInventory(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -504,7 +504,7 @@ func (c *controller) GetPipelineJobContainerLog(ctx *gin.Context) {
 
 	appId, err := requirement.GetAppId(ctx)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

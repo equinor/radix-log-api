@@ -327,7 +327,7 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 		logger.Warn().Err(resp.Error).Msg("Log query returned a warning")
 	}
 
-	return aztable.NewReader(resp.Results.Tables[0], 1), nil
+	return aztable.NewReader(resp.Tables[0], 1), nil
 }
 
 func mustParseTime(t string) time.Time {
