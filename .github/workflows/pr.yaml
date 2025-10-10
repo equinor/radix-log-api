@@ -54,30 +54,6 @@ jobs:
         run: |
           make verify-generate
 
-  report-swagger-changes:
-    name: Report Changes In Swagger Spec
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: git fetch --no-tags --no-recurse-submodules --depth=1  origin main:main
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
-      - name: Install Swagger
-        run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
-      - name: Check breaking changes
-        if: always()
-        id: breaking
-        continue-on-error: true
-        run: |
-          main_swagger=$(git show main:docs/swagger.json)
-          breaking_changes=$(swagger diff --break <$main_swagger docs/swagger.json) >> $GITHUB_OUTPUT
-      - name: Add comment
-        if: failure() && steps.breaking.outcome == 'failure'
-        uses: actions/github-script@v7
-        with:
-          script: console.log('${{ steps.breaking.outputs.breaking_changes }}');
-
   test-radixconfig:
     name: Test RadixConfig
     runs-on: ubuntu-latest
