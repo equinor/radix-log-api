@@ -29,13 +29,13 @@ type controllerPipelineJobContainerLogTestSuite struct {
 func (s *controllerPipelineJobContainerLogTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
-	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
+	s.AppProvider.EXPECT().GetApplication(gomock.Any(), gomock.Any(), "anyapp").AnyTimes().Return(anyApp, nil)
 }
 
 func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_Success() {
 	appName, pipelineJobName, replicaName, containerId := "anyapp", "anypipelinejob", "anyreplica", "anycontainer"
 	log := "line1\nline2"
-	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, "some-random-id", pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.PipelineJobContainerLogUrl(appName, pipelineJobName, replicaName, containerId), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -51,7 +51,7 @@ func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_Success()
 func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_ResponseAsAttachment() {
 	appName, pipelineJobName, replicaName, containerId := "anyapp", "anypipelinejob", "anyreplica", "anycontainer"
 	log := "line1\nline2"
-	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, "some-random-id", pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req, _ := request.New(request.PipelineJobContainerLogUrl(appName, pipelineJobName, replicaName, containerId, request.WithQueryParam("file", "true")), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -67,7 +67,7 @@ func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_ResponseA
 func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_WithParams() {
 	appName, pipelineJobName, replicaName, containerId := "anyapp", "anypipelinejob", "anyreplica", "anycontainer"
 	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
-	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, pipelineJobName, replicaName, containerId, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
+	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, "some-random-id", pipelineJobName, replicaName, containerId, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
 	req, _ := request.New(request.PipelineJobContainerLogUrl(appName, pipelineJobName, replicaName, containerId, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()
@@ -109,7 +109,7 @@ func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_InvalidPa
 
 func (s *controllerPipelineJobContainerLogTestSuite) Test_ContainerLog_LogServiceError() {
 	appName, pipelineJobName, replicaName, containerId := "anyapp", "anypipelinejob", "anyreplica", "anycontainer"
-	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
+	s.LogService.EXPECT().PipelineJobContainerLog(match.IsContext(), appName, "some-random-id", pipelineJobName, replicaName, containerId, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
 	req, _ := request.New(request.PipelineJobContainerLogUrl(appName, pipelineJobName, replicaName, containerId), request.WithBearerAuthorization("anytoken"))
 	w := httptest.NewRecorder()

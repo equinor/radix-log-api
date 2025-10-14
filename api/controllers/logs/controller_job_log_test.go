@@ -29,13 +29,13 @@ type controllerJobLogTestSuite struct {
 func (s *controllerJobLogTestSuite) SetupTest() {
 	s.controllerTestSuite.SetupTest()
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), gomock.Any()).AnyTimes()
-	s.ApplicationClient.EXPECT().GetApplication(gomock.Any(), gomock.Any()).AnyTimes()
+	s.AppProvider.EXPECT().GetApplication(gomock.Any(), gomock.Any(), "anyapp").AnyTimes().Return(anyApp, nil)
 }
 
 func (s *controllerJobLogTestSuite) Test_JobLog_Success() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyjob"
 	log := "line1\nline2"
-	s.LogService.EXPECT().JobLog(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().JobLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req := s.newRequest(request.JobLogUrl(appName, envName, jobCompName, jobName))
 	w := httptest.NewRecorder()
@@ -51,7 +51,7 @@ func (s *controllerJobLogTestSuite) Test_JobLog_Success() {
 func (s *controllerJobLogTestSuite) Test_JobLog_ResponseAsAttachment() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyjob"
 	log := "line1\nline2"
-	s.LogService.EXPECT().JobLog(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
+	s.LogService.EXPECT().JobLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte(log)), nil).Times(1)
 
 	req := s.newRequest(request.JobLogUrl(appName, envName, jobCompName, jobName, request.WithQueryParam("file", "true")))
 	w := httptest.NewRecorder()
@@ -67,7 +67,7 @@ func (s *controllerJobLogTestSuite) Test_JobLog_ResponseAsAttachment() {
 func (s *controllerJobLogTestSuite) Test_JobLog_WithParams() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyjob"
 	start, end, limit := utils.TimeFormatRFC3339(time.Now()), utils.TimeFormatRFC3339(time.Now().Add(time.Hour)), 500
-	s.LogService.EXPECT().JobLog(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
+	s.LogService.EXPECT().JobLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.LogOptions{Timeinterval: &logservice.TimeInterval{Start: start, End: end}, LimitRows: &limit}).Return(bytes.NewReader([]byte{}), nil).Times(1)
 
 	req := s.newRequest(request.JobLogUrl(appName, envName, jobCompName, jobName, request.WithQueryParam("start", start.Format(time.RFC3339)), request.WithQueryParam("end", end.Format(time.RFC3339)), request.WithQueryParam("tail", strconv.Itoa(limit))))
 	w := httptest.NewRecorder()
@@ -109,7 +109,7 @@ func (s *controllerJobLogTestSuite) Test_JobLog_InvalidParam_FileNonBoolean() {
 
 func (s *controllerJobLogTestSuite) Test_JobLog_LogServiceError() {
 	appName, envName, jobCompName, jobName := "anyapp", "anyenv", "anyjobcomp", "anyjob"
-	s.LogService.EXPECT().JobLog(match.IsContext(), appName, envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
+	s.LogService.EXPECT().JobLog(match.IsContext(), appName, "some-random-id", envName, jobCompName, jobName, &logservice.LogOptions{}).Return(bytes.NewReader([]byte{}), errors.New("any error")).Times(1)
 
 	req := s.newRequest(request.JobLogUrl(appName, envName, jobCompName, jobName))
 	w := httptest.NewRecorder()

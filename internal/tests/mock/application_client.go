@@ -155,6 +155,26 @@ func (mr *MockRadixApiApplicationClientMockRecorder) GetApplicationAlertingConfi
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationAlertingConfig", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).GetApplicationAlertingConfig), varargs...)
 }
 
+// GetApplicationResourcesUtilization mocks base method.
+func (m *MockRadixApiApplicationClient) GetApplicationResourcesUtilization(params *application.GetApplicationResourcesUtilizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.GetApplicationResourcesUtilizationOK, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{params, authInfo}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetApplicationResourcesUtilization", varargs...)
+	ret0, _ := ret[0].(*application.GetApplicationResourcesUtilizationOK)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetApplicationResourcesUtilization indicates an expected call of GetApplicationResourcesUtilization.
+func (mr *MockRadixApiApplicationClientMockRecorder) GetApplicationResourcesUtilization(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{params, authInfo}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationResourcesUtilization", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).GetApplicationResourcesUtilization), varargs...)
+}
+
 // GetBuildSecrets mocks base method.
 func (m *MockRadixApiApplicationClient) GetBuildSecrets(params *application.GetBuildSecretsParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.GetBuildSecretsOK, error) {
 	m.ctrl.T.Helper()
@@ -313,6 +333,46 @@ func (mr *MockRadixApiApplicationClientMockRecorder) RegenerateDeployKey(params,
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{params, authInfo}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateDeployKey", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).RegenerateDeployKey), varargs...)
+}
+
+// RegenerateSharedSecret mocks base method.
+func (m *MockRadixApiApplicationClient) RegenerateSharedSecret(params *application.RegenerateSharedSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.RegenerateSharedSecretNoContent, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{params, authInfo}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RegenerateSharedSecret", varargs...)
+	ret0, _ := ret[0].(*application.RegenerateSharedSecretNoContent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RegenerateSharedSecret indicates an expected call of RegenerateSharedSecret.
+func (mr *MockRadixApiApplicationClientMockRecorder) RegenerateSharedSecret(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{params, authInfo}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSharedSecret", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).RegenerateSharedSecret), varargs...)
+}
+
+// ResetManuallyScaledComponentsInApplication mocks base method.
+func (m *MockRadixApiApplicationClient) ResetManuallyScaledComponentsInApplication(params *application.ResetManuallyScaledComponentsInApplicationParams, authInfo runtime.ClientAuthInfoWriter, opts ...application.ClientOption) (*application.ResetManuallyScaledComponentsInApplicationOK, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{params, authInfo}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ResetManuallyScaledComponentsInApplication", varargs...)
+	ret0, _ := ret[0].(*application.ResetManuallyScaledComponentsInApplicationOK)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetManuallyScaledComponentsInApplication indicates an expected call of ResetManuallyScaledComponentsInApplication.
+func (mr *MockRadixApiApplicationClientMockRecorder) ResetManuallyScaledComponentsInApplication(params, authInfo interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{params, authInfo}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetManuallyScaledComponentsInApplication", reflect.TypeOf((*MockRadixApiApplicationClient)(nil).ResetManuallyScaledComponentsInApplication), varargs...)
 }
 
 // RestartApplication mocks base method.

@@ -23,6 +23,15 @@ type ApplicationRegistration struct {
 	// Required: true
 	AdGroups []string `json:"adGroups"`
 
+	// AdUsers the users/service-principals that should be able to access the application
+	// Required: true
+	AdUsers []string `json:"adUsers"`
+
+	// AppID the unique application ID, which is a ULID
+	// Example: 01JZ5GSH4B388RYMRYZPNR0104
+	// Required: true
+	AppID *string `json:"appId"`
+
 	// ConfigBranch information
 	// Required: true
 	ConfigBranch *string `json:"configBranch"`
@@ -49,7 +58,12 @@ type ApplicationRegistration struct {
 	RadixConfigFullName string `json:"radixConfigFullName,omitempty"`
 
 	// ReaderAdGroups the groups that should be able to read the application
+	// Required: true
 	ReaderAdGroups []string `json:"readerAdGroups"`
+
+	// ReaderAdUsers the users/service-principals that should be able to read the application
+	// Required: true
+	ReaderAdUsers []string `json:"readerAdUsers"`
 
 	// Repository the github repository
 	// Example: https://github.com/equinor/radix-canary-golang
@@ -59,9 +73,6 @@ type ApplicationRegistration struct {
 	// SharedSecret the shared secret of the webhook
 	// Required: true
 	SharedSecret *string `json:"sharedSecret"`
-
-	// WBS information
-	WBS string `json:"wbs,omitempty"`
 }
 
 // Validate validates this application registration
@@ -69,6 +80,14 @@ func (m *ApplicationRegistration) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAdGroups(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateAdUsers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateAppID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,6 +104,14 @@ func (m *ApplicationRegistration) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOwner(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateReaderAdGroups(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateReaderAdUsers(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -105,6 +132,24 @@ func (m *ApplicationRegistration) Validate(formats strfmt.Registry) error {
 func (m *ApplicationRegistration) validateAdGroups(formats strfmt.Registry) error {
 
 	if err := validate.Required("adGroups", "body", m.AdGroups); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ApplicationRegistration) validateAdUsers(formats strfmt.Registry) error {
+
+	if err := validate.Required("adUsers", "body", m.AdUsers); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ApplicationRegistration) validateAppID(formats strfmt.Registry) error {
+
+	if err := validate.Required("appId", "body", m.AppID); err != nil {
 		return err
 	}
 
@@ -141,6 +186,24 @@ func (m *ApplicationRegistration) validateName(formats strfmt.Registry) error {
 func (m *ApplicationRegistration) validateOwner(formats strfmt.Registry) error {
 
 	if err := validate.Required("owner", "body", m.Owner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ApplicationRegistration) validateReaderAdGroups(formats strfmt.Registry) error {
+
+	if err := validate.Required("readerAdGroups", "body", m.ReaderAdGroups); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ApplicationRegistration) validateReaderAdUsers(formats strfmt.Registry) error {
+
+	if err := validate.Required("readerAdUsers", "body", m.ReaderAdUsers); err != nil {
 		return err
 	}
 

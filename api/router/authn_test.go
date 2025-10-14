@@ -11,8 +11,8 @@ import (
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/internal/tests/match"
-	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
+	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
@@ -24,21 +24,21 @@ func Test_AuthnTestSuite(t *testing.T) {
 
 type authnTestSuite struct {
 	suite.Suite
-	JwtValidator      *authn.MockJwtValidator
-	ApplicationClient *mock.MockRadixApiApplicationClient
-	ApiController     *controllers.MockController
+	JwtValidator  *authn.MockJwtValidator
+	appProvider   *requirement.MockRadixAppProvider
+	ApiController *controllers.MockController
 }
 
 func (s *authnTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
 	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
-	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
+	s.appProvider = requirement.NewMockRadixAppProvider(ctrl)
 	s.ApiController = controllers.NewMockController(ctrl)
 }
 
 func (s *authnTestSuite) sut() http.Handler {
 	s.ApiController.EXPECT().Endpoints().Return([]controllers.Endpoint{{Path: "any", Method: "GET", Handler: func(ctx *gin.Context) { ctx.String(200, "apiresponse") }}}).Times(1)
-	sut, err := New(s.JwtValidator, s.ApplicationClient, s.ApiController)
+	sut, err := New(s.JwtValidator, s.appProvider, s.ApiController)
 	s.Require().NoError(err)
 	return sut
 }

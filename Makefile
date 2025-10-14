@@ -29,6 +29,7 @@ radixapiclient: bootstrap
 
 .PHONY: mocks
 mocks: bootstrap
+	mockgen -source ./pkg/authz/requirement/app_owner.go -destination ./pkg/authz/requirement/mock_app_owner.go -package requirement
 	mockgen -source ./api/controllers/interface.go -destination ./api/controllers/mock_controller.go -package controllers
 	mockgen -source ./pkg/services/logs/interface.go -mock_names Service=MockLogService -destination ./pkg/services/logs/mock_service.go -package logs
 	mockgen -source ./api/middleware/authn/jwt_validator.go -destination ./api/middleware/authn/mock_jwt_validator.go -package authn
