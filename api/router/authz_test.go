@@ -10,8 +10,8 @@ import (
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/internal/tests/match"
-	"github.com/equinor/radix-log-api/internal/tests/mock"
 	"github.com/equinor/radix-log-api/internal/tests/request"
+	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/gin-gonic/gin"
@@ -51,21 +51,21 @@ func Test_AuthzTestSuite(t *testing.T) {
 
 type authzTestSuite struct {
 	suite.Suite
-	JwtValidator      *authn.MockJwtValidator
-	ApplicationClient *mock.MockRadixApiApplicationClient
-	ApiController     *controllers.MockController
+	JwtValidator  *authn.MockJwtValidator
+	appProvider   *requirement.MockRadixAppProvider
+	ApiController *controllers.MockController
 }
 
 func (s *authzTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
 	s.JwtValidator = authn.NewMockJwtValidator(ctrl)
-	s.ApplicationClient = mock.NewMockRadixApiApplicationClient(ctrl)
+	s.appProvider = requirement.NewMockRadixAppProvider(ctrl)
 	s.ApiController = controllers.NewMockController(ctrl)
 }
 
 func (s *authzTestSuite) sut() http.Handler {
 	s.ApiController.EXPECT().Endpoints().Return(testAuthzEndpoints).Times(1)
-	sut, err := New(s.JwtValidator, s.ApplicationClient, s.ApiController)
+	sut, err := New(s.JwtValidator, s.appProvider, s.ApiController)
 	s.Require().NoError(err)
 	return sut
 }
@@ -73,7 +73,7 @@ func (s *authzTestSuite) sut() http.Handler {
 func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_AppNotfound() {
 	appName, token := "anyapp", "anytoken"
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
-	s.ApplicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationNotFound{}).Times(1)
+	s.appProvider.EXPECT().GetApplication(match.IsContext(), token, appName).Return(nil, &application.GetApplicationNotFound{}).Times(1)
 
 	req, _ := request.New("/api/v1/appadminpolicy/"+appName, request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -84,7 +84,7 @@ func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_AppNotfound() {
 func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_Unauthorized() {
 	appName, token := "anyapp", "anytoken"
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
-	s.ApplicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationUnauthorized{}).Times(1)
+	s.appProvider.EXPECT().GetApplication(match.IsContext(), token, appName).Return(nil, &application.GetApplicationUnauthorized{}).Times(1)
 
 	req, _ := request.New("/api/v1/appadminpolicy/"+appName, request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -95,7 +95,7 @@ func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_Unauthorized() {
 func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_Forbidden() {
 	appName, token := "anyapp", "anytoken"
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
-	s.ApplicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationForbidden{}).Times(1)
+	s.appProvider.EXPECT().GetApplication(match.IsContext(), token, appName).Return(nil, &application.GetApplicationForbidden{}).Times(1)
 
 	req, _ := request.New("/api/v1/appadminpolicy/"+appName, request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -106,7 +106,7 @@ func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_Forbidden() {
 func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_InternalServerError() {
 	appName, token := "anyapp", "anytoken"
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
-	s.ApplicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, &application.GetApplicationInternalServerError{}).Times(1)
+	s.appProvider.EXPECT().GetApplication(match.IsContext(), token, appName).Return(nil, &application.GetApplicationInternalServerError{}).Times(1)
 
 	req, _ := request.New("/api/v1/appadminpolicy/"+appName, request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()
@@ -117,7 +117,7 @@ func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_InternalServerError()
 func (s *authzTestSuite) Test_Authorization_AddAdminPolicy_GenericError() {
 	appName, token := "anyapp", "anytoken"
 	s.JwtValidator.EXPECT().Validate(match.IsContext(), token).Return(nil).Times(1)
-	s.ApplicationClient.EXPECT().GetApplication(match.GetApplicationRequest(appName), match.GetApplicationAuthRequest(token)).Return(nil, errors.New("any error")).Times(1)
+	s.appProvider.EXPECT().GetApplication(match.IsContext(), token, appName).Return(nil, errors.New("any error")).Times(1)
 
 	req, _ := request.New("/api/v1/appadminpolicy/"+appName, request.WithBearerAuthorization(token))
 	w := httptest.NewRecorder()

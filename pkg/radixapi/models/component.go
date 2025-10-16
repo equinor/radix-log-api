@@ -48,9 +48,13 @@ type Component struct {
 	// Array of ReplicaSummary
 	ReplicaList []*ReplicaSummary `json:"replicaList"`
 
-	// Array of pod names
+	// Deprecated: Array of pod names. Use ReplicaList instead
 	// Example: ["server-78fc8857c4-hm76l","server-78fc8857c4-asfa2"]
 	Replicas []string `json:"replicas"`
+
+	// Set if manual control of replicas is in place. Not set means automatic control, 0 means stopped and >= 1 is manually scaled.
+	// Example: 5
+	ReplicasOverride *int64 `json:"replicasOverride,omitempty"`
 
 	// ScheduledJobPayloadPath defines the payload path, where payload for Job Scheduler will be mapped as a file. From radixconfig.yaml
 	// Example: \"/tmp/payload\
@@ -88,6 +92,9 @@ type Component struct {
 	// identity
 	Identity *Identity `json:"identity,omitempty"`
 
+	// network
+	Network *Network `json:"network,omitempty"`
+
 	// notifications
 	Notifications *Notifications `json:"notifications,omitempty"`
 
@@ -96,6 +103,9 @@ type Component struct {
 
 	// resources
 	Resources *ResourceRequirements `json:"resources,omitempty"`
+
+	// runtime
+	Runtime *Runtime `json:"runtime,omitempty"`
 }
 
 // Validate validates this component
@@ -138,6 +148,10 @@ func (m *Component) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateNetwork(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateNotifications(formats); err != nil {
 		res = append(res, err)
 	}
@@ -147,6 +161,10 @@ func (m *Component) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateResources(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRuntime(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -384,6 +402,25 @@ func (m *Component) validateIdentity(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Component) validateNetwork(formats strfmt.Registry) error {
+	if swag.IsZero(m.Network) { // not required
+		return nil
+	}
+
+	if m.Network != nil {
+		if err := m.Network.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("network")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("network")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *Component) validateNotifications(formats strfmt.Registry) error {
 	if swag.IsZero(m.Notifications) { // not required
 		return nil
@@ -441,6 +478,25 @@ func (m *Component) validateResources(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Component) validateRuntime(formats strfmt.Registry) error {
+	if swag.IsZero(m.Runtime) { // not required
+		return nil
+	}
+
+	if m.Runtime != nil {
+		if err := m.Runtime.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("runtime")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("runtime")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this component based on the context it is used
 func (m *Component) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -465,6 +521,10 @@ func (m *Component) ContextValidate(ctx context.Context, formats strfmt.Registry
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateNetwork(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateNotifications(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -474,6 +534,10 @@ func (m *Component) ContextValidate(ctx context.Context, formats strfmt.Registry
 	}
 
 	if err := m.contextValidateResources(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRuntime(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -600,6 +664,27 @@ func (m *Component) contextValidateIdentity(ctx context.Context, formats strfmt.
 	return nil
 }
 
+func (m *Component) contextValidateNetwork(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Network != nil {
+
+		if swag.IsZero(m.Network) { // not required
+			return nil
+		}
+
+		if err := m.Network.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("network")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("network")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *Component) contextValidateNotifications(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Notifications != nil {
@@ -655,6 +740,27 @@ func (m *Component) contextValidateResources(ctx context.Context, formats strfmt
 				return ve.ValidateName("resources")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("resources")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Component) contextValidateRuntime(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Runtime != nil {
+
+		if swag.IsZero(m.Runtime) { // not required
+			return nil
+		}
+
+		if err := m.Runtime.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("runtime")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("runtime")
 			}
 			return err
 		}

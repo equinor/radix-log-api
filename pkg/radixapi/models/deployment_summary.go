@@ -22,13 +22,17 @@ import (
 type DeploymentSummary struct {
 
 	// ActiveFrom Timestamp when the deployment starts (or created)
-	// Example: 2006-01-02T15:04:05Z
 	// Required: true
-	ActiveFrom *string `json:"activeFrom"`
+	// Format: date-time
+	ActiveFrom *strfmt.DateTime `json:"activeFrom"`
 
 	// ActiveTo Timestamp when the deployment ends
-	// Example: 2006-01-02T15:04:05Z
-	ActiveTo string `json:"activeTo,omitempty"`
+	// Format: date-time
+	ActiveTo strfmt.DateTime `json:"activeTo,omitempty"`
+
+	// Name of the branch used to build the deployment
+	// Example: main
+	BuiltFromBranch string `json:"builtFromBranch,omitempty"`
 
 	// CommitID the commit ID of the branch to build
 	// Example: 4faca8595c5283a9d0f17a623b9255a0d9866a2e
@@ -49,6 +53,20 @@ type DeploymentSummary struct {
 	// Example: 4faca8595c5283a9d0f17a623b9255a0d9866a2e
 	GitCommitHash string `json:"gitCommitHash,omitempty"`
 
+	// GitRef Branch or tag to build from
+	// Example: master
+	GitRef string `json:"gitRef,omitempty"`
+
+	// GitRefType When the pipeline job should be built from branch or tag specified in GitRef:
+	// branch
+	// tag
+	// <empty> - either branch or tag
+	//
+	// required false
+	// Example: \"branch\
+	// Enum: ["branch","tag","\"\""]
+	GitRefType string `json:"gitRefType,omitempty"`
+
 	// GitTags the git tags that the git commit hash points to
 	// Example: \"v1.22.1 v1.22.3\
 	GitTags string `json:"gitTags,omitempty"`
@@ -60,13 +78,22 @@ type DeploymentSummary struct {
 
 	// Type of pipeline job
 	// Example: build-deploy
-	// Enum: ["build","build-deploy","promote","deploy"]
+	// Enum: ["build","build-deploy","promote","deploy","apply-config"]
 	PipelineJobType string `json:"pipelineJobType,omitempty"`
 
 	// Name of the environment the deployment was promoted from
 	// Applies only for pipeline jobs of type 'promote'
 	// Example: qa
 	PromotedFromEnvironment string `json:"promotedFromEnvironment,omitempty"`
+
+	// RefreshBuildCache forces to rebuild cache when UseBuildCache is true in the RadixApplication or OverrideUseBuildCache is true
+	RefreshBuildCache *bool `json:"refreshBuildCache,omitempty"`
+
+	// Defaults to true and requires useBuildKit to have an effect.
+	UseBuildCache *bool `json:"useBuildCache,omitempty"`
+
+	// Enables BuildKit when building Dockerfile.
+	UseBuildKit *bool `json:"useBuildKit,omitempty"`
 }
 
 // Validate validates this deployment summary
@@ -77,11 +104,19 @@ func (m *DeploymentSummary) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateActiveTo(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateComponents(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateEnvironment(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGitRefType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -102,6 +137,22 @@ func (m *DeploymentSummary) Validate(formats strfmt.Registry) error {
 func (m *DeploymentSummary) validateActiveFrom(formats strfmt.Registry) error {
 
 	if err := validate.Required("activeFrom", "body", m.ActiveFrom); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("activeFrom", "body", "date-time", m.ActiveFrom.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *DeploymentSummary) validateActiveTo(formats strfmt.Registry) error {
+	if swag.IsZero(m.ActiveTo) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("activeTo", "body", "date-time", m.ActiveTo.String(), formats); err != nil {
 		return err
 	}
 
@@ -143,6 +194,51 @@ func (m *DeploymentSummary) validateEnvironment(formats strfmt.Registry) error {
 	return nil
 }
 
+var deploymentSummaryTypeGitRefTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["branch","tag","\"\""]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		deploymentSummaryTypeGitRefTypePropEnum = append(deploymentSummaryTypeGitRefTypePropEnum, v)
+	}
+}
+
+const (
+
+	// DeploymentSummaryGitRefTypeBranch captures enum value "branch"
+	DeploymentSummaryGitRefTypeBranch string = "branch"
+
+	// DeploymentSummaryGitRefTypeTag captures enum value "tag"
+	DeploymentSummaryGitRefTypeTag string = "tag"
+
+	// DeploymentSummaryGitRefType captures enum value "\"\""
+	DeploymentSummaryGitRefType string = "\"\""
+)
+
+// prop value enum
+func (m *DeploymentSummary) validateGitRefTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, deploymentSummaryTypeGitRefTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *DeploymentSummary) validateGitRefType(formats strfmt.Registry) error {
+	if swag.IsZero(m.GitRefType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateGitRefTypeEnum("gitRefType", "body", m.GitRefType); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *DeploymentSummary) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
@@ -156,7 +252,7 @@ var deploymentSummaryTypePipelineJobTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["build","build-deploy","promote","deploy"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["build","build-deploy","promote","deploy","apply-config"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -177,6 +273,9 @@ const (
 
 	// DeploymentSummaryPipelineJobTypeDeploy captures enum value "deploy"
 	DeploymentSummaryPipelineJobTypeDeploy string = "deploy"
+
+	// DeploymentSummaryPipelineJobTypeApplyDashConfig captures enum value "apply-config"
+	DeploymentSummaryPipelineJobTypeApplyDashConfig string = "apply-config"
 )
 
 // prop value enum

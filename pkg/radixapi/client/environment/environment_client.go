@@ -56,6 +56,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	GetEnvironmentResourcesUtilization(params *GetEnvironmentResourcesUtilizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentResourcesUtilizationOK, error)
+
 	ChangeComponentSecret(params *ChangeComponentSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangeComponentSecretOK, error)
 
 	CreateEnvironment(params *CreateEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateEnvironmentOK, error)
@@ -70,6 +72,8 @@ type ClientService interface {
 
 	GetAzureKeyVaultSecretVersions(params *GetAzureKeyVaultSecretVersionsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAzureKeyVaultSecretVersionsOK, error)
 
+	GetComponentEvents(params *GetComponentEventsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetComponentEventsOK, error)
+
 	GetEnvironment(params *GetEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentOK, error)
 
 	GetEnvironmentAlertingConfig(params *GetEnvironmentAlertingConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentAlertingConfigOK, error)
@@ -77,6 +81,10 @@ type ClientService interface {
 	GetEnvironmentEvents(params *GetEnvironmentEventsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentEventsOK, error)
 
 	GetEnvironmentSummary(params *GetEnvironmentSummaryParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentSummaryOK, error)
+
+	GetReplicaEvents(params *GetReplicaEventsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetReplicaEventsOK, error)
+
+	ResetManuallyScaledComponentsInEnvironment(params *ResetManuallyScaledComponentsInEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetManuallyScaledComponentsInEnvironmentOK, error)
 
 	RestartEnvironment(params *RestartEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestartEnvironmentOK, error)
 
@@ -87,6 +95,45 @@ type ClientService interface {
 	UpdateEnvironmentAlertingConfig(params *UpdateEnvironmentAlertingConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateEnvironmentAlertingConfigOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+GetEnvironmentResourcesUtilization gets max resources used by the application
+*/
+func (a *Client) GetEnvironmentResourcesUtilization(params *GetEnvironmentResourcesUtilizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentResourcesUtilizationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetEnvironmentResourcesUtilizationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetEnvironmentResourcesUtilization",
+		Method:             "GET",
+		PathPattern:        "/applications/{appName}/environments/{envName}/utilization",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetEnvironmentResourcesUtilizationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetEnvironmentResourcesUtilizationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetEnvironmentResourcesUtilization: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -363,6 +410,45 @@ func (a *Client) GetAzureKeyVaultSecretVersions(params *GetAzureKeyVaultSecretVe
 }
 
 /*
+GetComponentEvents lists events for an application environment
+*/
+func (a *Client) GetComponentEvents(params *GetComponentEventsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetComponentEventsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetComponentEventsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getComponentEvents",
+		Method:             "GET",
+		PathPattern:        "/applications/{appName}/environments/{envName}/events/components/{componentName}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetComponentEventsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetComponentEventsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getComponentEvents: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 GetEnvironment gets details for an application environment
 */
 func (a *Client) GetEnvironment(params *GetEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentOK, error) {
@@ -519,6 +605,84 @@ func (a *Client) GetEnvironmentSummary(params *GetEnvironmentSummaryParams, auth
 }
 
 /*
+GetReplicaEvents lists events for an application environment
+*/
+func (a *Client) GetReplicaEvents(params *GetReplicaEventsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetReplicaEventsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetReplicaEventsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getReplicaEvents",
+		Method:             "GET",
+		PathPattern:        "/applications/{appName}/environments/{envName}/events/components/{componentName}/replicas/{podName}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetReplicaEventsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetReplicaEventsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getReplicaEvents: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ResetManuallyScaledComponentsInEnvironment resets all manually scaled component and resumes normal operation in environment
+*/
+func (a *Client) ResetManuallyScaledComponentsInEnvironment(params *ResetManuallyScaledComponentsInEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetManuallyScaledComponentsInEnvironmentOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewResetManuallyScaledComponentsInEnvironmentParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "resetManuallyScaledComponentsInEnvironment",
+		Method:             "POST",
+		PathPattern:        "/applications/{appName}/environments/{envName}/reset-scale",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &ResetManuallyScaledComponentsInEnvironmentReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ResetManuallyScaledComponentsInEnvironmentOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for resetManuallyScaledComponentsInEnvironment: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 RestartEnvironment restarts all components in the environment stops all running components in the environment pulls new images from image hub in radix configuration starts all components in the environment again using up to date image
 */
 func (a *Client) RestartEnvironment(params *RestartEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestartEnvironmentOK, error) {
@@ -558,7 +722,7 @@ func (a *Client) RestartEnvironment(params *RestartEnvironmentParams, authInfo r
 }
 
 /*
-StartEnvironment starts all components in the environment
+StartEnvironment deprecateds use reset scale instead that does the same thing but with better naming this method will be removed after 1 september 2025
 */
 func (a *Client) StartEnvironment(params *StartEnvironmentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*StartEnvironmentOK, error) {
 	// TODO: Validate the params before sending

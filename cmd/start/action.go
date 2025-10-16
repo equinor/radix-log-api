@@ -13,6 +13,7 @@ import (
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/api/server"
+	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	runtimeclient "github.com/go-openapi/runtime/client"
@@ -44,7 +45,9 @@ func buildRouter(cliCtx *cli.Context) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return router.New(jwtValidator, applicationClient, controllers...)
+
+	appProver := requirement.NewApplicationProvider(applicationClient)
+	return router.New(jwtValidator, appProver, controllers...)
 }
 
 func buildControllers(cliCtx *cli.Context) ([]controllers.Controller, error) {
