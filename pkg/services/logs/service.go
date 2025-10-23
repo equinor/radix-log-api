@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-kusto-go/kusto"
@@ -318,16 +319,18 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Max response from log analytics is 64MB. Result is truncated if limit is exceeded.
-	// When result is trucated, the reason is described in resp.Error.
-	// Tried `set notruncation` (https://aka.ms/kustoquerylimits) but it had no effect.
-	// For now we just log a warning if response contain an error, but perhaps we must forward the
-	// error to the user.
+
+	rdr := aztable.NewReader(resp.Tables[0], 1)
+
 	if resp.Error != nil {
 		logger.Warn().Err(resp.Error).Msg("Log query returned a warning")
+
+		if resp.Error.Code == "PartialError" {
+			return io.MultiReader(strings.NewReader("The results of this query exceed the set limit of 64MB or 500.000 records, so not all records were returned.\n\n"), rdr), nil
+		}
 	}
 
-	return aztable.NewReader(resp.Tables[0], 1), nil
+	return rdr, nil
 }
 
 func mustParseTime(t string) time.Time {
