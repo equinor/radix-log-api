@@ -326,7 +326,7 @@ func (s *service) executeLogQuery(ctx context.Context, builder *kql.Builder, opt
 		logger.Warn().Err(resp.Error).Msg("Log query returned a warning")
 
 		if resp.Error.Code == "PartialError" {
-			return io.MultiReader(strings.NewReader("The results of this query exceed the set limit of 64MB or 500.000 records, so not all records were returned.\n\n"), rdr), nil
+			return io.MultiReader(strings.NewReader("The results of this query exceed the set limit of 64MB or 500,000 records, so not all records were returned.\n\n"), rdr), nil
 		}
 	}
 
