@@ -1,0 +1,65 @@
+# yaml-language-server: =https://raw.githubusercontent.com/equinor/radix-operator/release/json-schema/radixapplication.json
+
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: radix-log-api
+spec:
+  build:
+    useBuildKit: true
+  environments:
+    - name: qa
+      build:
+        from: main
+    - name: prod
+      build:
+        from: release
+  components:
+    - name: server
+      readOnlyFileSystem: true
+      ports:
+        - name: http
+          port: 8000
+      publicPort: http
+      runtime:
+        architecture: arm64
+      identity:
+        azure:
+          clientId: c1e0f800-e81f-4612-921a-93d11c43d66f      
+      variables:
+        LOG_API_PORT: "8000"
+        LOG_API_AUTH_ISSUER: "https://sts.windows.net/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/"
+        LOG_API_AUTH_AUDIENCE: "6dae42f8-4368-4678-94ff-3960e28e3630"
+        LOG_API_LOG_ANALYTICS_WORKSPACE_ID: eac0ca03-aedd-4886-828f-eae96d20c6f7
+        LOG_API_LOG_LEVEL: "info"
+        LOG_API_LOG_PRETTY: "false"
+        GIN_MODE: "release"
+        LOG_API_LOG_ANALYTICS_LOG_TABLE: ContainerLogV2 # ContainerLog, ContainerLogV2, Both... Defaults to ContainerLog
+      resources:
+        limits:
+          cpu: 100m
+          memory: 1G
+        requests:
+          cpu: 100m
+          memory: 200M
+      environmentConfig:
+        - environment: qa
+          horizontalScaling:
+            maxReplicas: 1
+            minReplicas: 0
+            triggers:
+              - name: cron
+                cron:
+                  timezone: Europe/Oslo
+                  start: 0 7 * * 1-5 # 07:00 Monday - Friday
+                  end: 0 17 * * 1-5 # 17:00 Monday - Friday
+                  desiredReplicas: 1            
+        - environment: prod
+          replicas: 2
+          resources:
+            limits:
+              cpu: 100m
+              memory: 1G
+            requests:
+              cpu: 100m
+              memory: 200M

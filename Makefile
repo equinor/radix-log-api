@@ -43,6 +43,7 @@ radixconfigs:
 	AZURE_CLIENT_ID=d5ce79f3-3b26-46ad-992c-59f9a913b635 LOG_API_LOG_ANALYTICS_WORKSPACE_ID=7dffa030-c9ac-4d34-90ed-77ee26511aa4 envsubst < radixconfig.tpl.yaml > radixconfig.playground.yaml
 	AZURE_CLIENT_ID=a9489564-b5aa-404e-8a82-a21f2faa175f LOG_API_LOG_ANALYTICS_WORKSPACE_ID=ae599795-733e-48d5-b4bf-141c5e10f6b1 envsubst < radixconfig.tpl.yaml > radixconfig.platform.yaml
 	AZURE_CLIENT_ID=ac2eb093-8396-4f37-b43c-4bef2b5f9948 LOG_API_LOG_ANALYTICS_WORKSPACE_ID=4f4ff917-823c-4f80-8a46-4fbe7de5a32e envsubst < radixconfig.tpl.yaml > radixconfig.c2.yaml
+	AZURE_CLIENT_ID=c1e0f800-e81f-4612-921a-93d11c43d66f LOG_API_LOG_ANALYTICS_WORKSPACE_ID=eac0ca03-aedd-4886-828f-eae96d20c6f7 envsubst < radixconfig.tpl.yaml > radixconfig.c3.yaml
 
 .PHONY: generate
 generate: radixconfigs mocks swagger
