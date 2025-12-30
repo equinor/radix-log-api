@@ -39,7 +39,6 @@ func New(logsClient *azquery.LogsClient, workspaceId string, logType ContainerLo
 	}
 }
 
-// TODO: Remove this when legacy ContainerLog is no longer in use
 func getContainerJoinQuery(logType ContainerLogType) string {
 	var containerLogQuery string
 	switch logType {

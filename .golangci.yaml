@@ -1,6 +1,16 @@
 version: "2"
+
 linters:
   enable:
     - zerologlint
+    - godox # find todos, fixmes and other markers
+
 issues:
   max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    paths:
+      - docs/docs.go

@@ -58,14 +58,14 @@ HAS_MOCKGEN       := $(shell command -v mockgen;)
 
 bootstrap:
 ifndef HAS_SWAGGER
-	go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
+	go install github.com/go-swagger/go-swagger/cmd/swagger@v0.33.1
 endif
 ifndef HAS_GOLANGCI_LINT
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.2
 endif
 ifndef HAS_MOCKGEN
 	go install github.com/golang/mock/mockgen@v1.6.0
 endif
 ifndef HAS_SWAG_TOOL
-	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/swaggo/swag/cmd/swag@v1.16.4
 endif
