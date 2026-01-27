@@ -1,10 +1,34 @@
 apiVersion: backstage.io/v1alpha1
-kind: Component
+kind: API
 metadata:
   name: radix-log-api
+  title: Radix log API
+  description: "API to access historical logs for Radix applications"
   annotations:
     github.com/project-slug: equinor/radix-log-api
 spec:
-  type: other
-  lifecycle: unknown
+  type: openapi
+  lifecycle: production
   owner: omnia-radix
+  system: Radix
+  definition:
+    $text: "./swaggerui/html/swagger.json"
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: radix-log-api
+  title: Radix log API
+  description: "FastAPI backend for Radix log api"
+  tags:
+    - backend
+    - api
+  annotations:
+    github.com/project-slug: equinor/radix-vulnerability-scanner-api
+spec:
+  type: service
+  lifecycle: production
+  owner: omnia-radix
+  system: Radix
+  providesApis:
+    - radix-log-api
