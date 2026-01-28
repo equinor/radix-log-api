@@ -12,7 +12,7 @@ spec:
   owner: omnia-radix
   system: Radix
   definition:
-    $text: "./swaggerui/html/swagger.json"
+    $text: "./docs/swagger.yaml"
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
