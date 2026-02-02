@@ -8,9 +8,9 @@ import (
 	apierrors "github.com/equinor/radix-log-api/api/errors"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 type fakeTokenPrincipal struct {

@@ -14,8 +14,8 @@ import (
 	"github.com/equinor/radix-log-api/internal/tests/request"
 	"github.com/equinor/radix-log-api/internal/tests/utils"
 	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 func Test_ControllerJobLogTestSuite(t *testing.T) {

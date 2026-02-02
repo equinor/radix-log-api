@@ -15,8 +15,8 @@ import (
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 var testAuthzEndpoints []controllers.Endpoint = []controllers.Endpoint{
