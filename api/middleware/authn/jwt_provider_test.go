@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/equinor/radix-log-api/internal/tests/match"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 func Test_JwtTestSuite(t *testing.T) {

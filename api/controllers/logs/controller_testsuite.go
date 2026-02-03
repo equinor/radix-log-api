@@ -10,8 +10,8 @@ import (
 	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/radixapi/models"
 	logsservice "github.com/equinor/radix-log-api/pkg/services/logs"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 var anyApp = &models.Application{Name: pointers.Ptr("anyapp"), Registration: &models.ApplicationRegistration{AppID: pointers.Ptr("some-random-id")}}
