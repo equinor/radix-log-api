@@ -6,6 +6,7 @@ metadata:
   description: "API to access historical logs for Radix applications"
   annotations:
     github.com/project-slug: equinor/radix-log-api
+    equinor.com/entity-markdown-readme-url: https://github.com/equinor/radix-log-api/blob/main/README.md
 spec:
   type: openapi
   lifecycle: production
