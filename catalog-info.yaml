@@ -10,8 +10,8 @@ metadata:
 spec:
   type: openapi
   lifecycle: production
-  owner: omnia-radix
-  system: Radix
+  owner: team-radix
+  system: system:default/Radix
   definition:
     $text: "./docs/swagger.yaml"
 ---
@@ -29,7 +29,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: omnia-radix
-  system: Radix
+  owner: team-radix
+  ssystem: system:default/Radix
   providesApis:
     - radix-log-api
