@@ -30,6 +30,6 @@ spec:
   type: service
   lifecycle: production
   owner: team-radix
-  ssystem: system:default/Radix
+  system: system:default/Radix
   providesApis:
     - radix-log-api
