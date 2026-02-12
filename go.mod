@@ -1,6 +1,6 @@
 module github.com/equinor/radix-log-api
 
-go 1.25.5
+go 1.25.7
 
 require (
 	github.com/Azure/azure-kusto-go v0.16.1
