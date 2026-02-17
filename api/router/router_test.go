@@ -6,8 +6,8 @@ import (
 	"github.com/equinor/radix-log-api/api/controllers"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/pkg/authz/requirement"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 )
 
 func Test_RouterMapsControllers(t *testing.T) {

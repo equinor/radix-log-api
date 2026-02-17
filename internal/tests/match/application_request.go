@@ -8,7 +8,7 @@ import (
 
 	"github.com/equinor/radix-log-api/pkg/radixapi/client/application"
 	"github.com/go-openapi/runtime"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 )
 
 func GetApplicationRequest(appName string) gomock.Matcher {
