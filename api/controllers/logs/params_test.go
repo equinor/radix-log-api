@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/equinor/radix-common/utils/pointers"
 	logservice "github.com/equinor/radix-log-api/pkg/services/logs"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,8 +23,8 @@ func Test_AsLogOptions(t *testing.T) {
 		},
 		{
 			name:     "tail param",
-			param:    logParams{Tail: pointers.Ptr(1000)},
-			expected: logservice.LogOptions{LimitRows: pointers.Ptr(1000)},
+			param:    logParams{Tail: new(1000)},
+			expected: logservice.LogOptions{LimitRows: new(1000)},
 		},
 		{
 			name:     "start param",
@@ -40,7 +39,6 @@ func Test_AsLogOptions(t *testing.T) {
 	}
 
 	for _, scenario := range scenarios {
-		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, scenario.expected, scenario.param.AsLogOptions())
@@ -75,7 +73,6 @@ func Test_AsComponentPodInventoryOptions(t *testing.T) {
 	}
 
 	for _, scenario := range scenarios {
-		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, scenario.expected, scenario.param.AsInventoryOptions())

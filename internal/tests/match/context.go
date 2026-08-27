@@ -13,7 +13,7 @@ func IsContext() gomock.Matcher {
 type contextMatcher struct {
 }
 
-func (*contextMatcher) Matches(x interface{}) bool {
+func (*contextMatcher) Matches(x any) bool {
 	_, ok := x.(context.Context)
 	return ok
 }

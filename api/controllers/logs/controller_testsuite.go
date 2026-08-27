@@ -3,7 +3,6 @@ package logs
 import (
 	"net/http"
 
-	"github.com/equinor/radix-common/utils/pointers"
 	"github.com/equinor/radix-log-api/api/middleware/authn"
 	"github.com/equinor/radix-log-api/api/router"
 	"github.com/equinor/radix-log-api/internal/tests/request"
@@ -14,7 +13,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-var anyApp = &models.Application{Name: pointers.Ptr("anyapp"), Registration: &models.ApplicationRegistration{AppID: pointers.Ptr("some-random-id")}}
+var anyApp = &models.Application{Name: new("anyapp"), Registration: &models.ApplicationRegistration{AppID: new("some-random-id")}}
 
 type controllerTestSuite struct {
 	suite.Suite
