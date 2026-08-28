@@ -12,7 +12,7 @@ import (
 
 type SetZerologLoggerFn func(context.Context) zerolog.Logger
 
-// ZerologLoggerWithRequestId returns a zerolog logger with a request_id field with a new GUID
+// ZerologLoggerWithRequestId returns a zerolog logger with a request_id field containing a newly generated XID
 func ZerologLoggerWithRequestId(ctx context.Context) zerolog.Logger {
 	return zerolog.Ctx(ctx).With().Str("request_id", xid.New().String()).Logger()
 }
