@@ -13,14 +13,14 @@ import (
 func TestAzTableReader(t *testing.T) {
 	tests := []struct {
 		name        string
-		tableData   [][]interface{}
+		tableData   [][]any
 		logColIndex int
 		expected    string
 		expectedErr error
 	}{
 		{
 			name: "reads single row correctly",
-			tableData: [][]interface{}{
+			tableData: [][]any{
 				{"timestamp", "log message content"},
 			},
 			logColIndex: 1,
@@ -29,7 +29,7 @@ func TestAzTableReader(t *testing.T) {
 		},
 		{
 			name: "reads multiple rows in reverse order",
-			tableData: [][]interface{}{
+			tableData: [][]any{
 				{"timestamp1", "first log message"},
 				{"timestamp2", "second log message"},
 				{"timestamp3", "third log message"},
@@ -40,7 +40,7 @@ func TestAzTableReader(t *testing.T) {
 		},
 		{
 			name: "handles empty log message",
-			tableData: [][]interface{}{
+			tableData: [][]any{
 				{"timestamp", ""},
 			},
 			logColIndex: 1,
@@ -49,7 +49,7 @@ func TestAzTableReader(t *testing.T) {
 		},
 		{
 			name: "handles mixed content with empty lines",
-			tableData: [][]interface{}{
+			tableData: [][]any{
 				{"timestamp1", "first message"},
 				{"timestamp2", ""},
 				{"timestamp3", "third message"},
@@ -62,14 +62,14 @@ func TestAzTableReader(t *testing.T) {
 		},
 		{
 			name:        "handles empty table",
-			tableData:   [][]interface{}{},
+			tableData:   [][]any{},
 			logColIndex: 1,
 			expected:    "",
 			expectedErr: nil,
 		},
 		{
 			name: "handles content with unknown data types",
-			tableData: [][]interface{}{
+			tableData: [][]any{
 				{"timestamp1", "first message"},
 				{"timestamp2", 1234},
 				{"timestamp3", "third message"},
@@ -106,7 +106,7 @@ func TestAzTableReader(t *testing.T) {
 
 func TestAzTableReaderWithChunkedReading(t *testing.T) {
 	// Setup test data
-	tableData := [][]interface{}{
+	tableData := [][]any{
 		{"timestamp1", "first line"},
 		{"timestamp2", "second line that is longer"},
 		{"timestamp3", "third\nwith newline"},
@@ -156,7 +156,7 @@ func TestReaderWithNilSource(t *testing.T) {
 
 func TestInvalidColumnData(t *testing.T) {
 	// Test with non-string data in the log column
-	tableData := [][]interface{}{
+	tableData := [][]any{
 		{"timestamp", 123}, // Integer instead of string
 	}
 
