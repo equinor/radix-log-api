@@ -20,7 +20,7 @@ type getApplicationMatcher struct {
 }
 
 // Matches returns whether x is a match.
-func (m *getApplicationMatcher) Matches(x interface{}) bool {
+func (m *getApplicationMatcher) Matches(x any) bool {
 	if params, ok := x.(*application.GetApplicationParams); ok {
 		return params.AppName == m.appName && IsContext().Matches(params.Context)
 	}
@@ -41,7 +41,7 @@ type getApplicationAuthMatcher struct {
 }
 
 // Matches returns whether x is a match.
-func (m *getApplicationAuthMatcher) Matches(x interface{}) bool {
+func (m *getApplicationAuthMatcher) Matches(x any) bool {
 	if authWriter, ok := x.(runtime.ClientAuthInfoWriter); ok {
 		req := fakeClientRequest{}
 		_ = authWriter.AuthenticateRequest(&req, nil)
@@ -81,7 +81,7 @@ func (*fakeClientRequest) GetQueryParams() url.Values { return nil }
 
 func (*fakeClientRequest) SetFileParam(string, ...runtime.NamedReadCloser) error { return nil }
 
-func (*fakeClientRequest) SetBodyParam(interface{}) error { return nil }
+func (*fakeClientRequest) SetBodyParam(any) error { return nil }
 
 func (*fakeClientRequest) SetTimeout(time.Duration) error { return nil }
 
@@ -91,6 +91,6 @@ func (*fakeClientRequest) GetPath() string { return "" }
 
 func (*fakeClientRequest) GetBody() []byte { return nil }
 
-func (*fakeClientRequest) GetBodyParam() interface{} { return nil }
+func (*fakeClientRequest) GetBodyParam() any { return nil }
 
 func (*fakeClientRequest) GetFileParam() map[string][]runtime.NamedReadCloser { return nil }

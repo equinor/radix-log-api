@@ -3,11 +3,11 @@ package router
 import (
 	"net/http"
 
-	commongin "github.com/equinor/radix-common/pkg/gin"
 	"github.com/equinor/radix-log-api/api/controllers"
 	authnmiddleware "github.com/equinor/radix-log-api/api/middleware/authn"
 	authzmiddleware "github.com/equinor/radix-log-api/api/middleware/authz"
 	errmiddleware "github.com/equinor/radix-log-api/api/middleware/error"
+	"github.com/equinor/radix-log-api/api/middleware/logger"
 	"github.com/equinor/radix-log-api/pkg/authz/requirement"
 	"github.com/equinor/radix-log-api/pkg/constants"
 	"github.com/gin-contrib/cors"
@@ -20,8 +20,8 @@ import (
 func New(jwtValidator authnmiddleware.JwtValidator, appProvider requirement.RadixAppProvider, controllers ...controllers.Controller) (http.Handler, error) {
 	engine := gin.New()
 	engine.RemoveExtraSlash = true
-	engine.Use(commongin.SetZerologLogger(commongin.ZerologLoggerWithRequestId))
-	engine.Use(commongin.ZerologRequestLogger(), gzip.Gzip(gzip.DefaultCompression), gin.Recovery())
+	engine.Use(logger.SetZerologLogger(logger.ZerologLoggerWithRequestId))
+	engine.Use(logger.ZerologRequestLogger(), gzip.Gzip(gzip.DefaultCompression), gin.Recovery())
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	authz, err := buildAuthorizer(appProvider)
