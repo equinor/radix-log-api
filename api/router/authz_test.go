@@ -24,13 +24,13 @@ var testAuthzEndpoints []controllers.Endpoint = []controllers.Endpoint{
 		Path:                  "appadminpolicy",
 		Method:                "GET",
 		Handler:               func(ctx *gin.Context) { ctx.Status(200) },
-		AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		AuthorizationPolicies: []string{constants.AuthorizationPolicyAppReader},
 	},
 	{
 		Path:                  "appadminpolicy/:appName",
 		Method:                "GET",
 		Handler:               func(ctx *gin.Context) { ctx.Status(200) },
-		AuthorizationPolicies: []string{constants.AuthorizationPolicyAppAdmin},
+		AuthorizationPolicies: []string{constants.AuthorizationPolicyAppReader},
 	},
 	{
 		Path:                  "invalidpolicy",

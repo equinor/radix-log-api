@@ -46,10 +46,10 @@ func mapControllers(controllers []controllers.Controller, router gin.IRoutes, au
 }
 
 func buildAuthorizer(applicationClient requirement.RadixAppProvider) (authzmiddleware.Authorizer, error) {
-	appOwnerRequirement := requirement.NewAppOwnerRequirement(applicationClient)
+	appReaderRequirement := requirement.NewAppReaderRequirement(applicationClient)
 	auth := authzmiddleware.NewAuthorizer(func(ab authzmiddleware.AuthorizationConfiguration) {
-		ab.AddPolicy(constants.AuthorizationPolicyAppAdmin, func(pb authzmiddleware.PolicyConfiguration) {
-			pb.RequireAuthenticatedUser().AddRequirement(appOwnerRequirement)
+		ab.AddPolicy(constants.AuthorizationPolicyAppReader, func(pb authzmiddleware.PolicyConfiguration) {
+			pb.RequireAuthenticatedUser().AddRequirement(appReaderRequirement)
 		})
 	})
 	return auth, nil
