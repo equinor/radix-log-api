@@ -21,17 +21,21 @@ type RadixAppProvider interface {
 	GetApplication(ctx context.Context, bearerToken, appName string) (*models.Application, error)
 }
 
-type appOwnerRequirement struct {
+type appReaderRequirement struct {
 	appProvider RadixAppProvider
 }
 
-func NewAppOwnerRequirement(appProvider RadixAppProvider) authz.Requirement {
-	return &appOwnerRequirement{
+// NewAppReaderRequirement returns a requirement that is satisfied when the caller can read the application
+// through Radix API. Radix API authorizes GET /applications/{appName} using the caller's bearer token, and
+// application readers are intentionally allowed to view logs (the radix-app-reader-envs ClusterRole in
+// radix-operator grants pods/log). A successful lookup is therefore sufficient; no admin check is intended.
+func NewAppReaderRequirement(appProvider RadixAppProvider) authz.Requirement {
+	return &appReaderRequirement{
 		appProvider: appProvider,
 	}
 }
 
-func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContext) error {
+func (r *appReaderRequirement) ValidateRequirement(ctx *authz.AuthorizationContext) error {
 	var params params.App
 	if err := ctx.GinCtx().ShouldBindUri(&params); err != nil {
 		return apierrors.NewInternalServerError(apierrors.WithCause(err))
@@ -63,7 +67,7 @@ func (r *appOwnerRequirement) ValidateRequirement(ctx *authz.AuthorizationContex
 func GetAppId(ctx *gin.Context) (string, error) {
 	appId := ctx.GetString(radixAppIDKey)
 	if len(appId) == 0 {
-		log.Error().Msg("You cannot call GetAppId without using the paired AppOwner requirement!")
+		log.Error().Msg("You cannot call GetAppId without using the paired AppReader requirement!")
 		return "", apierrors.NewForbiddenError(apierrors.WithCause(ErrMissingRadixAppID))
 	}
 
